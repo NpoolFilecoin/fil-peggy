@@ -52,3 +52,20 @@ We'll benefit from using smart contract as miner's owner:
 * Mining reward distribution process is implemented in the smart contract. It'll be run with a cron process, or triggerd by somebody. We do not need someone to calculate the reward distribution anymore;
 * Miner with smart contract owner can face to more token holders. Token holder can invest any amount to smart contract, then just wait for reward;
 * Amount of the smart contract can be minted to NFT, then the NFT could be transfered. New owner of the NFT can change the old amount beneficiary to theiry new acount.
+
+## 4 FVM Validation
+### 4.1 CreateMiner with FVM
+
+Native smart contract cannot create miner directly. Only account or multisig account can create miner. We don't know if it'll be supported by FVM in future.
+
+### 4.2 Use smart contract address as miner's owner
+
+Smart contract address could be used as miner's owner and could implement all owner functionality in the smart contract.
+
+### 4.2 Record deposit (invoke smart contract with method 0 to send FIL to smart contract address) account inside smart contract
+
+Actually currently we cannot know about who deposit FIL to smart contract address inside smart contract. Issue https://github.com/filecoin-project/ref-fvm/issues/835 let us know about that FVM team is considering about that. But even it cannot be supported, we still can use some half-decentralized method to implement this requirement.
+
+### 4.3 Use smart contract address as miner's worker
+
+Smart contract address cannot be used as miner's worker.
