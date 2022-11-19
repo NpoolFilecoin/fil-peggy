@@ -75,3 +75,16 @@ Smart contract address cannot be used as miner's worker.
 * Detect deposit to smart contract address inside smart contract
 * Mining reward distribution according to amount ratio
 * Upgrade governance process
+
+## 6 Product
+* FIL-Peggy Playground: One stop FIL-Peggy smart contract creation and management tool.
+  * PC: Desktop version with rust and rust gui framework
+  * Online: Network version, also support to show the history deposit and reward data from blockchain
+  * Web3: Browser extension version, do not connect to any centralized server
+
+## 7 Roadmap
+| Time  | Status |
+| ------------- | ------------- |
+| 2022-11-30  | Peggy Playground compilation architecture and workflow |
+| 2022-12-20  | Finish host tool functionality and peggy smart contract code |
+| 2023-01-10  | Peggy is deployed to testnet</br>Peggy website is online, support wallet connect, support create miner investment offset, support history data show |
