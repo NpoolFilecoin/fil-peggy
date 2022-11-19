@@ -1,0 +1,17 @@
+[package]
+name = "peggy"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [
+  "cli",
+]
+
+[[bin]]
+name = "peggy-cli"
+path = "cli/src/main.rs"
+
+[dependencies.clap]
+version = "4.0.26"
+features = [ "derive" ]
