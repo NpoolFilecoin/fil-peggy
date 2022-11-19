@@ -15,3 +15,7 @@ path = "cli/src/main.rs"
 [dependencies.clap]
 version = "4.0.26"
 features = [ "derive" ]
+
+[dependencies.scanf]
+version = "1.2.1"
+
