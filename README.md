@@ -44,3 +44,11 @@ flowchart TD
 * Transfer deposited FIL to pledge account or pledge smart contract
 * Provide liquidity to user who want to withdraw before their collateral expired
 * Upgrade work flow with governance of all deposited accounts
+
+We'll benefit from using smart contract as miner's owner:
+* The code of owner smart contract is open source, everybody can review the work flow;
+* Smart contract implement the execution logic. Miner node operator create miner, then set miner's owner to smart contract. Smart contract won't accept change owner request again, so the miner will be managed by smart contract in its lifetime. Nobody can do anything which is not defined in smart contract. If the miner is owned by sereval partner, partner won't be worry about lose private key or some partners union to do evil anymore;
+* Execution process of smart contract is transparency. It could be autited by everybody. Anybody can invoke the smart contract, but any invocation can only execute predefined process in the smart contract. With smart contract, all parties can know the details of the miner better;
+* Mining reward distribution process is implemented in the smart contract. It'll be run with a cron process, or triggerd by somebody. We do not need someone to calculate the reward distribution anymore;
+* Miner with smart contract owner can face to more token holders. Token holder can invest any amount to smart contract, then just wait for reward;
+* Amount of the smart contract can be minted to NFT, then the NFT could be transfered. New owner of the NFT can change the old amount beneficiary to theiry new acount.
