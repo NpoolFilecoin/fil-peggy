@@ -11,7 +11,7 @@ When user want to run a Filecoin miner node, they need to have an account or mul
 We have three problems if miner is managed by an account whose private key is hold by one or several users.
 * If the owner account is hold by the user who own the miner node, when the private key is lost, or stolen by someone else, then user cannot control miner anymore;
 * if the miner node is operated by more than 1 users, they may use a multisig account as the owner. But as we know, if we want to keep the private key safe (not lost), the power of each private key is not fair, then some operator may union to do evil;
-* When miner node operator want to let investor to invest their miner, then pay benefit to investors with feature mining reward, token holder won't trust miner node operator so easy if owner private key is hold by somebody.
+* When miner node operator want to let investor to invest their miner, then pay benefit to investors with future mining reward, token holder won't trust miner node operator so easy if owner private key is hold by somebody.
 
 ## 3 Solution
 
