@@ -69,3 +69,9 @@ Actually currently we cannot know about who deposit FIL to smart contract addres
 ### 4.3 Use smart contract address as miner's worker
 
 Smart contract address cannot be used as miner's worker.
+
+### 5 Peggy Smart Contract Functionalities
+* All funtionalities to manage miner
+* Detect deposit to smart contract address inside smart contract
+* Mining reward distribution according to amount ratio
+* Upgrade governance process
