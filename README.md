@@ -2,18 +2,18 @@
 # FIL Peggy: $\mathbb{\color{#1e46a2}{Manage \ your \ \ miner \ with \ FVM}}$
 ### ${\color{blue}Let \space your \space friend \space invest \space your \space miner \space through \space smart \space contract \space directly}$
 
-## 1 Overview
+## ${\color{blue}{1 \ Overview}}$
 
 When user want to run a Filecoin miner node, they need to have an account or multisig account, then they can create miner. Account which is used to create the miner is the owner of the miner. The owner can send a request to network to change miner's owner to a new account. All management of miner can only be executed by owner. Mining reward will be withdrawed to owner, or some beneficiary account set by owner.
 
-## 2 Problem
+## ${\color{blue}{2 \ Problem}}$
 
 We have three problems if miner is managed by an account whose private key is hold by one or several users.
 * If the owner account is hold by the user who own the miner node, when the private key is lost, or stolen by someone else, then user cannot control miner anymore;
 * if the miner node is operated by more than 1 users, they may use a multisig account as the owner. But as we know, if we want to keep the private key safe (not lost), the power of each private key is not fair, then some operator may union to do evil;
 * When miner node operator want to let investor to invest their miner, then pay benefit to investors with future mining reward, token holder won't trust miner node operator so easy if owner private key is hold by somebody.
 
-## 3 Solution
+## ${\color{blue}{3 \ Solution}}$
 
 With FVM, we can manage miner with smart contract. The smart contract implements all ability to manage miner. All strategies will be implemented and opened to all users who take part in to review. So all user can invoke the smart contract to trigger something, but what's triggered by them is always the same workflow. Currently FVM do not support to use smart contract as miner's worker address, but it may be supported in future, then we can also use smart contract as worker to secure smart contract fund.
 
@@ -53,7 +53,7 @@ We'll benefit from using smart contract as miner's owner:
 * Miner with smart contract owner can connect to more token holders, big or small. Token holder can invest any amount to smart contract, then just wait for reward;
 * Amount of the smart contract can be minted to NFT, then the NFT could be transfered. New owner of the NFT can change the old amount beneficiary to theiry new acount.
 
-## 4 FVM Validation
+## ${\color{blue}{4 \ FVM \ Validation}}$
 ### 4.1 CreateMiner with FVM
 
 Native smart contract cannot create miner directly. Only account or multisig account can create miner. We don't know if it'll be supported by FVM in future.
@@ -70,19 +70,19 @@ Actually currently we cannot know about who deposit FIL to smart contract addres
 
 Smart contract address cannot be used as miner's worker.
 
-### 5 Peggy Smart Contract Functionalities
+## ${\color{blue}{5 \ Peggy \ Smart \ Contract \ Functionalities}}$
 * All funtionalities to manage miner
 * Detect deposit to smart contract address inside smart contract
 * Mining reward distribution according to amount ratio
 * Upgrade governance process
 
-## 6 Product
+## ${\color{blue}{6 \ Product}}$
 * FIL-Peggy Playground: One stop FIL-Peggy smart contract creation and management tool.
   * PC: Desktop version with rust and rust gui framework
   * Online: Network version, also support to show the history deposit and reward data from blockchain
   * Web3: Browser extension version, do not connect to any centralized server
 
-## 7 Roadmap
+## ${\color{blue}{7 \ Roadmap}}$
 | Time  | Status |
 | ------------- | ------------- |
 | 2022-11-30  | Peggy Playground compilation architecture and workflow |
