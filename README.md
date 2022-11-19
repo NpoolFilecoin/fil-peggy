@@ -1,5 +1,5 @@
 ![image](logos/256x256.png)
-# FIL Peggy: $\mathbb{\color{#1e46a2}{Manage \ your \ a \ miner \ in \ with \ FVM}}$
+# FIL Peggy: $\mathbb{\color{#1e46a2}{Manage \ your \ \ miner \ with \ FVM}}$
 ### ${\color{blue}Let \space your \space friend \space invest \space your \space miner \space through \space smart \space contract \space directly}$
 
 ## 1 Overview
