@@ -32,6 +32,7 @@ use forest_json::{
 use reqwest::blocking;
 use jsonrpc_v2::RequestObject;
 use forest_rpc_api::mpool_api;
+use serde_json::json;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -187,7 +188,7 @@ fn create_miner() {
     let peer_id = PeerId::from(net_keypair.public());
     println!("{}{:?}", "    PeerId:".yellow(), peer_id);
 
-    let mut rpc_host = String::from("https://wallaby.node.glif.io/rpc/v1");
+    let mut rpc_host = String::from("https://wallaby.node.glif.io/rpc/v0");
     println!("{}{}", "Enter wallet rpc endpoint:".green(), format!(" (default https://wallaby.node.glif.io/rpc/v1)"));
     scanf!("{}", rpc_host).unwrap();
     println!("{}{}{}", "  You will use ".yellow(), rpc_host, " as your rpc host.".yellow());
@@ -219,13 +220,11 @@ fn create_miner() {
         msg_cid.to_bytes().as_slice(),
     ).unwrap();
     let smsg = SignedMessage::new_from_parts(msg, sig).unwrap();
-    let signed_msg = serde_json::to_string(&SignedMessageJson(smsg.clone())).unwrap();
     println!("{}", "  Create miner message:".green());
     println!("{}{:?}", "    CID:".yellow(), msg_cid);
-    println!("{}{:?}", "    MSG:".yellow(), signed_msg);
 
     let req = RequestObject::request()
-        .with_params(serde_json::to_value(smsg.clone()).unwrap())
+        .with_params(json!(SignedMessageJson(smsg.clone())))
         .with_method(mpool_api::MPOOL_PUSH)
         .with_id(7878)
         .finish();
@@ -238,7 +237,7 @@ fn create_miner() {
         .send()
         .unwrap();
     println!("{}{:?}", "Create miner: ".yellow(), res);
-    println!("{}{}", "  Input: ".yellow(), req);
+    println!("{}{:?}", "  Input: ".yellow(), req);
 }
 
 fn change_owner() {
