@@ -3,7 +3,11 @@ use scanf::scanf;
 use std::str::FromStr;
 use colored::Colorize;
 use forest_key_management::json::KeyInfoJson;
-use fvm_shared::crypto::signature::SignatureType;
+use fvm_shared::{
+    crypto::signature::SignatureType,
+    address::Address,
+};
+// use fil_actor_power::CreateMinerParams;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -115,7 +119,19 @@ impl FromStr for MinerMenuItem {
 }
 
 fn create_miner() {
+    let mut owner = Address::default();
+    println!("{}{}{}", "Enter miner's owner address:".green(), ", default owner is: ".yellow(), format!("{}", owner));
+    match scanf!("{}", owner) {
+        Ok(_) => {
+            println!("{}{}{}", "  You will use ".yellow(), owner, " as owner address.".yellow());
+        },
+        Err(err) => {
+            println!("{}", format!("  Fail to get owner address: {}", err).red());
+            ()
+        },
+    }
 
+    // let params = CreateMinerParams {};
 }
 
 fn change_owner() {

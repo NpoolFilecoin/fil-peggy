@@ -1185,6 +1185,63 @@ dependencies = [
 ]
 
 [[package]]
+name = "fil_actor_power"
+version = "9.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d059e129d8cc314c6713a322b03e3dbf10d2afd31738159d7f70534c21ff36e"
+dependencies = [
+ "anyhow",
+ "cid",
+ "fil_actors_runtime",
+ "fvm_ipld_blockstore",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_ipld_hamt",
+ "fvm_shared",
+ "indexmap",
+ "integer-encoding",
+ "lazy_static",
+ "log",
+ "num-derive",
+ "num-traits",
+ "serde",
+]
+
+[[package]]
+name = "fil_actors_runtime"
+version = "9.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d7eb48228f064bfb981cc95e20883ff85cd4f3369628b1cf8433450deee43d9"
+dependencies = [
+ "anyhow",
+ "base64",
+ "blake2b_simd",
+ "byteorder",
+ "cid",
+ "fvm_ipld_amt",
+ "fvm_ipld_bitfield",
+ "fvm_ipld_blockstore",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_ipld_hamt",
+ "fvm_shared",
+ "getrandom",
+ "indexmap",
+ "integer-encoding",
+ "itertools 0.10.5",
+ "log",
+ "multihash",
+ "num-derive",
+ "num-traits",
+ "paste",
+ "rand",
+ "regex",
+ "serde",
+ "serde_repr",
+ "sha2 0.10.6",
+ "thiserror",
+ "unsigned-varint",
+]
+
+[[package]]
 name = "filecoin-hashers"
 version = "7.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1308,7 +1365,7 @@ dependencies = [
  "forest_message",
  "forest_utils",
  "fvm",
- "fvm_ipld_encoding",
+ "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
  "multihash",
  "num-bigint",
@@ -1348,7 +1405,7 @@ dependencies = [
  "cid",
  "forest_encoding",
  "fvm",
- "fvm_ipld_encoding",
+ "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
  "num-traits",
  "serde",
@@ -1368,7 +1425,7 @@ dependencies = [
  "forest_encoding",
  "futures",
  "fvm_ipld_blockstore",
- "fvm_ipld_encoding",
+ "fvm_ipld_encoding 0.2.2",
  "hyper",
  "hyper-rustls",
  "libc",
@@ -1536,7 +1593,7 @@ dependencies = [
  "fvm-wasm-instrument",
  "fvm_ipld_amt",
  "fvm_ipld_blockstore",
- "fvm_ipld_encoding",
+ "fvm_ipld_encoding 0.2.2",
  "fvm_ipld_hamt",
  "fvm_shared",
  "lazy_static",
@@ -1571,14 +1628,27 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48d09e5aa7de45452676d18fcb70b750acd65faae7a4fe18fe784b4c85f869fb"
 dependencies = [
+ "ahash",
  "anyhow",
  "cid",
  "fvm_ipld_blockstore",
- "fvm_ipld_encoding",
+ "fvm_ipld_encoding 0.2.2",
  "itertools 0.10.5",
  "once_cell",
  "serde",
  "thiserror",
+]
+
+[[package]]
+name = "fvm_ipld_bitfield"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d1950291f40d2d1047eb0a4568f7ef6d5b4973452dcef012dffb1957fe483ff7"
+dependencies = [
+ "fvm_ipld_encoding 0.3.0",
+ "serde",
+ "thiserror",
+ "unsigned-varint",
 ]
 
 [[package]]
@@ -1611,6 +1681,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "fvm_ipld_encoding"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf531c59e7c9a4c9044a34d1b44c9d544fab1eb0ba50aaa18121fe698d4fec35"
+dependencies = [
+ "anyhow",
+ "cid",
+ "fvm_ipld_blockstore",
+ "multihash",
+ "serde",
+ "serde_ipld_dagcbor 0.2.2",
+ "serde_repr",
+ "serde_tuple",
+ "thiserror",
+]
+
+[[package]]
 name = "fvm_ipld_hamt"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1622,7 +1709,7 @@ dependencies = [
  "cs_serde_bytes",
  "forest_hash_utils",
  "fvm_ipld_blockstore",
- "fvm_ipld_encoding",
+ "fvm_ipld_encoding 0.2.2",
  "libipld-core",
  "multihash",
  "once_cell",
@@ -1647,7 +1734,7 @@ dependencies = [
  "data-encoding-macro",
  "filecoin-proofs-api",
  "fvm_ipld_blockstore",
- "fvm_ipld_encoding",
+ "fvm_ipld_encoding 0.2.2",
  "lazy_static",
  "libsecp256k1",
  "log",
@@ -1698,8 +1785,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c05aeb6a22b8f62540c194aac980f2115af067bfe15a0734d7277a768d396b31"
 dependencies = [
  "cfg-if 1.0.0",
+ "js-sys",
  "libc",
  "wasi 0.11.0+wasi-snapshot-preview1",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -1906,6 +1995,12 @@ checksum = "7a5bbe824c507c5da5956355e86a746d82e0e1464f65d862cc5e71da70e94b2c"
 dependencies = [
  "cfg-if 1.0.0",
 ]
+
+[[package]]
+name = "integer-encoding"
+version = "3.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8bb03732005da905c88227371639bf1ad885cc712789c011c31c5fb3ab3ccf02"
 
 [[package]]
 name = "io-lifetimes"
@@ -2431,6 +2526,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "colored",
+ "fil_actor_power",
  "forest_key_management",
  "fvm_shared",
  "hex",
