@@ -16,7 +16,6 @@ use fvm_shared::{
 };
 use fil_actor_power::{
     CreateMinerParams,
-    // CreateMinerReturn,
 };
 use libp2p::{
     identity::{ed25519, Keypair},
