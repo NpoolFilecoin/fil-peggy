@@ -2,7 +2,8 @@ use clap::Parser;
 use scanf::scanf;
 use std::str::FromStr;
 use colored::Colorize;
-use forest_key_management::{Key, SignatureType};
+use forest_key_management;
+use fvm_shared::crypto::signature::SignatureType;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -42,9 +43,47 @@ fn select_menu() -> Result<MenuItem, String> {
     }
 }
 
-fn create_wallet() {
-    let key = forest_key_management::generate_key(SignatureType::Secp256k1)?;
+enum WalletMenuItem {
+    Secp256k1,
+    BLS,
+}
+
+impl FromStr for WalletMenuItem {
+    type Err = std::num::ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let item = s.parse::<i32>()?;
+        match item {
+            1 => Ok(Self::Secp256k1),
+            2 => Ok(Self::BLS),
+            _ => Ok(Self::Secp256k1),
+        }
+    }
+}
+
+fn create_wallet(wallet_type: SignatureType) {
+    let key = forest_key_management::generate_key(wallet_type).unwrap();
     println!("{}{}", " Create new wallet: ".yellow(), key.address.to_string());
+}
+
+fn wallet_handler() {
+    println!("{}", "Wallet action you want:".green());
+    println!("{}{}", "  1".green(), ". Secp256k1".blue());
+    println!("{}{}", "  2".green(), ". BLS".blue());
+
+    let mut wallet_type = WalletMenuItem::Secp256k1;
+    match scanf!("{}", wallet_type) {
+        Ok(_) => {
+            let wallet_type = match wallet_type {
+                WalletMenuItem::Secp256k1 => SignatureType::Secp256k1,
+                WalletMenuItem::BLS => SignatureType::BLS,
+            };
+            create_wallet(wallet_type)
+        },
+        Err(err) => {
+            println!("{}", format!("  Fail to get wallet type input: {}", err).red());
+        },
+    }
 }
 
 enum ActorMenuItem {
@@ -108,13 +147,13 @@ fn actor_handler() {
     }
 }
 
-fn main() {
+pub fn cli_main() {
     let _ = Args::parse();
 
     loop {
         let menu = select_menu().unwrap();
         match menu {
-            MenuItem::Wallet => create_wallet(),
+            MenuItem::Wallet => wallet_handler(),
             MenuItem::Actor => actor_handler(),
         }
     }

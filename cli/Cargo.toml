@@ -3,6 +3,22 @@ name = "peggy-cli"
 version = "0.1.0"
 edition = "2021"
 
+[dependencies]
+fvm_shared = "2.0.0"
+
+[dependencies.clap]
+version = "4.0.26"
+features = [ "derive" ]
+
+[dependencies.scanf]
+version = "1.2.1"
+
+[dependencies.colored]
+version = "2.0.0"
+
 [dependencies.forest_key_management]
 version = "0.2.0"
 git = "https://github.com/ChainSafe/forest.git"
+
+[depedencies.fvm-shared]
+version = "2.0.0"
