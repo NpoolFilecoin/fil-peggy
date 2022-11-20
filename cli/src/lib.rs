@@ -222,7 +222,7 @@ fn create_miner() {
         from: owner,
         method_num: 2,
         value: TokenAmount::from_atto(1000),
-        sequence: 3,
+        sequence: 0,
         params: params,
         gas_fee_cap: TokenAmount::from_nano(10000),
         gas_limit: 301000,
@@ -248,7 +248,7 @@ fn create_miner() {
         .finish();
 
     let cli = blocking::Client::builder()
-        .timeout(std::time::Duration::from_secs(60))
+        .timeout(std::time::Duration::from_secs(600))
         .build()
         .unwrap();
     let res = cli
@@ -273,6 +273,8 @@ fn create_miner() {
 
     println!("{}", "Wait create miner result: ".yellow());
     println!("{}{:?}", "  Params: ".yellow(), params);
+    let req = serde_json::to_string(&req).unwrap();
+    println!("{}{:?}", "  Input: ".yellow(), req);
 
     let res = cli
         .post(rpc_host.clone())
@@ -284,8 +286,6 @@ fn create_miner() {
     println!("{}", "Create miner result: ".yellow());
     println!("{}{}", "  Status: ".yellow(), res.status());
     println!("{}{}", "  Message: ".yellow(), res.text().unwrap());
-    let req = serde_json::to_string(&req).unwrap();
-    println!("{}{:?}", "  Input: ".yellow(), req);
 }
 
 fn change_owner() {
