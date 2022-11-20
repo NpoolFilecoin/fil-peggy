@@ -2,7 +2,7 @@ use clap::Parser;
 use scanf::scanf;
 use std::str::FromStr;
 use colored::Colorize;
-use forest_key_management;
+use forest_key_management::json::KeyInfoJson;
 use fvm_shared::crypto::signature::SignatureType;
 
 #[derive(Parser, Debug)]
@@ -63,7 +63,14 @@ impl FromStr for WalletMenuItem {
 
 fn create_wallet(wallet_type: SignatureType) {
     let key = forest_key_management::generate_key(wallet_type).unwrap();
-    println!("{}{}", " Create new wallet: ".yellow(), key.address.to_string());
+    println!("{}", " Create new wallet: ".yellow());
+    println!("{}{}", "   Address: ".yellow(), key.address.to_string());
+
+    let key_info = KeyInfoJson(key.key_info);
+    let encoded_key = serde_json::to_string(&key_info).unwrap();
+    let encoded_key = hex::encode(encoded_key);
+
+    println!("{}{:?}", "   KeyInfo: ".yellow(), encoded_key);
 }
 
 fn wallet_handler() {

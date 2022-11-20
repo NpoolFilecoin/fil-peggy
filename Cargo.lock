@@ -2433,7 +2433,9 @@ dependencies = [
  "colored",
  "forest_key_management",
  "fvm_shared",
+ "hex",
  "scanf",
+ "serde_json",
 ]
 
 [[package]]
