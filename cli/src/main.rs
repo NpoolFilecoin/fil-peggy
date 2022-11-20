@@ -2,6 +2,7 @@ use clap::Parser;
 use scanf::scanf;
 use std::str::FromStr;
 use colored::Colorize;
+use forest_key_management::{Key, SignatureType};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -42,7 +43,8 @@ fn select_menu() -> Result<MenuItem, String> {
 }
 
 fn create_wallet() {
-    println!("{}", " Try create new wallet".yellow());
+    let key = forest_key_management::generate_key(SignatureType::Secp256k1)?;
+    println!("{}{}", " Create new wallet: ".yellow(), key.address.to_string());
 }
 
 enum ActorMenuItem {

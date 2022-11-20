@@ -12,6 +12,9 @@ members = [
 name = "peggy-cli"
 path = "cli/src/main.rs"
 
+[dependencies]
+funty = "2.0.0"
+
 [dependencies.clap]
 version = "4.0.26"
 features = [ "derive" ]
