@@ -6,8 +6,14 @@ use forest_key_management::json::KeyInfoJson;
 use fvm_shared::{
     crypto::signature::SignatureType,
     address::Address,
+    sector::{RegisteredSealProof, SectorSize},
+    version::NetworkVersion,
 };
 // use fil_actor_power::CreateMinerParams;
+use libp2p::{
+    identity::{ed25519, Keypair},
+    PeerId,
+};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -121,27 +127,39 @@ impl FromStr for MinerMenuItem {
 fn create_miner() {
     let mut owner: Address = Address::default();
     println!("{}", "Enter miner's owner address:".green());
-    match scanf!("{}", owner) {
-        Ok(_) => {
-            println!("{}{}{}", "  You will use ".yellow(), owner, " as owner address.".yellow());
-        },
-        Err(err) => {
-            println!("{}", format!("  Fail to get owner address: {}", err).red());
-            ()
-        },
-    }
+    scanf!("{}", owner).unwrap();
+    println!("{}{}{}", "  You will use ".yellow(), owner, " as owner address.".yellow());
 
     let mut worker: Address = Address::default();
     println!("{}", "Enter miner's worker address:".green());
-    match scanf!("{}", worker) {
-        Ok(_) => {
-            println!("{}{}{}", "  You will use ".yellow(), worker, " as worker address.".yellow());
-        },
-        Err(err) => {
-            println!("{}", format!("  Fail to get worker address: {}", err).red());
-            ()
-        },
-    }
+    scanf!("{}", worker).unwrap();
+    println!("{}{}{}", "  You will use ".yellow(), worker, " as worker address.".yellow());
+
+    println!("{}", "Enter miner's sector size:".green());
+    println!("{}{}", "  1".green(), ". 32GiB".blue());
+    println!("{}{}", "  2".green(), ". 64GiB".blue());
+    println!("{}{}", "  3".green(), ". 2KiB".blue());
+
+    let mut proof_type = 0;
+    scanf!("{}", proof_type).unwrap();
+    let sector_size =  match proof_type {
+        1 => SectorSize::_32GiB,
+        2 => SectorSize::_64GiB,
+        3 => SectorSize::_2KiB,
+        _ => SectorSize::_32GiB,
+    };
+
+    let seal_proof = RegisteredSealProof::from_sector_size(sector_size, NetworkVersion::V17);
+    let post_proof = seal_proof.registered_window_post_proof().unwrap();
+    println!("{}{:?}{}", "  You will use ".yellow(), post_proof, " as miner post proof.".yellow());
+
+    let gen_keypair = ed25519::Keypair::generate();
+    let net_keypair = Keypair::Ed25519(gen_keypair);
+    println!("{}", "  You peer id:".green());
+    println!("{}{:?}", "    Public key: ".yellow(), net_keypair.public());
+    println!("{}{:?}", "    Key pair: ".yellow(), net_keypair);
+    let peer_id = PeerId::from(net_keypair.public());
+    println!("{}{:?}", "    PeerId:".yellow(), peer_id);
 
     // let params = CreateMinerParams {};
 }
