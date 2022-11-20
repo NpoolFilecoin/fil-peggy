@@ -70,6 +70,8 @@ Actually currently we cannot know about who deposit FIL to smart contract addres
 
 Smart contract address cannot be used as miner's worker.
 
+```All validation code could be found in ```https://github.com/kikakkz/fvm-actor-example.git
+
 ## ${\color{blue}{5 \ Peggy \ Smart \ Contract \ Functionalities}}$
 * All funtionalities to manage miner
 * Detect deposit to smart contract address inside smart contract
