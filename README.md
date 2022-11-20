@@ -89,4 +89,4 @@ Smart contract address cannot be used as miner's worker.
 | ------------- | ------------- |
 | 2022-11-30  | Peggy Playground compilation architecture and workflow |
 | 2022-12-20  | Finish host tool functionality and peggy smart contract code |
-| 2023-01-10  | Peggy is deployed to testnet</br>Peggy website is online, support wallet connect, support create miner investment offset, support history data show |
+| 2023-01-10  | Peggy is deployed to testnet</br>Peggy website is online, support wallet connect, support create miner investment offer, support show history data |
