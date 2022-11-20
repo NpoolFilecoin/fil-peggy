@@ -68,6 +68,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "arbitrary"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29d47fbf90d5149a107494b15a7dc8d69b351be2db3bb9691740e88ec17fd880"
+dependencies = [
+ "derive_arbitrary",
+]
+
+[[package]]
 name = "argon2"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -954,6 +963,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "derive_arbitrary"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4903dff04948f22033ca30232ab8eca2c3fc4c913a8b6a34ee5199699814817f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "derive_builder"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1240,7 +1260,7 @@ checksum = "7d059e129d8cc314c6713a322b03e3dbf10d2afd31738159d7f70534c21ff36e"
 dependencies = [
  "anyhow",
  "cid",
- "fil_actors_runtime",
+ "fil_actors_runtime 9.0.1",
  "fvm_ipld_blockstore",
  "fvm_ipld_encoding 0.2.2",
  "fvm_ipld_hamt",
@@ -1259,6 +1279,40 @@ name = "fil_actors_runtime"
 version = "9.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d7eb48228f064bfb981cc95e20883ff85cd4f3369628b1cf8433450deee43d9"
+dependencies = [
+ "anyhow",
+ "base64",
+ "blake2b_simd",
+ "byteorder",
+ "cid",
+ "fvm_ipld_amt",
+ "fvm_ipld_bitfield",
+ "fvm_ipld_blockstore",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_ipld_hamt",
+ "fvm_shared",
+ "getrandom 0.2.8",
+ "indexmap",
+ "integer-encoding",
+ "itertools 0.10.5",
+ "log",
+ "multihash",
+ "num-derive",
+ "num-traits",
+ "paste",
+ "rand 0.8.5",
+ "regex",
+ "serde",
+ "serde_repr",
+ "sha2 0.10.6",
+ "thiserror",
+ "unsigned-varint",
+]
+
+[[package]]
+name = "fil_actors_runtime"
+version = "10.0.0-alpha.1"
+source = "git+https://github.com/filecoin-project/builtin-actors.git#24348672cb66972dc34a1b46b9ac608da31a97c3"
 dependencies = [
  "anyhow",
  "base64",
@@ -1786,6 +1840,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff7d1de62b7b74909d6e4816de83c4e6b46017bba9a31bb0de82b6b26b11cf74"
 dependencies = [
  "anyhow",
+ "arbitrary",
  "blake2b_simd",
  "bls-signatures",
  "byteorder",
@@ -2745,7 +2800,11 @@ dependencies = [
  "clap",
  "colored",
  "fil_actor_power",
+ "fil_actors_runtime 10.0.0-alpha.1",
+ "forest_json",
  "forest_key_management",
+ "forest_message",
+ "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
  "hex",
  "libp2p",

@@ -2,17 +2,32 @@ use clap::Parser;
 use scanf::scanf;
 use std::str::FromStr;
 use colored::Colorize;
-use forest_key_management::json::KeyInfoJson;
+use forest_key_management::{
+    json::KeyInfoJson,
+    KeyInfo,
+};
 use fvm_shared::{
     crypto::signature::SignatureType,
     address::Address,
     sector::{RegisteredSealProof, SectorSize},
     version::NetworkVersion,
+    message::Message,
+    econ::TokenAmount,
 };
-// use fil_actor_power::CreateMinerParams;
+use fil_actor_power::CreateMinerParams;
 use libp2p::{
     identity::{ed25519, Keypair},
     PeerId,
+};
+use fvm_ipld_encoding::{
+    RawBytes,
+    BytesDe,
+    Cbor,
+};
+use fil_actors_runtime::STORAGE_POWER_ACTOR_ADDR;
+use forest_message::signed_message::SignedMessage;
+use forest_json::{
+    signed_message::json::SignedMessageJson,
 };
 
 #[derive(Parser, Debug)]
@@ -130,6 +145,14 @@ fn create_miner() {
     scanf!("{}", owner).unwrap();
     println!("{}{}{}", "  You will use ".yellow(), owner, " as owner address.".yellow());
 
+    println!("{}", "Enter owner's key info:".green());
+    let mut key_info = String::default();
+    scanf!("{}", key_info).unwrap();
+    let key_info = hex::decode(&key_info).unwrap();
+    let key_info: KeyInfoJson = serde_json::from_slice(&key_info).unwrap();
+    println!("{}{:?}", "  KeyInfoJson: ".yellow(), key_info);
+    let key_info: KeyInfo = KeyInfo::from(key_info);
+
     let mut worker: Address = Address::default();
     println!("{}", "Enter miner's worker address:".green());
     scanf!("{}", worker).unwrap();
@@ -161,7 +184,37 @@ fn create_miner() {
     let peer_id = PeerId::from(net_keypair.public());
     println!("{}{:?}", "    PeerId:".yellow(), peer_id);
 
-    // let params = CreateMinerParams {};
+    let params = CreateMinerParams {
+        owner,
+        worker,
+        window_post_proof_type: post_proof,
+        peer: peer_id.to_bytes(),
+        multiaddrs: vec![BytesDe("".as_bytes().to_vec())],
+    };
+    let params = RawBytes::serialize(params).unwrap();
+    let msg = Message {
+        version: 0,
+        to: STORAGE_POWER_ACTOR_ADDR,
+        from: owner,
+        method_num: 2,
+        value: TokenAmount::from_atto(1000),
+        sequence: 0,
+        params: params,
+        gas_fee_cap: TokenAmount::from_nano(100000),
+        gas_limit: 0,
+        gas_premium: TokenAmount::from_atto(1000),
+    };
+    let msg_cid = msg.cid().unwrap();
+    let sig = forest_key_management::sign(
+        *key_info.key_type(),
+        key_info.private_key(),
+        msg_cid.to_bytes().as_slice(),
+    ).unwrap();
+    let smsg = SignedMessage::new_from_parts(msg, sig).unwrap();
+    let signed_msg = SignedMessageJson(smsg);
+    println!("{}", "  Create miner message:".green());
+    println!("{}{:?}", "    CID:".yellow(), msg_cid);
+    println!("{}{:?}", "    MSG:".yellow(), serde_json::to_string(&signed_msg).unwrap());
 }
 
 fn change_owner() {
