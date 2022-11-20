@@ -203,7 +203,7 @@ fn create_miner() {
     scanf!("{}", rpc_host).unwrap();
     println!("{}{}{}", "  You will use ".yellow(), rpc_host, " as your rpc host.".yellow());
 
-    let mut bearer_token = String::from("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiXX0.TrGlLJwD5kVqnlAKcQSoims5x4H904EWcqnrOFJWw5Y");
+    let mut bearer_token = String::from("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.T-IbxWiqPOCak-ZBjXDbDkCBAGGMrPbQvfQTUxtIF10");
     println!("{}{}", "Enter rpc bearer token: ".green(), format!("(default {})", bearer_token));
     scanf!("{}", bearer_token).unwrap();
     println!("{}{}{}", "You will use ".yellow(), bearer_token, " as your rpc access token.".yellow());
