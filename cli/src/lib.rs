@@ -119,14 +119,26 @@ impl FromStr for MinerMenuItem {
 }
 
 fn create_miner() {
-    let mut owner = Address::default();
-    println!("{}{}{}", "Enter miner's owner address:".green(), ", default owner is: ".yellow(), format!("{}", owner));
+    let mut owner: Address = Address::default();
+    println!("{}", "Enter miner's owner address:".green());
     match scanf!("{}", owner) {
         Ok(_) => {
             println!("{}{}{}", "  You will use ".yellow(), owner, " as owner address.".yellow());
         },
         Err(err) => {
             println!("{}", format!("  Fail to get owner address: {}", err).red());
+            ()
+        },
+    }
+
+    let mut worker: Address = Address::default();
+    println!("{}", "Enter miner's worker address:".green());
+    match scanf!("{}", worker) {
+        Ok(_) => {
+            println!("{}{}{}", "  You will use ".yellow(), worker, " as worker address.".yellow());
+        },
+        Err(err) => {
+            println!("{}", format!("  Fail to get worker address: {}", err).red());
             ()
         },
     }
