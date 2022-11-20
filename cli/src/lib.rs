@@ -12,7 +12,8 @@ struct Args {
 
 #[derive(Debug)]
 enum MenuItem {
-    Wallet = 1,
+    Wallet,
+    Miner,
     Actor,
 }
 
@@ -23,7 +24,8 @@ impl FromStr for MenuItem {
         let item = s.parse::<i32>()?;
         match item {
             1 => Ok(Self::Wallet),
-            2 => Ok(Self::Actor),
+            2 => Ok(Self::Miner),
+            3 => Ok(Self::Actor),
             _ => Ok(Self::Wallet),
         }
     }
@@ -32,7 +34,8 @@ impl FromStr for MenuItem {
 fn select_menu() -> Result<MenuItem, String> {
     println!("{}", "Action you want:".green());
     println!("{}{}", "  1".green(), ". Wallet".blue());
-    println!("{}{}", "  2".green(), ". Actor".blue());
+    println!("{}{}", "  2".green(), ". Miner".blue());
+    println!("{}{}", "  3".green(), ". Actor".blue());
 
     let mut action = MenuItem::Wallet;
     match scanf!("{}", action) {
@@ -89,6 +92,51 @@ fn wallet_handler() {
         },
         Err(err) => {
             println!("{}", format!("  Fail to get wallet type input: {}", err).red());
+        },
+    }
+}
+
+enum MinerMenuItem {
+    Create,
+    ChangeOwner,
+}
+
+impl FromStr for MinerMenuItem {
+    type Err = std::num::ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let item = s.parse::<i32>()?;
+        match item {
+            1 => Ok(Self::Create),
+            2 => Ok(Self::ChangeOwner),
+            _ => Ok(Self::Create),
+        }
+    }
+}
+
+fn create_miner() {
+
+}
+
+fn change_owner() {
+
+}
+
+fn miner_handler() {
+    println!("{}", "Miner action you want:".green());
+    println!("{}{}", "  1".green(), ". Create".blue());
+    println!("{}{}", "  2".green(), ". ChangeOwner".blue());
+
+    let mut action = MinerMenuItem::Create;
+    match scanf!("{}", action) {
+        Ok(_) => {
+            match action {
+                MinerMenuItem::Create => create_miner(),
+                MinerMenuItem::ChangeOwner => change_owner(),
+            }
+        },
+        Err(err) => {
+            println!("{}", format!("  Fail to get miner menu input: {}", err).red());
         },
     }
 }
@@ -161,6 +209,7 @@ pub fn cli_main() {
         let menu = select_menu().unwrap();
         match menu {
             MenuItem::Wallet => wallet_handler(),
+            MenuItem::Miner => miner_handler(),
             MenuItem::Actor => actor_handler(),
         }
     }
