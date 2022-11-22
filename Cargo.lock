@@ -924,13 +924,13 @@ dependencies = [
  "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
  "hex",
- "jsonrpc-v2",
  "libp2p",
  "miner",
  "reqwest",
  "rpc",
  "scanf",
  "serde_json",
+ "url",
  "wallet",
 ]
 
@@ -5241,6 +5241,7 @@ name = "peggy"
 version = "0.1.0"
 dependencies = [
  "cli",
+ "tokio",
 ]
 
 [[package]]
@@ -5894,23 +5895,12 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
- "clap 4.0.26",
- "colored",
- "fil_actor_power 9.0.1",
- "fil_actors_runtime 10.0.0-alpha.1",
- "forest_json",
- "forest_key_management",
- "forest_message",
- "forest_rpc-api",
- "fvm_ipld_encoding 0.2.2",
- "fvm_shared",
- "hex",
+ "fvm_ipld_encoding 0.3.0",
  "jsonrpc-v2",
- "libp2p",
+ "log",
  "reqwest",
- "scanf",
  "serde_json",
- "wallet",
+ "url",
 ]
 
 [[package]]
@@ -6196,9 +6186,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.88"
+version = "1.0.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e8b3801309262e8184d9687fb697586833e939767aea0dda89f5a8e650e8bd7"
+checksum = "020ff22c755c2ed3f8cf162dbb41a7268d934702f3ed3631656ea597e08fc3db"
 dependencies = [
  "itoa",
  "ryu",

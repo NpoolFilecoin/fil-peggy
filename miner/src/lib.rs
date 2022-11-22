@@ -23,7 +23,7 @@ use fil_actors_runtime::STORAGE_POWER_ACTOR_ADDR;
 use forest_message::signed_message::SignedMessage;
 use forest_json::{
     signed_message::json::SignedMessageJson,
-    cid::CidJson;
+    cid::CidJson,
 };
 use forest_rpc_api::{
     mpool_api,
@@ -31,24 +31,20 @@ use forest_rpc_api::{
 use rpc::RpcEndpoint;
 use log::debug;
 
-struct Miner {
-    owner: Address,
-    owner_key_info: KeyInfo,
-    worker: Address,
-    window_post_proof_type: RegisteredPoStProof,
-    peer_id: PeerId,
-    rpc: RpcEndpoint,
-    miner_id: Option<Address>,
-    multiaddrs: Option<Vec<BytesDe>>,
+pub struct Miner {
+    pub owner: Address,
+    pub owner_key_info: KeyInfo,
+    pub worker: Address,
+    pub window_post_proof_type: RegisteredPoStProof,
+    pub peer_id: PeerId,
+    pub rpc: RpcEndpoint,
+    pub miner_id: Option<Address>,
+    pub multiaddrs: Option<Vec<BytesDe>>,
 }
 
 impl Miner {
-    fn create_miner(&self) -> Result<String, &str> {
-        let owner: Address = self.owner.clone();
-        let worker: Address = self.worker.clone();
+    pub async fn create_miner(&self) -> Result<String, &str> {
         let key_info = self.owner_key_info.clone();
-        let proof_type = self.window_post_proof_type;
-        let peer_id = self.peer_id.clone();
 
         let params = CreateMinerParams {
             owner: self.owner,
@@ -61,7 +57,7 @@ impl Miner {
         let msg = Message {
             version: 0,
             to: STORAGE_POWER_ACTOR_ADDR,
-            from: owner,
+            from: self.owner,
             method_num: 2,
             value: TokenAmount::from_atto(1000),
             sequence: 0,
@@ -83,14 +79,18 @@ impl Miner {
         debug!("{}{:?}", "    Signed CID:".yellow(), smsg.cid().unwrap());
         debug!("{}{:?}", "    Key type:".yellow(), key_info.key_type());
 
-        let res = self.rpc.post(mpool_api::MPOOL_PUSH, vec![SignedMessageJson(smsg.clone())])?;
+        let res = self
+            .rpc
+            .post::<_, CidJson>(mpool_api::MPOOL_PUSH, vec![SignedMessageJson(smsg.clone())])
+            .await
+            .unwrap();
         debug!("{}", "Create miner: ".yellow());
-        debug!("{}{}", "  Result: ".yellow(), res);
+        debug!("{}{:?}", "  Result: ".yellow(), res);
 
         Ok(String::default())
     }
 
-    fn change_owner(&self) -> Result<String, &str> {
+    pub fn change_owner(&self) -> Result<String, &str> {
         Ok(String::default())
     }
 }

@@ -1,5 +1,6 @@
 use cli::cli_main;
 
-fn main() {
-    cli_main();
+#[tokio::main]
+async fn main() {
+    cli_main().await;
 }

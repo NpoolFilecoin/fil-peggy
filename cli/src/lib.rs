@@ -11,40 +11,15 @@ use fvm_shared::{
     address::Address,
     sector::{RegisteredSealProof, SectorSize},
     version::NetworkVersion,
-    message::Message,
-    econ::TokenAmount,
-};
-use fil_actor_power::{
-    CreateMinerParams,
 };
 use libp2p::{
     identity::{ed25519, Keypair},
     PeerId,
 };
-use fvm_ipld_encoding::{
-    RawBytes,
-    BytesDe,
-    Cbor,
-};
-use fil_actors_runtime::STORAGE_POWER_ACTOR_ADDR;
-use forest_message::signed_message::SignedMessage;
-use forest_json::{
-    signed_message::json::SignedMessageJson,
-    cid::CidJson,
-};
-use reqwest::{
-    blocking,
-    header::{CONTENT_TYPE, AUTHORIZATION},
-};
-use jsonrpc_v2::RequestObject;
-use forest_rpc_api::{
-    mpool_api,
-    state_api,
-};
-use serde_json::json;
 
 use wallet;
 use miner::Miner;
+use rpc::RpcEndpoint;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -150,7 +125,7 @@ impl FromStr for MinerMenuItem {
     }
 }
 
-fn create_miner() {
+async fn create_miner() {
     let mut owner: Address = Address::default();
     println!("{}", "Enter miner's owner address:".green());
     scanf!("{}", owner).unwrap();
@@ -205,49 +180,21 @@ fn create_miner() {
     scanf!("{}", bearer_token).unwrap();
     println!("{}{}{}", "You will use ".yellow(), bearer_token, " as your rpc access token.".yellow());
 
-    let rpc_cli = rpc::new(rpc_host, bearer_token, true).unwrap();
+    let rpc_cli = RpcEndpoint::new(rpc_host, bearer_token).unwrap();
     let miner = Miner {
         owner: owner,
-        owner_key_info: key_info,
+        owner_key_info: key_info.clone(),
         worker: worker,
         window_post_proof_type: post_proof,
-        peer: peer_id,
+        peer_id: peer_id,
         rpc: rpc_cli,
+        miner_id: None,
+        multiaddrs: None,
     };
-    miner.create_miner().unwrap();
-
-    let params = CreateMinerParams {
-        owner,
-        worker,
-        window_post_proof_type: post_proof,
-        peer: peer_id.to_bytes(),
-        multiaddrs: vec![BytesDe("".as_bytes().to_vec())],
-    };
-    let params = RawBytes::serialize(params).unwrap();
-    let msg = Message {
-        version: 0,
-        to: STORAGE_POWER_ACTOR_ADDR,
-        from: owner,
-        method_num: 2,
-        value: TokenAmount::from_atto(1000),
-        sequence: 0,
-        params: params,
-        gas_fee_cap: TokenAmount::from_nano(10000),
-        gas_limit: 301000,
-        gas_premium: TokenAmount::from_atto(100),
-    };
-    let msg_cid = msg.cid().unwrap();
-    let sig = forest_key_management::sign(
-        *key_info.key_type(),
-        key_info.private_key(),
-        msg_cid.to_bytes().as_slice(),
-    ).unwrap();
-    let smsg = SignedMessage::new_from_parts(msg, sig).unwrap();
-    println!("{}", "  Create miner message:".green());
-    println!("{}{:?}", "    CID:".yellow(), msg_cid);
-    println!("{}{:?}", "    CidJson:".yellow(), CidJson(msg_cid));
-    println!("{}{:?}", "    Signed CID:".yellow(), smsg.cid().unwrap());
-    println!("{}{:?}", "    Key type:".yellow(), key_info.key_type());
+    miner
+        .create_miner()
+        .await
+        .unwrap();
 
     /*
     let params = json!([CidJson(smsg.cid().unwrap()), 900]);
@@ -279,7 +226,7 @@ fn change_owner() {
 
 }
 
-fn miner_handler() {
+async fn miner_handler() {
     println!("{}", "Miner action you want:".green());
     println!("{}{}", "  1".green(), ". Create".blue());
     println!("{}{}", "  2".green(), ". ChangeOwner".blue());
@@ -288,8 +235,12 @@ fn miner_handler() {
     match scanf!("{}", action) {
         Ok(_) => {
             match action {
-                MinerMenuItem::Create => create_miner(),
-                MinerMenuItem::ChangeOwner => change_owner(),
+                MinerMenuItem::Create => {
+                    create_miner().await;
+                },
+                MinerMenuItem::ChangeOwner => {
+                    change_owner();
+                },
             }
         },
         Err(err) => {
@@ -359,14 +310,14 @@ fn actor_handler() {
     }
 }
 
-pub fn cli_main() {
+pub async fn cli_main() {
     let _ = Args::parse();
 
     loop {
         let menu = select_menu().unwrap();
         match menu {
             MenuItem::Wallet => wallet_handler(),
-            MenuItem::Miner => miner_handler(),
+            MenuItem::Miner => miner_handler().await,
             MenuItem::Actor => actor_handler(),
         }
     }

@@ -1,90 +1,89 @@
-use url::Url;
-use std::sync::atomic::Ordering::{SeqCst, Relaxed};
+use url::{Url, ParseError};
 use jsonrpc_v2::RequestObject;
 use reqwest::{
-    Client,
     blocking::Client,
     header::{CONTENT_TYPE, AUTHORIZATION},
+    Error,
 };
 use std::{
     str::FromStr,
+    sync::{
+        Arc,
+        atomic::{
+            AtomicUsize,
+            Ordering::{SeqCst, Relaxed},
+        },
+    },
+    time::Duration,
 };
-use anyhow::Error;
+use log::{error, info};
+use serde_json::json;
 
 const RPC_START_ID: usize = 1000;
 
-#[derive(Try)]
-struct RpcEndpoint {
+pub struct RpcEndpoint {
     url: Url,
     request_id: Arc<AtomicUsize>,
-    cli: Client,
     bearer_token: String,
-    non_block: bool,
 }
 
 impl FromStr for RpcEndpoint {
-    type Err = Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let cli = blocking::Client::builder()
-            .timeout(std::time::Duration::from_secs(600))
-            .build()?;
-
         let url = Url::parse(s)?;
 
         Ok(Self {
             url: url,
-            request_id: RPC_START_ID,
-            cli: cli,
+            request_id: Arc::new(AtomicUsize::new(RPC_START_ID)),
             bearer_token: String::default(),
-            non_block: false,
         })
     }
 }
 
 impl RpcEndpoint {
-    fn new(url: &str, bearer_token: &str, non_block: bool) -> Result<Self, &str> {
-        let cli = match non_block {
-            true => cli = Client::builder().build()?;
-            false => cli = blocking::Client::builder()
-                .timeout(std::time::Duration::from_secs(600))
-                .build()?;
-        }
-
-        let url = Url::parse(url)?;
+    pub fn new(url: String, bearer_token: String) -> Result<Self, ParseError> {
+        let url = Url::parse(url.as_str())?;
 
         Ok(Self {
             url: url,
-            request_id: RPC_START_ID,
-            cli: cli,
+            request_id: Arc::new(AtomicUsize::new(RPC_START_ID)),
             bearer_token: bearer_token.to_string(),
-            non_block: non_block,
         })
     }
 
-    async fn post<T1, T2>(&self, method: &str, params: T1) -> Result<T2, &str> {
+    pub async fn post<
+        T1: fvm_ipld_encoding::ser::Serialize,
+        T2: for<'de> fvm_ipld_encoding::de::Deserialize<'de>,
+    >(&self, method: &str, params: T1) -> Result<T2, Error> {
         let req = RequestObject::request()
             .with_params(json!(params))
             .with_method(method)
-            .with_id(self.request_id.load(Relaxed))
+            .with_id(self.request_id.load(Relaxed) as i64)
             .finish();
 
         self.request_id.fetch_add(1, SeqCst);
 
-        let res = self.cli
+        let cli = Client::builder()
+            .timeout(Duration::from_secs(600))
+            .build()?;
+
+        let res = cli
             .post(self.url.clone())
             .header(CONTENT_TYPE, "application/json")
             .header(AUTHORIZATION, format!("Bearer {}", self.bearer_token))
             .json(&req)
-            .send()
-            .await?;
-        if !res.status().is_success() {
-            error!("POST -> {} - {} FAIL", method, res.status());
-            return Err("request fail");
+            .send()?;
+
+        match res.error_for_status() {
+            Ok(res) => {
+                info!("POST -> {} SUCCESS", method);
+                res.json::<T2>()
+            },
+            Err(err) => {
+                error!("POST -> {} - {} FAIL", method, err.status().unwrap());
+                Err(err)
+            },
         }
-
-        info!("POST -> {} SUCCESS", method);
-
-        res.json()
     }
 }
