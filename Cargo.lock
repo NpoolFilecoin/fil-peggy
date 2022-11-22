@@ -919,6 +919,7 @@ dependencies = [
  "fvm_shared",
  "hex",
  "libp2p",
+ "log",
  "miner",
  "rpc",
  "scanf",
