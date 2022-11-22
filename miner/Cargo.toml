@@ -1,5 +1,5 @@
 [package]
-name = "peggy-cli"
+name = "miner"
 version = "0.1.0"
 edition = "2021"
 
@@ -52,6 +52,3 @@ features = [ "blocking", "json" ]
 version = "0.11"
 features = ["easy-errors", "macros", "bytes-v05"]
 default-features = false
-
-[dependencies.wallet]
-path = "../wallet"

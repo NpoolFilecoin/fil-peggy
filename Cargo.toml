@@ -6,6 +6,9 @@ edition = "2021"
 [workspace]
 members = [
   "cli",
+  "wallet",
+  "miner",
+  "actor",
 ]
 
 [[bin]]
@@ -14,3 +17,4 @@ path = "peggy/main.rs"
 
 [dependencies.peggy-cli]
 path = "./cli"
+

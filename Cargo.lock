@@ -3,6 +3,28 @@
 version = 3
 
 [[package]]
+name = "actor"
+version = "0.1.0"
+dependencies = [
+ "clap 4.0.26",
+ "colored",
+ "fil_actor_power 9.0.1",
+ "fil_actors_runtime 10.0.0-alpha.1",
+ "forest_json",
+ "forest_key_management",
+ "forest_message",
+ "forest_rpc-api",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_shared",
+ "hex",
+ "jsonrpc-v2",
+ "libp2p",
+ "reqwest",
+ "scanf",
+ "serde_json",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4575,6 +4597,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a60c7ce501c71e03a9c9c0d35b861413ae925bd979cc7a4e30d060069aaac8d"
 
 [[package]]
+name = "miner"
+version = "0.1.0"
+dependencies = [
+ "clap 4.0.26",
+ "colored",
+ "fil_actor_power 9.0.1",
+ "fil_actors_runtime 10.0.0-alpha.1",
+ "forest_json",
+ "forest_key_management",
+ "forest_message",
+ "forest_rpc-api",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_shared",
+ "hex",
+ "jsonrpc-v2",
+ "libp2p",
+ "reqwest",
+ "scanf",
+ "serde_json",
+]
+
+[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5192,6 +5236,7 @@ dependencies = [
  "reqwest",
  "scanf",
  "serde_json",
+ "wallet",
 ]
 
 [[package]]
@@ -7099,6 +7144,28 @@ name = "waker-fn"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d5b2c62b4012a3e1eca5a7e077d13b3bf498c4073e33ccd58626607748ceeca"
+
+[[package]]
+name = "wallet"
+version = "0.1.0"
+dependencies = [
+ "clap 4.0.26",
+ "colored",
+ "fil_actor_power 9.0.1",
+ "fil_actors_runtime 10.0.0-alpha.1",
+ "forest_json",
+ "forest_key_management",
+ "forest_message",
+ "forest_rpc-api",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_shared",
+ "hex",
+ "jsonrpc-v2",
+ "libp2p",
+ "reqwest",
+ "scanf",
+ "serde_json",
+]
 
 [[package]]
 name = "want"
