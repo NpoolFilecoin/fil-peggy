@@ -4617,7 +4617,6 @@ checksum = "2a60c7ce501c71e03a9c9c0d35b861413ae925bd979cc7a4e30d060069aaac8d"
 name = "miner"
 version = "0.1.0"
 dependencies = [
- "clap 4.0.26",
  "colored",
  "fil_actor_power 9.0.1",
  "fil_actors_runtime 10.0.0-alpha.1",
@@ -4627,14 +4626,10 @@ dependencies = [
  "forest_rpc-api",
  "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
- "hex",
- "jsonrpc-v2",
  "libp2p",
  "log",
  "reqwest",
  "rpc",
- "scanf",
- "serde_json",
 ]
 
 [[package]]
