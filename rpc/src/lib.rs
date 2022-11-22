@@ -1,7 +1,7 @@
 use url::{Url, ParseError};
 use jsonrpc_v2::RequestObject;
 use reqwest::{
-    blocking::Client,
+    Client,
     header::{CONTENT_TYPE, AUTHORIZATION},
     Error,
 };
@@ -73,12 +73,13 @@ impl RpcEndpoint {
             .header(CONTENT_TYPE, "application/json")
             .header(AUTHORIZATION, format!("Bearer {}", self.bearer_token))
             .json(&req)
-            .send()?;
+            .send()
+            .await?;
 
         match res.error_for_status() {
             Ok(res) => {
                 info!("POST -> {} SUCCESS", method);
-                res.json::<T2>()
+                res.json::<T2>().await
             },
             Err(err) => {
                 error!("POST -> {} - {} FAIL", method, err.status().unwrap());
