@@ -30,6 +30,7 @@ use forest_rpc_api::{
 };
 use rpc::RpcEndpoint;
 use log::debug;
+use reqwest::Error;
 
 pub struct Miner {
     pub owner: Address,
@@ -43,7 +44,7 @@ pub struct Miner {
 }
 
 impl Miner {
-    pub async fn create_miner(&self) -> Result<String, &str> {
+    pub async fn create_miner(&self) -> Result<String, Error> {
         let key_info = self.owner_key_info.clone();
 
         let params = CreateMinerParams {
@@ -82,8 +83,8 @@ impl Miner {
         let res = self
             .rpc
             .post::<_, CidJson>(mpool_api::MPOOL_PUSH, vec![SignedMessageJson(smsg.clone())])
-            .await
-            .unwrap();
+            .await?;
+
         debug!("{}", "Create miner: ".yellow());
         debug!("{}{:?}", "  Result: ".yellow(), res);
 
