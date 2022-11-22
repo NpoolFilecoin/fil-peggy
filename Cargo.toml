@@ -16,8 +16,9 @@ members = [
 name = "peggy-cli"
 path = "peggy/main.rs"
 
-[dependencies]
-tokio = "1.22.0"
+[dependencies.tokio]
+version = "1.22.0"
+features = ["macros"]
 
 [workspace.dependencies]
 cli      = { path = "./cli" }
