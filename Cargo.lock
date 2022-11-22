@@ -7149,21 +7149,9 @@ checksum = "9d5b2c62b4012a3e1eca5a7e077d13b3bf498c4073e33ccd58626607748ceeca"
 name = "wallet"
 version = "0.1.0"
 dependencies = [
- "clap 4.0.26",
- "colored",
- "fil_actor_power 9.0.1",
- "fil_actors_runtime 10.0.0-alpha.1",
- "forest_json",
  "forest_key_management",
- "forest_message",
- "forest_rpc-api",
- "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
  "hex",
- "jsonrpc-v2",
- "libp2p",
- "reqwest",
- "scanf",
  "serde_json",
 ]
 

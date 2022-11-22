@@ -44,6 +44,14 @@ use forest_rpc_api::{
 };
 use serde_json::json;
 
+struct Miner {
+    owner: Address,
+    owner_key_info: KeyInfo,
+    worker: Address,
+    window_post_proof_type: RegisteredWindowPoStProof,
+    peer: PeerId,
+}
+
 fn create_miner() {
     let mut owner: Address = Address::default();
     println!("{}", "Enter miner's owner address:".green());
