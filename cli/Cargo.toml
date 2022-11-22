@@ -1,5 +1,5 @@
 [package]
-name = "peggy-cli"
+name = "cli"
 version = "0.1.0"
 edition = "2021"
 
@@ -54,4 +54,10 @@ features = ["easy-errors", "macros", "bytes-v05"]
 default-features = false
 
 [dependencies.wallet]
-path = "../wallet"
+workspace = true
+
+[dependencies.miner]
+workspace = true
+
+[dependencies.rpc]
+workspace = true

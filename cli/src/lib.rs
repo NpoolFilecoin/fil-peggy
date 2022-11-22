@@ -42,7 +42,9 @@ use forest_rpc_api::{
     state_api,
 };
 use serde_json::json;
+
 use wallet;
+use miner::Miner;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -203,6 +205,17 @@ fn create_miner() {
     scanf!("{}", bearer_token).unwrap();
     println!("{}{}{}", "You will use ".yellow(), bearer_token, " as your rpc access token.".yellow());
 
+    let rpc_cli = rpc::new(rpc_host, bearer_token, true).unwrap();
+    let miner = Miner {
+        owner: owner,
+        owner_key_info: key_info,
+        worker: worker,
+        window_post_proof_type: post_proof,
+        peer: peer_id,
+        rpc: rpc_cli,
+    };
+    miner.create_miner().unwrap();
+
     let params = CreateMinerParams {
         owner,
         worker,
@@ -236,29 +249,7 @@ fn create_miner() {
     println!("{}{:?}", "    Signed CID:".yellow(), smsg.cid().unwrap());
     println!("{}{:?}", "    Key type:".yellow(), key_info.key_type());
 
-    let req = RequestObject::request()
-        .with_params(json!(vec![SignedMessageJson(smsg.clone())]))
-        .with_method(mpool_api::MPOOL_PUSH)
-        .with_id(7878)
-        .finish();
-
-    let cli = blocking::Client::builder()
-        .timeout(std::time::Duration::from_secs(600))
-        .build()
-        .unwrap();
-    let res = cli
-        .post(rpc_host.clone())
-        .header(CONTENT_TYPE, "application/json")
-        .header(AUTHORIZATION, format!("Bearer {}", bearer_token))
-        .json(&req)
-        .send()
-        .unwrap();
-    println!("{}", "Create miner: ".yellow());
-    println!("{}{}", "  Status: ".yellow(), res.status());
-    println!("{}{}", "  Message: ".yellow(), res.text().unwrap());
-    let req = serde_json::to_string(&req).unwrap();
-    println!("{}{:?}", "  Input: ".yellow(), req);
-
+    /*
     let params = json!([CidJson(smsg.cid().unwrap()), 900]);
     let req = RequestObject::request()
         .with_params(params.clone())
@@ -281,6 +272,7 @@ fn create_miner() {
     println!("{}", "Create miner result: ".yellow());
     println!("{}{}", "  Status: ".yellow(), res.status());
     println!("{}{}", "  Message: ".yellow(), res.text().unwrap());
+    */
 }
 
 fn change_owner() {

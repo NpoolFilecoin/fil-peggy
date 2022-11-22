@@ -9,12 +9,18 @@ members = [
   "wallet",
   "miner",
   "actor",
+  "rpc",
 ]
 
 [[bin]]
 name = "peggy-cli"
 path = "peggy/main.rs"
 
-[dependencies.peggy-cli]
-path = "./cli"
+[workspace.dependencies]
+cli      = { path = "./cli" }
+wallet   = { path = "./wallet" }
+miner    = { path = "./miner" }
+rpc      = { path = "./rpc" }
 
+[dependencies.cli]
+workspace = true

@@ -910,6 +910,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "cli"
+version = "0.1.0"
+dependencies = [
+ "clap 4.0.26",
+ "colored",
+ "fil_actor_power 9.0.1",
+ "fil_actors_runtime 10.0.0-alpha.1",
+ "forest_json",
+ "forest_key_management",
+ "forest_message",
+ "forest_rpc-api",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_shared",
+ "hex",
+ "jsonrpc-v2",
+ "libp2p",
+ "miner",
+ "reqwest",
+ "rpc",
+ "scanf",
+ "serde_json",
+ "wallet",
+]
+
+[[package]]
 name = "codespan-reporting"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4613,7 +4638,9 @@ dependencies = [
  "hex",
  "jsonrpc-v2",
  "libp2p",
+ "log",
  "reqwest",
+ "rpc",
  "scanf",
  "serde_json",
 ]
@@ -5213,30 +5240,7 @@ dependencies = [
 name = "peggy"
 version = "0.1.0"
 dependencies = [
- "peggy-cli",
-]
-
-[[package]]
-name = "peggy-cli"
-version = "0.1.0"
-dependencies = [
- "clap 4.0.26",
- "colored",
- "fil_actor_power 9.0.1",
- "fil_actors_runtime 10.0.0-alpha.1",
- "forest_json",
- "forest_key_management",
- "forest_message",
- "forest_rpc-api",
- "fvm_ipld_encoding 0.2.2",
- "fvm_shared",
- "hex",
- "jsonrpc-v2",
- "libp2p",
- "reqwest",
- "scanf",
- "serde_json",
- "wallet",
+ "cli",
 ]
 
 [[package]]
@@ -5884,6 +5888,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bd124222d17ad93a644ed9d011a40f4fb64aa54275c08cc216524a9ea82fb09f"
 dependencies = [
  "digest 0.10.6",
+]
+
+[[package]]
+name = "rpc"
+version = "0.1.0"
+dependencies = [
+ "clap 4.0.26",
+ "colored",
+ "fil_actor_power 9.0.1",
+ "fil_actors_runtime 10.0.0-alpha.1",
+ "forest_json",
+ "forest_key_management",
+ "forest_message",
+ "forest_rpc-api",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_shared",
+ "hex",
+ "jsonrpc-v2",
+ "libp2p",
+ "reqwest",
+ "scanf",
+ "serde_json",
+ "wallet",
 ]
 
 [[package]]
