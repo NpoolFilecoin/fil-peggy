@@ -20,7 +20,7 @@ use libp2p::{
 use wallet;
 use miner::Miner;
 use rpc::RpcEndpoint;
-use log::{LevelFilter, Record, Level, Metadata, info};
+use log::{LevelFilter, Record, Level, Metadata};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -330,7 +330,7 @@ pub async fn cli_main() {
     let _ = Args::parse();
 
     let _ = log::set_boxed_logger(Box::new(SimpleLogger)).
-        map(|()| log::set_max_level(LevelFilter::Info));
+        map(|()| log::set_max_level(LevelFilter::Debug));
 
     loop {
         let menu = select_menu().unwrap();
