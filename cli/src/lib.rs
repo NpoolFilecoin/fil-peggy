@@ -198,31 +198,6 @@ async fn create_miner() {
 
     let msg_lookup = wait_msg(rpc_cli.clone(), res.clone()).await.unwrap();
     println!("Wait Create Miner -- {:?} - {:?}", res, msg_lookup);
-
-    /*
-    let params = json!([CidJson(smsg.cid().unwrap()), 900]);
-    let req = RequestObject::request()
-        .with_params(params.clone())
-        .with_method(state_api::STATE_WAIT_MSG)
-        .with_id(7879)
-        .finish();
-
-    println!("{}", "Wait create miner result: ".yellow());
-    println!("{}{:?}", "  Params: ".yellow(), params);
-    let req = serde_json::to_string(&req).unwrap();
-    println!("{}{:?}", "  Input: ".yellow(), req);
-
-    let res = cli
-        .post(rpc_host.clone())
-        .header(CONTENT_TYPE, "application/json")
-        .header(AUTHORIZATION, format!("Bearer {}", bearer_token))
-        .json(&req)
-        .send()
-        .unwrap();
-    println!("{}", "Create miner result: ".yellow());
-    println!("{}{}", "  Status: ".yellow(), res.status());
-    println!("{}{}", "  Message: ".yellow(), res.text().unwrap());
-    */
 }
 
 fn change_owner() {
