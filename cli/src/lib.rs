@@ -192,7 +192,8 @@ async fn create_miner() {
         miner_id: None,
         multiaddrs: None,
     };
-    let _ = miner.create_miner().await;
+    let res = miner.create_miner().await;
+    println!("Create Miner -- {:?}", res);
 
     /*
     let params = json!([CidJson(smsg.cid().unwrap()), 900]);

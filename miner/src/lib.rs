@@ -30,7 +30,6 @@ use forest_rpc_api::{
 };
 use rpc::RpcEndpoint;
 use log::debug;
-use reqwest::Error;
 
 pub struct Miner {
     pub owner: Address,
@@ -44,7 +43,7 @@ pub struct Miner {
 }
 
 impl Miner {
-    pub async fn create_miner(&self) -> Result<String, Error> {
+    pub async fn create_miner(&self) -> Result<String, String> {
         let key_info = self.owner_key_info.clone();
 
         let params = CreateMinerParams {

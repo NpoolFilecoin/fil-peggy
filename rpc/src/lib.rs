@@ -3,7 +3,6 @@ use jsonrpc_v2::RequestObject;
 use reqwest::{
     Client,
     header::{CONTENT_TYPE, AUTHORIZATION},
-    Error,
 };
 use std::{
     str::FromStr,
@@ -54,8 +53,8 @@ impl RpcEndpoint {
 
     pub async fn post<
         T1: fvm_ipld_encoding::ser::Serialize,
-        T2: for<'de> fvm_ipld_encoding::de::Deserialize<'de>,
-    >(&self, method: &str, params: T1) -> Result<T2, Error> {
+        T2: for<'de>fvm_ipld_encoding::serde::Deserialize<'de>,
+    >(&self, method: &str, params: T1) -> Result<T2, String> {
         let req = RequestObject::request()
             .with_params(json!(params))
             .with_method(method)
@@ -66,25 +65,55 @@ impl RpcEndpoint {
 
         let cli = Client::builder()
             .timeout(Duration::from_secs(600))
-            .build()?;
+            .build();
+        if cli.is_err() {
+            return Err(String::from(format!("fail build client: {:?}", cli)));
+        }
 
+        let cli = cli.unwrap();
         let res = cli
             .post(self.url.clone())
             .header(CONTENT_TYPE, "application/json")
             .header(AUTHORIZATION, format!("Bearer {}", self.bearer_token))
             .json(&req)
             .send()
-            .await?;
+            .await;
+        if res.is_err() {
+            return Err(String::from(format!("fail request: {:?}", res)));
+        }
+
+        let res = res.unwrap();
+        let resp;
 
         match res.error_for_status() {
             Ok(res) => {
                 info!("POST -> {} SUCCESS", method);
-                res.json::<T2>().await
+                resp = res;
             },
             Err(err) => {
-                error!("POST -> {} - {} FAIL", method, err.status().unwrap());
-                Err(err)
+                error!("POST -> {} - {} FAIL", method, err);
+                return Err(String::from(format!("fail request: {} {}", method, err)));
             },
         }
+
+        let res = resp;
+
+        let res = res.json::<serde_json::Value>().await;
+        if res.is_err() {
+            return Err(String::from(format!("fail parse res: {:?}", res)));
+        }
+
+        let res = res.unwrap();
+        if res.get("result").is_some() {
+            match serde_json::from_value::<T2>(res.get("result").unwrap().clone()) {
+                Ok(res) => return Ok(res),
+                Err(err) => return Err(String::from(format!("fail parse result: {}", err))),
+            };
+        }
+        if res.get("error").is_some() {
+            return Err(String::from(format!("{:?}", res.get("error").unwrap())));
+        }
+        Err(String::from(format!("unknow error: {:?}", res)))
+
     }
 }
