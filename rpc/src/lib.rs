@@ -114,6 +114,5 @@ impl RpcEndpoint {
             return Err(String::from(format!("{:?}", res.get("error").unwrap())));
         }
         Err(String::from(format!("unknow error: {:?}", res)))
-
     }
 }
