@@ -329,7 +329,7 @@ pub async fn cli_main() {
     let _ = Args::parse();
 
     let _ = log::set_boxed_logger(Box::new(SimpleLogger)).
-        map(|()| log::set_max_level(LevelFilter::Debug));
+        map(|()| log::set_max_level(LevelFilter::Trace));
 
     loop {
         let menu = select_menu().unwrap();

@@ -1,4 +1,3 @@
-use colored::Colorize;
 use forest_key_management::{
     KeyInfo,
 };
@@ -29,7 +28,6 @@ use forest_rpc_api::{
     mpool_api,
 };
 use rpc::RpcEndpoint;
-use log::debug;
 
 pub struct Miner {
     pub owner: Address,
@@ -43,7 +41,7 @@ pub struct Miner {
 }
 
 impl Miner {
-    pub async fn create_miner(&self) -> Result<String, String> {
+    pub async fn create_miner(&self) -> Result<CidJson, String> {
         let key_info = self.owner_key_info.clone();
 
         let params = CreateMinerParams {
@@ -73,21 +71,10 @@ impl Miner {
             msg_cid.to_bytes().as_slice(),
             ).unwrap();
         let smsg = SignedMessage::new_from_parts(msg, sig).unwrap();
-        debug!("{}", "  Create miner message:".green());
-        debug!("{}{:?}", "    CID:".yellow(), msg_cid);
-        debug!("{}{:?}", "    CidJson:".yellow(), CidJson(msg_cid));
-        debug!("{}{:?}", "    Signed CID:".yellow(), smsg.cid().unwrap());
-        debug!("{}{:?}", "    Key type:".yellow(), key_info.key_type());
 
-        let res = self
-            .rpc
+        self.rpc
             .post::<_, CidJson>(mpool_api::MPOOL_PUSH, vec![SignedMessageJson(smsg.clone())])
-            .await?;
-
-        debug!("{}", "Create miner: ".yellow());
-        debug!("{}{:?}", "  Result: ".yellow(), res);
-
-        Ok(String::default())
+            .await
     }
 
     pub fn change_owner(&self) -> Result<String, &str> {
