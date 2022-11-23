@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-fvm_ipld_encoding = "0.3.0"
 serde_json = "1.0.89"
 url = "2.3.1"
 log = "0.4.17"
+serde = "1.0.147"
 
 [dependencies.jsonrpc-v2]
 version = "0.11.0"

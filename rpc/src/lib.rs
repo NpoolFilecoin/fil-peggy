@@ -20,6 +20,7 @@ use serde_json::json;
 
 const RPC_START_ID: usize = 1000;
 
+#[derive(Clone)]
 pub struct RpcEndpoint {
     url: Url,
     request_id: Arc<AtomicUsize>,
@@ -52,8 +53,8 @@ impl RpcEndpoint {
     }
 
     pub async fn post<
-        T1: fvm_ipld_encoding::ser::Serialize,
-        T2: for<'de>fvm_ipld_encoding::serde::Deserialize<'de>,
+        T1: serde::Serialize,
+        T2: for<'de>serde::Deserialize<'de>,
     >(&self, method: &str, params: T1) -> Result<T2, String> {
         let req = RequestObject::request()
             .with_params(json!(params))

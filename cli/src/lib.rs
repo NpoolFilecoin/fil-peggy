@@ -21,6 +21,7 @@ use wallet;
 use miner::Miner;
 use rpc::RpcEndpoint;
 use log::{LevelFilter, Record, Level, Metadata};
+use state::wait_msg;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -188,12 +189,15 @@ async fn create_miner() {
         worker: worker,
         window_post_proof_type: post_proof,
         peer_id: peer_id,
-        rpc: rpc_cli,
+        rpc: rpc_cli.clone(),
         miner_id: None,
         multiaddrs: None,
     };
-    let res = miner.create_miner().await;
-    println!("Create Miner -- {:?}", res);
+    let res = miner.create_miner().await.unwrap();
+    println!("Create Miner -- {:?}", res.clone());
+
+    let msg_lookup = wait_msg(rpc_cli.clone(), res.clone()).await.unwrap();
+    println!("Wait Create Miner -- {:?} - {:?}", res, msg_lookup);
 
     /*
     let params = json!([CidJson(smsg.cid().unwrap()), 900]);

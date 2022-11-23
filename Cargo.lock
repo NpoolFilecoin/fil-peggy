@@ -924,6 +924,7 @@ dependencies = [
  "rpc",
  "scanf",
  "serde_json",
+ "state",
  "wallet",
 ]
 
@@ -5881,10 +5882,10 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
- "fvm_ipld_encoding 0.3.0",
  "jsonrpc-v2",
  "log",
  "reqwest",
+ "serde",
  "serde_json",
  "url",
 ]
@@ -6449,6 +6450,19 @@ name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
+
+[[package]]
+name = "state"
+version = "0.1.0"
+dependencies = [
+ "forest_blocks",
+ "forest_ipld",
+ "forest_json",
+ "forest_rpc-api",
+ "rpc",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "static_assertions"
