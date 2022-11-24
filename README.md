@@ -107,6 +107,9 @@ Smart contract address cannot be used as miner's worker.
 - [ ] Native actor code support deposit process (depend on FVM implementation)
 - [ ] Native actor code support reward distribution
 - [ ] Native actor code support deploy parameter setting
+- [ ] Native actor code support mint NFT for deposit account
+- [ ] Native actor code support NFT transfer process
+- [ ] Native actor code support upgrade governance
 - [ ] Ncurse UI
 - [ ] Desktop UI (Linux / Mac / Window)
 - [ ] dApp implementation
