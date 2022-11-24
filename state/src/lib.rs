@@ -25,5 +25,5 @@ pub struct MessageLookup {
 }
 
 pub async fn wait_msg(rpc: RpcEndpoint, cid: CidJson) -> Result<MessageLookup, String> {
-    rpc.post::<_, MessageLookup>(state_api::STATE_WAIT_MSG, json!([cid, 900])).await
+    rpc.post::<_, MessageLookup>(state_api::STATE_WAIT_MSG, json!([cid, 10])).await
 }

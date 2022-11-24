@@ -49,7 +49,7 @@ impl Miner {
             worker: self.worker,
             window_post_proof_type: self.window_post_proof_type,
             peer: self.peer_id.to_bytes(),
-            multiaddrs: vec![BytesDe("".as_bytes().to_vec())],
+            multiaddrs: vec![BytesDe("peggy-miner".as_bytes().to_vec())],
         };
         let params = RawBytes::serialize(params).unwrap();
         let msg = Message {
@@ -57,12 +57,12 @@ impl Miner {
             to: STORAGE_POWER_ACTOR_ADDR,
             from: self.owner,
             method_num: 2,
-            value: TokenAmount::from_atto(1000),
+            value: TokenAmount::from_atto(0),
             sequence: 0,
             params: params,
-            gas_fee_cap: TokenAmount::from_nano(10000),
-            gas_limit: 301000,
-            gas_premium: TokenAmount::from_atto(100),
+            gas_fee_cap: TokenAmount::from_atto(101137),
+            gas_limit: 32932877,
+            gas_premium: TokenAmount::from_atto(100083),
         };
         let msg_cid = msg.cid().unwrap();
         let sig = forest_key_management::sign(
