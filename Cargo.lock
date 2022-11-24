@@ -919,7 +919,7 @@ dependencies = [
  "fvm_shared",
  "hex",
  "libp2p",
- "log",
+ "logger",
  "miner",
  "rpc",
  "scanf",
@@ -4498,6 +4498,13 @@ checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
 dependencies = [
  "cfg-if 1.0.0",
  "value-bag",
+]
+
+[[package]]
+name = "logger"
+version = "0.1.0"
+dependencies = [
+ "log",
 ]
 
 [[package]]

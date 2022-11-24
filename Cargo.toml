@@ -11,6 +11,7 @@ members = [
   "actor",
   "rpc",
   "state",
+  "logger",
 ]
 
 [[bin]]
@@ -27,6 +28,7 @@ wallet   = { path = "./wallet" }
 miner    = { path = "./miner" }
 rpc      = { path = "./rpc" }
 state    = { path = "./state" }
+logger   = { path = "./logger" }
 
 [dependencies.cli]
 workspace = true

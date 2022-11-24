@@ -20,8 +20,8 @@ use libp2p::{
 use wallet;
 use miner::Miner;
 use rpc::RpcEndpoint;
-use log::{LevelFilter, Record, Level, Metadata};
 use state::wait_msg;
+use logger;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -288,27 +288,10 @@ fn actor_handler() {
     }
 }
 
-struct SimpleLogger;
-
-impl log::Log for SimpleLogger {
-    fn enabled(&self, metadata: &Metadata) -> bool {
-        metadata.level() <= Level::Info
-    }
-
-    fn log(&self, record: &Record) {
-        if self.enabled(record.metadata()) {
-            println!("{} - {}", record.level(), record.args());
-        }
-    }
-
-    fn flush(&self) {}
-}
-
 pub async fn cli_main() {
     let _ = Args::parse();
 
-    let _ = log::set_boxed_logger(Box::new(SimpleLogger)).
-        map(|()| log::set_max_level(LevelFilter::Trace));
+    logger::initialize();
 
     loop {
         let menu = select_menu().unwrap();
