@@ -92,23 +92,23 @@ Smart contract address cannot be used as miner's worker.
 | 2023-01-10  | Peggy is deployed to testnet</br>Peggy website is online, support wallet connect, support create miner investment offer, support show history data |
 
 ## ${\color{blue}{8 \ Development Progress}}$
-[X] Support to create wallet
-[X] Support to create miner
-[ ] Get noce before sign message
-[ ] Estimate gas instead of fix one
-[ ] Add a fund account for new account create miner gas
-[ ] Native actor code support take owner of miner
-[ ] Compile native actor code
-[ ] Install actor
-[ ] Create actor
-[ ] Host code support invoke take owner
-[ ] Native actor code support other miner action
-[ ] Native actor code support deposit process (depend on FVM implementation)
-[ ] Native actor code support reward distribution
-[ ] Native actor code support deploy parameter setting
-[ ] Ncurse UI
-[ ] Desktop UI (Linux / Mac / Window)
-[ ] dApp implementation
-[ ] Peggy website - support miner create offer
-[ ] Peggy website - support display contract history data
-[ ] Peggy website - support miner reputation from on-chain data
+- [X] Support to create wallet
+- [X] Support to create miner
+- [ ] Get noce before sign message
+- [ ] Estimate gas instead of fix one
+- [ ] Add a fund account for new account create miner gas
+- [ ] Native actor code support take owner of miner
+- [ ] Compile native actor code
+- [ ] Install actor
+- [ ] Create actor
+- [ ] Host code support invoke take owner
+- [ ] Native actor code support other miner action
+- [ ] Native actor code support deposit process (depend on FVM implementation)
+- [ ] Native actor code support reward distribution
+- [ ] Native actor code support deploy parameter setting
+- [ ] Ncurse UI
+- [ ] Desktop UI (Linux / Mac / Window)
+- [ ] dApp implementation
+- [ ] Peggy website - support miner create offer
+- [ ] Peggy website - support display contract history data
+- [ ] Peggy website - support miner reputation from on-chain data
