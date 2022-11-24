@@ -17,6 +17,7 @@ use std::{
 };
 use log::{error, info};
 use serde_json::json;
+use thiserror::Error;
 
 const RPC_START_ID: usize = 1000;
 
@@ -43,6 +44,22 @@ impl FromStr for RpcEndpoint {
     }
 }
 
+#[derive(Error, Debug)]
+pub enum RpcError {
+    #[error("low level error")]
+    LowLevelError(#[from] reqwest::Error),
+    #[error("fail request")]
+    RequestError,
+    #[error("rpc application error")]
+    RpcApplicationError,
+    #[error("rpc response parse error")]
+    RpcResponseParseError,
+    #[error("rpc application result parse error")]
+    RpcApplicationResultParseError(#[from] serde_json::Error),
+    #[error("unknown error")]
+    Unknown,
+}
+
 impl RpcEndpoint {
     pub fn new(url: String, bearer_token: String) -> Result<Self, ParseError> {
         let url = Url::parse(url.as_str())?;
@@ -63,7 +80,7 @@ impl RpcEndpoint {
     pub async fn post<
         T1: serde::Serialize,
         T2: for<'de>serde::Deserialize<'de>,
-    >(&self, method: &str, params: T1) -> Result<T2, String> {
+    >(&self, method: &str, params: T1) -> Result<T2, RpcError> {
         let req = RequestObject::request()
             .with_params(json!(params))
             .with_method(method)
@@ -74,24 +91,16 @@ impl RpcEndpoint {
 
         let cli = Client::builder()
             .timeout(Duration::from_secs(600))
-            .build();
-        if cli.is_err() {
-            return Err(String::from(format!("fail build client: {:?}", cli)));
-        }
+            .build()?;
 
-        let cli = cli.unwrap();
         let res = cli
             .post(self.url.clone())
             .header(CONTENT_TYPE, "application/json")
             .header(AUTHORIZATION, format!("Bearer {}", self.bearer_token))
             .json(&req)
             .send()
-            .await;
-        if res.is_err() {
-            return Err(String::from(format!("fail request: {:?}", res)));
-        }
+            .await?;
 
-        let res = res.unwrap();
         let resp;
 
         match res.error_for_status() {
@@ -101,18 +110,13 @@ impl RpcEndpoint {
             },
             Err(err) => {
                 error!("POST -> {} - {} FAIL", method, err);
-                return Err(String::from(format!("fail request: {} {}", method, err)));
+                return Err(RpcError::LowLevelError(err));
             },
         }
 
         let res = resp;
 
-        let res = res.json::<serde_json::Value>().await;
-        if res.is_err() {
-            return Err(String::from(format!("fail parse res: {:?}", res)));
-        }
-
-        let res = res.unwrap();
+        let res = res.json::<serde_json::Value>().await?;
         if self.debug {
             info!("Response: {}", res);
         }
@@ -120,12 +124,12 @@ impl RpcEndpoint {
         if res.get("result").is_some() {
             match serde_json::from_value::<T2>(res.get("result").unwrap().clone()) {
                 Ok(res) => return Ok(res),
-                Err(err) => return Err(String::from(format!("fail parse result: {}", err))),
+                Err(err) => return Err(RpcError::RpcApplicationResultParseError(err)),
             };
         }
         if res.get("error").is_some() {
-            return Err(String::from(format!("{:?}", res.get("error").unwrap())));
+            return Err(RpcError::RpcApplicationError);
         }
-        Err(String::from(format!("unknow error: {:?}", res)))
+        Err(RpcError::Unknown)
     }
 }

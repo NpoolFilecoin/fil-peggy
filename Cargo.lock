@@ -4670,6 +4670,9 @@ dependencies = [
  "libp2p",
  "reqwest",
  "rpc",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -5940,6 +5943,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "thiserror",
  "url",
 ]
 
@@ -6516,6 +6520,7 @@ dependencies = [
  "rpc",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]

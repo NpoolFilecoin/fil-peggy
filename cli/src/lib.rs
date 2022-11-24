@@ -11,19 +11,14 @@ use fvm_shared::{
     address::Address,
     sector::{RegisteredSealProof, SectorSize},
     version::NetworkVersion,
-    error::ExitCode,
 };
 use libp2p::{
     identity::{ed25519, Keypair},
     PeerId,
 };
-use fil_actor_power::{
-    CreateMinerReturn,
-};
-use forest_ipld::json::IpldJson;
 
 use wallet;
-use miner::Miner;
+use miner::{Miner, CreateMinerReturn};
 use rpc::RpcEndpoint;
 use state::wait_msg;
 use logger;
@@ -202,18 +197,7 @@ async fn create_miner() {
     let res = miner.create_miner().await.unwrap();
     println!("Create Miner -- {:?}", res.clone());
 
-    let msg_lookup = wait_msg(rpc_cli.clone(), res.clone()).await.unwrap();
-    println!("Wait Create Miner -- {:?} - {:?}", res, msg_lookup);
-
-    if msg_lookup.receipt.0.exit_code != ExitCode::OK {
-        println!("Fail Create Miner: {}", msg_lookup.receipt.0.exit_code);
-        return
-    }
-
-    let IpldJson(ipld) = msg_lookup.return_dec;
-    println!("ReturnDec: {:?}", ipld);
-
-    let ret = forest_ipld::from_ipld::<CreateMinerReturn>(ipld).unwrap();
+    let ret = wait_msg::<CreateMinerReturn>(rpc_cli.clone(), res.clone()).await.unwrap();
     println!("Create Miner:");
     println!("  IDAddress: {:?}", ret.id_address);
     println!("  RobustAddress: {:?}", ret.robust_address);

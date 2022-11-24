@@ -27,7 +27,51 @@ use forest_json::{
 use forest_rpc_api::{
     mpool_api,
 };
-use rpc::RpcEndpoint;
+use rpc::{RpcEndpoint, RpcError};
+use serde::Deserialize;
+use thiserror::Error;
+use std::str::FromStr;
+
+#[derive(Error, Debug)]
+pub enum MinerError {
+    #[error("miss IDAddress in string")]
+    MissIDAddress,
+    #[error("miss RobustAddress in string")]
+    MissRobustAddress,
+    #[error("json parse error")]
+    JsonParseError(#[from] serde_json::Error),
+    #[error("address parse error")]
+    AddressParseError(#[from] fvm_shared::address::Error),
+}
+
+pub struct CreateMinerReturn {
+    pub id_address: Address,
+    pub robust_address: Address,
+}
+
+impl FromStr for CreateMinerReturn {
+    type Err = MinerError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        #[derive(Deserialize)]
+        #[serde(rename_all = "PascalCase")]
+        struct T {
+            #[serde(rename = "IDAddress")]
+            id_address: String,
+            robust_address: String,
+        }
+
+        let v = serde_json::from_str::<T>(s)?;
+
+        let id_address = Address::from_str(&v.id_address)?;
+        let robust_address = Address::from_str(&v.robust_address)?;
+
+        Ok(Self {
+            id_address,
+            robust_address,
+        })
+    }
+}
 
 pub struct Miner {
     pub owner: Address,
@@ -41,7 +85,7 @@ pub struct Miner {
 }
 
 impl Miner {
-    pub async fn create_miner(&self) -> Result<CidJson, String> {
+    pub async fn create_miner(&self) -> Result<CidJson, RpcError> {
         let key_info = self.owner_key_info.clone();
 
         let params = CreateMinerParams {

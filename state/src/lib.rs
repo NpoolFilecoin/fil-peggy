@@ -1,4 +1,4 @@
-use rpc::RpcEndpoint;
+use rpc::{RpcEndpoint, RpcError};
 use forest_json::{
     cid::CidJson,
     message_receipt::json::ReceiptJson,
@@ -13,6 +13,9 @@ use forest_blocks::{
 };
 use serde_json::json;
 use std::fmt;
+use fvm_shared::error::ExitCode;
+use thiserror::Error;
+use std::{str::FromStr, fmt::Debug};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -35,6 +38,30 @@ impl fmt::Debug for MessageLookup {
     }
 }
 
-pub async fn wait_msg(rpc: RpcEndpoint, cid: CidJson) -> Result<MessageLookup, String> {
-    rpc.post::<_, MessageLookup>(state_api::STATE_WAIT_MSG, json!([cid, 10])).await
+#[derive(Error, Debug)]
+pub enum StateError {
+    #[error("rpc error")]
+    StateRpcError(#[from] RpcError),
+    #[error("message code error `{0}`")]
+    MsgCodeError(ExitCode),
+    #[error("parse return_dec error")]
+    ParseReturnDecError(#[from] serde_json::Error),
+    #[error("convert return_dec to target error `{0}`")]
+    ConvertReturnDecError(String),
+}
+
+pub async fn wait_msg<T: FromStr>(rpc: RpcEndpoint, cid: CidJson) -> Result<T, StateError>
+    where <T as FromStr>::Err: Debug
+{
+    let msg_lookup = rpc.post::<_, MessageLookup>(state_api::STATE_WAIT_MSG, json!([cid, 10])).await?;
+
+    if msg_lookup.receipt.0.exit_code != ExitCode::OK {
+        return Err(StateError::MsgCodeError(msg_lookup.receipt.0.exit_code));
+    }
+
+    let ret = serde_json::to_string(&msg_lookup.return_dec)?;
+    match T::from_str(&ret) {
+        Ok(ret) => Ok(ret),
+        Err(err) => Err(StateError::ConvertReturnDecError(format!("{:?}", err))),
+    }
 }
