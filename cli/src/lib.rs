@@ -11,11 +11,16 @@ use fvm_shared::{
     address::Address,
     sector::{RegisteredSealProof, SectorSize},
     version::NetworkVersion,
+    error::ExitCode,
 };
 use libp2p::{
     identity::{ed25519, Keypair},
     PeerId,
 };
+use fil_actor_power::{
+    CreateMinerReturn,
+};
+use forest_ipld::json::IpldJson;
 
 use wallet;
 use miner::Miner;
@@ -183,6 +188,7 @@ async fn create_miner() {
     println!("{}{}{}", "You will use ".yellow(), bearer_token, " as your rpc access token.".yellow());
 
     let rpc_cli = RpcEndpoint::new(rpc_host, bearer_token).unwrap();
+    let rpc_cli = rpc_cli.debug();
     let miner = Miner {
         owner: owner,
         owner_key_info: key_info.clone(),
@@ -198,6 +204,19 @@ async fn create_miner() {
 
     let msg_lookup = wait_msg(rpc_cli.clone(), res.clone()).await.unwrap();
     println!("Wait Create Miner -- {:?} - {:?}", res, msg_lookup);
+
+    if msg_lookup.receipt.0.exit_code != ExitCode::OK {
+        println!("Fail Create Miner: {}", msg_lookup.receipt.0.exit_code);
+        return
+    }
+
+    let IpldJson(ipld) = msg_lookup.return_dec;
+    println!("ReturnDec: {:?}", ipld);
+
+    let ret = forest_ipld::from_ipld::<CreateMinerReturn>(ipld).unwrap();
+    println!("Create Miner:");
+    println!("  IDAddress: {:?}", ret.id_address);
+    println!("  RobustAddress: {:?}", ret.robust_address);
 }
 
 fn change_owner() {
