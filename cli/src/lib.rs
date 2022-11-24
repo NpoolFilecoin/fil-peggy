@@ -183,7 +183,6 @@ async fn create_miner() {
     println!("{}{}{}", "You will use ".yellow(), bearer_token, " as your rpc access token.".yellow());
 
     let rpc_cli = RpcEndpoint::new(rpc_host, bearer_token).unwrap();
-    let rpc_cli = rpc_cli.debug();
     let miner = Miner {
         owner: owner,
         owner_key_info: key_info.clone(),
@@ -199,8 +198,8 @@ async fn create_miner() {
 
     let ret = wait_msg::<CreateMinerReturn>(rpc_cli.clone(), res.clone()).await.unwrap();
     println!("Create Miner:");
-    println!("  IDAddress: {:?}", ret.id_address);
-    println!("  RobustAddress: {:?}", ret.robust_address);
+    println!("  IDAddress: {}", ret.id_address);
+    println!("  RobustAddress: {}", ret.robust_address);
 }
 
 fn change_owner() {

@@ -15,7 +15,7 @@ members = [
 ]
 
 [[bin]]
-name = "peggy-cli"
+name = "peggy"
 path = "peggy/main.rs"
 
 [dependencies.tokio]
