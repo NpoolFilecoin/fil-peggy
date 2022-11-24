@@ -25,6 +25,7 @@ pub struct RpcEndpoint {
     url: Url,
     request_id: Arc<AtomicUsize>,
     bearer_token: String,
+    debug: bool,
 }
 
 impl FromStr for RpcEndpoint {
@@ -37,6 +38,7 @@ impl FromStr for RpcEndpoint {
             url: url,
             request_id: Arc::new(AtomicUsize::new(RPC_START_ID)),
             bearer_token: String::default(),
+            debug: false,
         })
     }
 }
@@ -49,7 +51,13 @@ impl RpcEndpoint {
             url: url,
             request_id: Arc::new(AtomicUsize::new(RPC_START_ID)),
             bearer_token: bearer_token.to_string(),
+            debug: false,
         })
+    }
+
+    pub fn debug(mut self) -> Self {
+        self.debug = true;
+        self
     }
 
     pub async fn post<
@@ -105,6 +113,10 @@ impl RpcEndpoint {
         }
 
         let res = res.unwrap();
+        if self.debug {
+            info!("Response: {}", res);
+        }
+
         if res.get("result").is_some() {
             match serde_json::from_value::<T2>(res.get("result").unwrap().clone()) {
                 Ok(res) => return Ok(res),

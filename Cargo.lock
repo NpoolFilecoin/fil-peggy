@@ -6459,6 +6459,7 @@ dependencies = [
  "forest_ipld",
  "forest_json",
  "forest_rpc-api",
+ "fvm_shared",
  "rpc",
  "serde",
  "serde_json",
