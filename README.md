@@ -94,6 +94,7 @@ Smart contract address cannot be used as miner's worker.
 ## ${\color{blue}{8 \ Development Progress}}$
 - [X] Support to create wallet
 - [X] Support to create miner
+- [X] Support to wait message to get action result
 - [ ] Get noce before sign message
 - [ ] Estimate gas instead of fix one
 - [ ] Add a fund account for new account create miner gas
