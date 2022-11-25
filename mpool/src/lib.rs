@@ -20,6 +20,12 @@ use forest_rpc_api::{
     mpool_api,
 };
 use gasestimator::{estimate_msg_gas, GasEstimatorError};
+use wallet::{get_balance, WalletError};
+use std::{
+    ops::{Add, Mul},
+    cmp::Ordering,
+};
+use num_bigint::BigInt;
 
 #[derive(Error, Debug)]
 pub enum MpoolError {
@@ -33,6 +39,10 @@ pub enum MpoolError {
     AnyhowError(#[from] anyhow::Error),
     #[error("gas estimator error")]
     EstimateGasError(#[from] GasEstimatorError),
+    #[error("wallet call error")]
+    WalletCallError(#[from] WalletError),
+    #[error("insufficient funds")]
+    InsufficientFunds,
 }
 
 async fn mpool_get_nonce(rpc: RpcEndpoint, address: Address) -> Result<u64, MpoolError> {
@@ -54,8 +64,7 @@ pub async fn mpool_push<
     params: T1) -> Result<T2, MpoolError>
 {
     let nonce = mpool_get_nonce(rpc.clone(), from).await?;
-
-    // TODO: check balance
+    let balance = get_balance(rpc.clone(), from).await?;
 
     let params = RawBytes::serialize(params)?;
     let msg = Message {
@@ -63,7 +72,7 @@ pub async fn mpool_push<
         to: to,
         from: from,
         method_num: method_num,
-        value: value,
+        value: value.clone(),
         sequence: nonce,
         params: params,
         gas_fee_cap: TokenAmount::from_atto(0),
@@ -71,8 +80,12 @@ pub async fn mpool_push<
         gas_premium: TokenAmount::from_atto(0),
     };
 
-    // TODO: estimate gas
-    let msg = estimate_msg_gas(rpc.clone().debug(), msg).await?;
+    let msg = estimate_msg_gas(rpc.clone().debug(), msg.clone()).await?;
+
+    let gas_fee = msg.clone().gas_fee_cap.add(msg.clone().gas_premium.mul(BigInt::from(msg.clone().gas_limit)));
+    if balance.cmp(&gas_fee.add(value)) == Ordering::Less {
+        return Err(MpoolError::InsufficientFunds);
+    }
 
     let msg_cid = msg.cid()?;
     let sig = forest_key_management::sign(

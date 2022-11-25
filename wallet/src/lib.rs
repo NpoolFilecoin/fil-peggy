@@ -5,7 +5,22 @@ use forest_key_management::{
 use fvm_shared::{
     crypto::signature::SignatureType,
     address::Address,
+    econ::TokenAmount,
 };
+use rpc::{RpcEndpoint, RpcError};
+use thiserror::Error;
+use forest_rpc_api::{
+    wallet_api,
+};
+use num_bigint::{BigInt, ParseBigIntError};
+
+#[derive(Error, Debug)]
+pub enum WalletError {
+    #[error("rpc request error")]
+    RpcRequestError(#[from] RpcError),
+    #[error("parse token amount error")]
+    ParseTokenAmountError(#[from] ParseBigIntError),
+}
 
 pub fn create_wallet(wallet_type: SignatureType) -> (Address, String, Key, KeyInfoJson) {
     let key = forest_key_management::generate_key(wallet_type).unwrap();
@@ -15,3 +30,13 @@ pub fn create_wallet(wallet_type: SignatureType) -> (Address, String, Key, KeyIn
     (key.address, encoded_key, key, key_info)
 }
 
+pub async fn get_balance(rpc: RpcEndpoint, address: Address) -> Result<TokenAmount, WalletError> {
+    match rpc.post::<_, String>(wallet_api::WALLET_BALANCE, vec![address.to_string()]).await {
+        Ok(res) => {
+            let res = res.parse::<BigInt>()?;
+            let res = TokenAmount::from_atto(res);
+            Ok(res)
+        },
+        Err(err) => Err(WalletError::RpcRequestError(err)),
+    }
+}

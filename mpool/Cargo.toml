@@ -8,6 +8,7 @@ fvm_ipld_encoding = "0.2.2"
 thiserror = "1.0.37"
 fvm_shared = "2.0.0"
 serde = "1.0.147"
+num-bigint = "0.4.3"
 anyhow = "1.0.66"
 
 [dependencies.forest_key_management]
@@ -30,4 +31,7 @@ git = "https://github.com/ChainSafe/forest.git"
 workspace = true
 
 [dependencies.gasestimator]
+workspace = true
+
+[dependencies.wallet]
 workspace = true

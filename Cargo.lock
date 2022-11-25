@@ -4724,9 +4724,11 @@ dependencies = [
  "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
  "gasestimator",
+ "num-bigint",
  "rpc",
  "serde",
  "thiserror",
+ "wallet",
 ]
 
 [[package]]
@@ -7253,9 +7255,13 @@ name = "wallet"
 version = "0.1.0"
 dependencies = [
  "forest_key_management",
+ "forest_rpc-api",
  "fvm_shared",
  "hex",
+ "num-bigint",
+ "rpc",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]
