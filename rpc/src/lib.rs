@@ -87,6 +87,10 @@ impl RpcEndpoint {
             .with_id(self.request_id.load(Relaxed) as i64)
             .finish();
 
+        if self.debug {
+            info!("Request: {:?}", req);
+        }
+
         self.request_id.fetch_add(1, SeqCst);
 
         let cli = Client::builder()

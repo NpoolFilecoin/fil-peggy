@@ -32,6 +32,13 @@ pub enum MpoolError {
     AnyhowError(#[from] anyhow::Error)
 }
 
+async fn mpool_get_nonce(rpc: RpcEndpoint, address: Address) -> Result<u64, MpoolError> {
+    match rpc.post::<_, u64>(mpool_api::MPOOL_GET_NONCE, vec![address.to_string()]).await {
+        Ok(res) => Ok(res),
+        Err(err) => Err(MpoolError::RpcRequestError(err)),
+    }
+}
+
 pub async fn mpool_push<
     T1: serde::Serialize,
     T2: for<'de>serde::Deserialize<'de>>(
@@ -43,7 +50,8 @@ pub async fn mpool_push<
     value: TokenAmount,
     params: T1) -> Result<T2, MpoolError>
 {
-    // TODO: get nonce
+    let nonce = mpool_get_nonce(rpc.clone(), from).await?;
+
     // TODO: estimate gas
     // TODO: check balance
 
@@ -54,7 +62,7 @@ pub async fn mpool_push<
         from: from,
         method_num: method_num,
         value: value,
-        sequence: 0,
+        sequence: nonce,
         params: params,
         gas_fee_cap: TokenAmount::from_atto(101137),
         gas_limit: 32932877,
