@@ -3451,6 +3451,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "gasestimator"
+version = "0.1.0"
+dependencies = [
+ "forest_json",
+ "forest_rpc-api",
+ "fvm_shared",
+ "rpc",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "generic-array"
 version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4711,6 +4723,7 @@ dependencies = [
  "forest_rpc-api",
  "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
+ "gasestimator",
  "rpc",
  "serde",
  "thiserror",

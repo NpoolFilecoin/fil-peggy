@@ -28,3 +28,6 @@ git = "https://github.com/ChainSafe/forest.git"
 
 [dependencies.rpc]
 workspace = true
+
+[dependencies.gasestimator]
+workspace = true

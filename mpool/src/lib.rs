@@ -19,6 +19,7 @@ use forest_json::{
 use forest_rpc_api::{
     mpool_api,
 };
+use gasestimator::{estimate_msg_gas, GasEstimatorError};
 
 #[derive(Error, Debug)]
 pub enum MpoolError {
@@ -29,7 +30,9 @@ pub enum MpoolError {
     #[error("key management error")]
     KeyManagementError(#[from] forest_key_management::Error),
     #[error("anyhow error")]
-    AnyhowError(#[from] anyhow::Error)
+    AnyhowError(#[from] anyhow::Error),
+    #[error("gas estimator error")]
+    EstimateGasError(#[from] GasEstimatorError),
 }
 
 async fn mpool_get_nonce(rpc: RpcEndpoint, address: Address) -> Result<u64, MpoolError> {
@@ -52,7 +55,6 @@ pub async fn mpool_push<
 {
     let nonce = mpool_get_nonce(rpc.clone(), from).await?;
 
-    // TODO: estimate gas
     // TODO: check balance
 
     let params = RawBytes::serialize(params)?;
@@ -64,10 +66,14 @@ pub async fn mpool_push<
         value: value,
         sequence: nonce,
         params: params,
-        gas_fee_cap: TokenAmount::from_atto(101137),
-        gas_limit: 32932877,
-        gas_premium: TokenAmount::from_atto(100083),
+        gas_fee_cap: TokenAmount::from_atto(0),
+        gas_limit: 0,
+        gas_premium: TokenAmount::from_atto(0),
     };
+
+    // TODO: estimate gas
+    let msg = estimate_msg_gas(rpc.clone().debug(), msg).await?;
+
     let msg_cid = msg.cid()?;
     let sig = forest_key_management::sign(
         *from_key_info.key_type(),
