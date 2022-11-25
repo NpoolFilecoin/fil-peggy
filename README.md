@@ -110,7 +110,7 @@ Smart contract address cannot be used as miner's worker.
 - [ ] Native actor code support mint NFT for deposit account
 - [ ] Native actor code support NFT transfer process
 - [ ] Native actor code support upgrade governance
-- [ ] Ncurse UI
+- [ ] Terminal UI
 - [ ] Desktop UI (Linux / Mac / Window)
 - [ ] dApp implementation
 - [ ] Peggy website - support miner create offer
