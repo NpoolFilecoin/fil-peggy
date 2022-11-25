@@ -39,6 +39,7 @@ pub enum MinerError {
     MpoolCallError(#[from] MpoolError)
 }
 
+#[derive(Default)]
 pub struct CreateMinerReturn {
     pub id_address: Address,
     pub robust_address: Address,

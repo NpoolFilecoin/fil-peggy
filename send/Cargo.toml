@@ -1,26 +1,26 @@
 [package]
-name = "wallet"
+name = "send"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-hex = "0.4.3"
-serde_json = "1.0.88"
+fvm_shared = "2.0.0"
 thiserror = "1.0.37"
-num-bigint = "0.4.3"
+serde_json = "1.0.89"
+
+[dependencies.mpool]
+workspace = true
 
 [dependencies.forest_key_management]
 version = "0.2.0"
 git = "https://github.com/ChainSafe/forest.git"
 
-[dependencies.forest_rpc-api]
+[dependencies.forest_json]
 version = "0.2.0"
 git = "https://github.com/ChainSafe/forest.git"
-
-[dependencies.fvm_shared]
-version = "2.0.0"
-features = [ "arb" ]
 
 [dependencies.rpc]
 workspace = true
 
+[dependencies.state]
+workspace = true

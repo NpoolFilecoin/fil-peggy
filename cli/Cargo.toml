@@ -38,6 +38,9 @@ workspace = true
 [dependencies.miner]
 workspace = true
 
+[dependencies.send]
+workspace = true
+
 [dependencies.rpc]
 workspace = true
 

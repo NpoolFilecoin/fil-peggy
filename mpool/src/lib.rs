@@ -80,7 +80,7 @@ pub async fn mpool_push<
         gas_premium: TokenAmount::from_atto(0),
     };
 
-    let msg = estimate_msg_gas(rpc.clone().debug(), msg.clone()).await?;
+    let msg = estimate_msg_gas(rpc.clone(), msg.clone()).await?;
 
     let gas_fee = msg.clone().gas_fee_cap.add(msg.clone().gas_premium.mul(BigInt::from(msg.clone().gas_limit)));
     if balance.cmp(&gas_fee.add(value)) == Ordering::Less {

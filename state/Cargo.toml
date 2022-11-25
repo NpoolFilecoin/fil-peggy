@@ -8,6 +8,8 @@ serde = "1.0.147"
 serde_json = "1.0.89"
 fvm_shared = "2.0.0"
 thiserror = "1.0.37"
+libipld-core = "0.15.0"
+log = "0.4.17"
 
 [dependencies.forest_json]
 version = "0.2.0"

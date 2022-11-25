@@ -40,3 +40,4 @@ pub async fn get_balance(rpc: RpcEndpoint, address: Address) -> Result<TokenAmou
         Err(err) => Err(WalletError::RpcRequestError(err)),
     }
 }
+

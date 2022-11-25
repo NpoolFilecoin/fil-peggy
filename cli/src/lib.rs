@@ -11,6 +11,7 @@ use fvm_shared::{
     address::Address,
     sector::{RegisteredSealProof, SectorSize},
     version::NetworkVersion,
+    econ::TokenAmount,
 };
 use libp2p::{
     identity::{ed25519, Keypair},
@@ -22,6 +23,7 @@ use miner::{Miner, CreateMinerReturn};
 use rpc::RpcEndpoint;
 use state::wait_msg;
 use logger;
+use send::send;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -146,6 +148,19 @@ async fn create_miner() {
     scanf!("{}", worker).unwrap();
     println!("{}{}{}", "  You will use ".yellow(), worker, " as worker address.".yellow());
 
+    let mut fund_account: Address = Address::default();
+    println!("{}", "Enter fund account address:".green());
+    scanf!("{}", fund_account).unwrap();
+    println!("{}{}{}", "  You will use ".yellow(), fund_account, " as fund account.".yellow());
+
+    println!("{}", "Enter fund account's key info:".green());
+    let mut fund_key_info = String::default();
+    scanf!("{}", fund_key_info).unwrap();
+    let fund_key_info = hex::decode(&fund_key_info).unwrap();
+    let fund_key_info: KeyInfoJson = serde_json::from_slice(&fund_key_info).unwrap();
+    println!("{}{:?}", "  Fund KeyInfoJson: ".yellow(), fund_key_info);
+    let fund_key_info: KeyInfo = KeyInfo::from(fund_key_info);
+
     println!("{}", "Enter miner's sector size:".green());
     println!("{}{}", "  1".green(), ". 32GiB".blue());
     println!("{}{}", "  2".green(), ". 64GiB".blue());
@@ -183,6 +198,10 @@ async fn create_miner() {
     println!("{}{}{}", "You will use ".yellow(), bearer_token, " as your rpc access token.".yellow());
 
     let rpc_cli = RpcEndpoint::new(rpc_host, bearer_token).unwrap();
+
+    let _ = send(rpc_cli.clone(), fund_account, fund_key_info.clone(), owner, TokenAmount::from_nano(100_000_000)).await.unwrap();
+    let _ = send(rpc_cli.clone(), fund_account, fund_key_info, worker, TokenAmount::from_nano(100_000_000)).await.unwrap();
+
     let miner = Miner {
         owner: owner,
         owner_key_info: key_info.clone(),
