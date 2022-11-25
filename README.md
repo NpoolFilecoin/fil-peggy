@@ -97,6 +97,7 @@ Smart contract address cannot be used as miner's worker.
 - [X] Support to wait message to get action result
 - [X] Extract common mpool api
 - [X] Get noce before sign message
+- [X] Support to estimate message gas
 - [ ] Estimate gas instead of fix one
 - [ ] Add a fund account for new account create miner gas
 - [ ] Native actor code support take owner of miner
