@@ -6,10 +6,11 @@ use forest_rpc_api::{
     state_api,
 };
 use serde::{Deserialize, Serialize};
-use forest_ipld::json::IpldJson;
+use forest_ipld::{json, Ipld};
 use forest_blocks::{
     tipset_keys_json::TipsetKeysJson,
 };
+use forest_json::message_receipt::json::ReceiptJson;
 use serde_json::json;
 use std::fmt;
 use fvm_shared::{
@@ -18,6 +19,7 @@ use fvm_shared::{
 use thiserror::Error;
 use std::{str::FromStr, fmt::Debug};
 
+/*
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ReceiptJson {
@@ -26,6 +28,7 @@ pub struct ReceiptJson {
     return_data: Option<String>,
     gas_used: i64,
 }
+*/
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -35,7 +38,8 @@ pub struct MessageLookup {
     pub tipset: TipsetKeysJson,
     pub height: i64,
     pub message: CidJson,
-    pub return_dec: Option<IpldJson>,
+    #[serde(with = "json")]
+    pub return_dec: Ipld,
 }
 
 impl fmt::Debug for MessageLookup {
@@ -65,8 +69,8 @@ pub async fn wait_msg<T: FromStr + Default>(rpc: RpcEndpoint, cid: CidJson) -> R
 {
     let msg_lookup = rpc.post::<_, MessageLookup>(state_api::STATE_WAIT_MSG, json!([cid, 10])).await?;
 
-    if msg_lookup.receipt.exit_code != ExitCode::OK {
-        return Err(StateError::MsgCodeError(msg_lookup.receipt.exit_code));
+    if msg_lookup.receipt.0.exit_code != ExitCode::OK {
+        return Err(StateError::MsgCodeError(msg_lookup.receipt.0.exit_code));
     }
 
     let ret = serde_json::to_string(&msg_lookup.return_dec)?;
