@@ -4663,12 +4663,10 @@ dependencies = [
  "fil_actors_runtime 10.0.0-alpha.1",
  "forest_json",
  "forest_key_management",
- "forest_message",
- "forest_rpc-api",
  "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
  "libp2p",
- "reqwest",
+ "mpool",
  "rpc",
  "serde",
  "serde_json",
@@ -4700,6 +4698,22 @@ dependencies = [
  "log",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys 0.42.0",
+]
+
+[[package]]
+name = "mpool"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "forest_json",
+ "forest_key_management",
+ "forest_message",
+ "forest_rpc-api",
+ "fvm_ipld_encoding 0.2.2",
+ "fvm_shared",
+ "rpc",
+ "serde",
+ "thiserror",
 ]
 
 [[package]]

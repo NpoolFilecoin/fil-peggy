@@ -12,6 +12,7 @@ members = [
   "rpc",
   "state",
   "logger",
+  "mpool"
 ]
 
 [[bin]]
@@ -29,6 +30,7 @@ miner    = { path = "./miner" }
 rpc      = { path = "./rpc" }
 state    = { path = "./state" }
 logger   = { path = "./logger" }
+mpool    = { path = "./mpool" }
 
 [dependencies.cli]
 workspace = true
