@@ -960,6 +960,7 @@ dependencies = [
  "state",
  "terminal-menu",
  "thiserror",
+ "url",
  "wallet",
 ]
 
@@ -4809,6 +4810,7 @@ dependencies = [
  "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
  "gasestimator",
+ "log",
  "num-bigint",
  "rpc",
  "serde",

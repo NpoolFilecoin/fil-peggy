@@ -41,6 +41,7 @@ terminal-menu  = { version =  "2.0.4" }
 tokio          = { version = "1.22.0", features = ["macros"] }
 crossterm      = { version = "0.23.2" }
 log            = { version = "0.4.17" }
+url            = { version = "2.3.1" }
 
 [dependencies.app]
 workspace = true

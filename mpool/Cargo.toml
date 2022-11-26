@@ -35,3 +35,6 @@ workspace = true
 
 [dependencies.wallet]
 workspace = true
+
+[dependencies.log]
+workspace = true

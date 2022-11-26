@@ -24,6 +24,7 @@ use anyhow::{anyhow, Error as AnyhowError};
 use std::io::{self, Write};
 use terminal_menu::{menu, label, button, run, mut_menu};
 use crossterm::style::Color;
+use log::{info, error};
 
 use wallet;
 use miner::{Miner, CreateMinerReturn};
@@ -96,6 +97,14 @@ pub enum CliError {
     ParseHexError(#[from] FromHexError),
     #[error("common error")]
     CommonError(#[from] AnyhowError),
+    #[error("parse url error")]
+    ParseUrlError(#[from] url::ParseError),
+    #[error("send call error")]
+    SendCallError(#[from] send::SendError),
+    #[error("miner call error")]
+    MinerCallError(#[from] miner::MinerError),
+    #[error("state call error")]
+    StateCallError(#[from] state::StateError),
 }
 
 #[derive(Debug, Subcommand, Clone)]
@@ -122,9 +131,9 @@ impl Cli {
         println!("{}", figure.unwrap());
     }
 
-    pub fn run(&mut self) -> Result<(), CliError> {
+    pub async fn run(&mut self) -> Result<(), CliError> {
         Self::print_banner();
-        Runner::new().run_main()
+        Runner::new().run_main().await
     }
 }
 
@@ -146,6 +155,12 @@ struct Runner {
     window_post_proof_type: Option<RegisteredPoStProof>,
     miner_keypair: Option<Keypair>,
     miner_peer_id: Option<PeerId>,
+    miner_id_address: Address,
+    miner_robust_address: Address,
+
+    rpc_host: String,
+    rpc_bearer_token: String,
+    rpc: Option<RpcEndpoint>,
 }
 
 impl Runner {
@@ -168,13 +183,20 @@ impl Runner {
             window_post_proof_type: None,
             miner_keypair: None,
             miner_peer_id: None,
+            miner_id_address: Address::default(),
+            miner_robust_address: Address::default(),
+
+            rpc_host: String::default(),
+            rpc_bearer_token: String::default(),
+            rpc: None,
         }
     }
 
-    fn run_main(&mut self) -> Result<(), CliError> {
+    async fn run_main(&mut self) -> Result<(), CliError> {
         self.prepare_fund_account()?;
         self.account_handler()?;
-        self.miner_handler()?;
+        self.prepare_rpc_endpoint()?;
+        self.miner_handler().await?;
         self.print_myself()?;
         Ok(())
     }
@@ -189,6 +211,42 @@ impl Runner {
                 self.fill_old_account()?;
             },
         }
+
+        Ok(())
+    }
+
+    fn prepare_rpc_endpoint(&mut self) -> Result<(), CliError> {
+        print!("> {}{}", "Rpc host to lotus".green(), " (e.g. http://localhost:1234/rpc/v0): ".yellow());
+        io::stdout().flush().unwrap();
+
+        let mut rpc_host: String = String::default();
+        match scanf!("{}", rpc_host) {
+            Ok(_) => {
+                self.rpc_host = rpc_host.clone();
+            },
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+
+        println!("> {}{}", "Lotus bearer token".green(),
+            " (e.g. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.T-IbxWiqPOCak-ZBjXDbDkCBAGGMrPbQvfQTUxtIF10): ".yellow());
+        println!("{}", "    Could be ignored if proxy process token for lotus api request!".yellow());
+
+        print!(">   ");
+        io::stdout().flush().unwrap();
+
+        let mut bearer_token: String = String::default();
+        match scanf!("{}", bearer_token) {
+            Ok(_) => {
+                self.rpc_bearer_token = bearer_token.clone();
+            },
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+
+        self.rpc = Some(RpcEndpoint::new(rpc_host, bearer_token)?);
 
         Ok(())
     }
@@ -363,12 +421,16 @@ impl Runner {
 
         println!("  > {}{}", "Miner PoSt Proof:".green(), format!(" {:?}", self.window_post_proof_type));
         println!("  > {}{}", "Miner Peer ID:".green(), format!(" {:?}", self.miner_peer_id));
-        println!("  > {}{}", "Miner KeyPair:".green(), format!(" {:?}", self.miner_keypair));
+        println!("  > {}{}", "Miner ID Address:".green(), format!(" {}", self.miner_id_address));
+        println!("  > {}{}", "Miner Robust Address:".green(), format!(" {}", self.miner_robust_address));
+
+        println!("  > {}{}", "Rpc Host:".green(), format!(" {}", self.rpc_host));
+        println!("  > {}{}", "Rpc Bearer Token:".green(), format!(" {}", self.rpc_bearer_token));
 
         Ok(())
     }
 
-    fn miner_handler(&mut self) -> Result<(), CliError> {
+    async fn miner_handler(&mut self) -> Result<(), CliError> {
         let menu = menu(vec![
             label("> Select miner action:").colorize(Color::Green),
             button("Create"),
@@ -379,13 +441,13 @@ impl Runner {
         let menu = mut_menu(&menu);
         let action = menu.selected_item_name();
         match MinerAction::from_str(action) {
-            Ok(MinerAction::Create) => self.create_miner(),
+            Ok(MinerAction::Create) => self.create_miner().await,
             Ok(MinerAction::ChangeOwner) => self.change_owner(),
             Err(err) => Err(CliError::CommonError(err)),
         }
     }
 
-    fn create_miner(&mut self) -> Result<(), CliError> {
+    async fn create_miner(&mut self) -> Result<(), CliError> {
         self.print_myself()?;
 
         let yes_no = Runner::yes_no("Would you like to create miner with above ^ information?")?;
@@ -425,6 +487,86 @@ impl Runner {
         let net_keypair = Keypair::Ed25519(gen_keypair);
         self.miner_keypair = Some(net_keypair.clone());
         self.miner_peer_id = Some(PeerId::from(net_keypair.public()));
+
+        let rpc_cli: RpcEndpoint;
+        match &self.rpc {
+            Some(rpc) => {
+                rpc_cli = rpc.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid rpc")));
+            },
+        }
+
+        let fund_key_info: KeyInfo;
+        match &self.fund_key_info {
+            Some(key_info) => {
+                fund_key_info = key_info.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid fund key info")));
+            }
+        }
+
+        info!("{}", "> Fund owner address".yellow());
+        let _ = send(
+            rpc_cli.clone(),
+            self.fund,
+            fund_key_info.clone(),
+            self.owner,
+            TokenAmount::from_nano(100_000_000),
+        ).await?;
+
+        info!("{}", "> Fund worker address".yellow());
+        let _ = send(
+            rpc_cli.clone(),
+            self.fund,
+            fund_key_info.clone(),
+            self.worker,
+            TokenAmount::from_nano(100_000_000),
+        ).await?;
+
+        let owner_key_info: KeyInfo;
+        match &self.owner_key_info {
+            Some(key_info) => {
+                owner_key_info = key_info.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid owner key info")));
+            }
+        }
+
+        self.print_myself()?;
+
+        let miner = Miner {
+            owner: self.owner,
+            owner_key_info: owner_key_info.clone(),
+            worker: self.worker,
+            window_post_proof_type: self.window_post_proof_type.ok_or(anyhow!("invalid proof type"))?,
+            peer_id: self.miner_peer_id.ok_or(anyhow!("invalid peer id"))?,
+            rpc: rpc_cli.clone(),
+            miner_id: None,
+            multiaddrs: None,
+        };
+
+        info!("{}", "> Create miner".yellow());
+        let res = match miner.create_miner().await {
+            Ok(res) => {
+                res
+            },
+            Err(err) => {
+                error!("{}", format!(">   Create miner fail: {}", err).red());
+                return Err(CliError::MinerCallError(err));
+            },
+        };
+
+        info!("{}", "> Wait create miner".yellow());
+        let ret = wait_msg::<CreateMinerReturn>(
+            rpc_cli.clone(),
+            res.clone(),
+        ).await?;
+        self.miner_id_address = ret.id_address;
+        self.miner_robust_address = ret.robust_address;
 
         Ok(())
     }

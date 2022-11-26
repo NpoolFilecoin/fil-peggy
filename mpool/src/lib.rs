@@ -26,6 +26,7 @@ use std::{
     cmp::Ordering,
 };
 use num_bigint::BigInt;
+use log::error;
 
 #[derive(Error, Debug)]
 pub enum MpoolError {
@@ -83,7 +84,8 @@ pub async fn mpool_push<
     let msg = estimate_msg_gas(rpc.clone(), msg.clone()).await?;
 
     let gas_fee = msg.clone().gas_fee_cap.add(msg.clone().gas_premium.mul(BigInt::from(msg.clone().gas_limit)));
-    if balance.cmp(&gas_fee.add(value)) == Ordering::Less {
+    if balance.cmp(&gas_fee.clone().add(value.clone())) == Ordering::Less {
+        error!("Account {} balance {} < fee {} + value {}", from, balance, gas_fee, value);
         return Err(MpoolError::InsufficientFunds);
     }
 

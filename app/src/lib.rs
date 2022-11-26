@@ -41,10 +41,10 @@ impl Cmd {
         Ok(self)
     }
 
-    pub fn run(self) -> anyhow::Result<(), AppError> {
+    pub async fn run(self) -> anyhow::Result<(), AppError> {
         match self {
             Self::Cli(mut cmd) => {
-                let _ = cmd.run()?;
+                let _ = cmd.run().await?;
             },
         }
         Ok(())

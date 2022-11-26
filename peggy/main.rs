@@ -12,7 +12,7 @@ async fn main() -> Result<(), Error> {
         Ok(cmd) => Ok(cmd),
         Err(err) => Err(anyhow!("{}", err)),
     };
-    match cmd?.run() {
+    match cmd?.run().await {
         Ok(_) => Ok(()),
         Err(err) => Err(anyhow!("{}", err)),
     }
