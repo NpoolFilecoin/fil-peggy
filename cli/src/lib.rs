@@ -58,7 +58,7 @@ enum AccountType {
 }
 
 impl FromStr for AccountType {
-    type Err = std::num::ParseIntError;
+    type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -69,6 +69,22 @@ impl FromStr for AccountType {
     }
 }
 
+enum MinerAction {
+    Create,
+    ChangeOwner,
+}
+
+impl FromStr for MinerAction {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Create" => Ok(Self::Create),
+            "ChangeOwner" => Ok(Self::ChangeOwner),
+            _ => Ok(Self::Create),
+        }
+    }
+}
 
 #[derive(Error, Debug)]
 pub enum CliError {
@@ -78,6 +94,8 @@ pub enum CliError {
     ParseJsonError(#[from] serde_json::Error),
     #[error("parse hex error")]
     ParseHexError(#[from] FromHexError),
+    #[error("common error")]
+    CommonError(#[from] anyhow::Error),
 }
 
 #[derive(Debug, Subcommand, Clone)]
@@ -137,6 +155,7 @@ impl Cli {
     fn cli_main(&mut self) -> Result<(), CliError> {
         self.prepare_fund_account()?;
         self.account_handler()?;
+        self.miner_handler()?;
         self.print_myself()?;
         Ok(())
     }
@@ -325,6 +344,31 @@ impl Cli {
 
         Ok(())
     }
+
+    fn miner_handler(&mut self) -> Result<(), CliError> {
+        let menu = menu(vec![
+            label("> Select miner action:").colorize(Color::Green),
+            button("Create"),
+            button("ChangeOwner")
+        ]);
+        run(&menu);
+
+        let menu = mut_menu(&menu);
+        let action = menu.selected_item_name();
+        match MinerAction::from_str(action) {
+            Ok(MinerAction::Create) => self.create_miner(),
+            Ok(MinerAction::ChangeOwner) => self.change_owner(),
+            Err(err) => Err(CliError::CommonError(err)),
+        }
+    }
+
+    fn create_miner(&mut self) -> Result<(), CliError> {
+        Ok(())
+    }
+
+    fn change_owner(&mut self) -> Result<(), CliError> {
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -357,24 +401,6 @@ fn select_menu() -> Result<MenuItem, String> {
             Ok(action)
         },
         Err(err) => Err(err.to_string()),
-    }
-}
-
-enum MinerMenuItem {
-    Create,
-    ChangeOwner,
-}
-
-impl FromStr for MinerMenuItem {
-    type Err = std::num::ParseIntError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let item = s.parse::<i32>()?;
-        match item {
-            1 => Ok(Self::Create),
-            2 => Ok(Self::ChangeOwner),
-            _ => Ok(Self::Create),
-        }
     }
 }
 
@@ -479,14 +505,14 @@ async fn miner_handler() {
     println!("{}{}", "  1".green(), ". Create".blue());
     println!("{}{}", "  2".green(), ". ChangeOwner".blue());
 
-    let mut action = MinerMenuItem::Create;
+    let mut action = MinerAction::Create;
     match scanf!("{}", action) {
         Ok(_) => {
             match action {
-                MinerMenuItem::Create => {
+                MinerAction::Create => {
                     create_miner().await;
                 },
-                MinerMenuItem::ChangeOwner => {
+                MinerAction::ChangeOwner => {
                     change_owner();
                 },
             }
