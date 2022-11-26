@@ -22,24 +22,25 @@ members = [
 name = "peggy"
 path = "peggy/main.rs"
 
-[dependencies.tokio]
-version = "1.22.0"
-features = ["macros"]
-
 [workspace.dependencies]
-app          = { path = "./app" }
-cli          = { path = "./cli" }
-wallet       = { path = "./wallet" }
-miner        = { path = "./miner" }
-rpc          = { path = "./rpc" }
-state        = { path = "./state" }
-logger       = { path = "./logger" }
-mpool        = { path = "./mpool" }
-gasestimator = { path = "./gasestimator" }
-send         = { path = "./send" }
-clap         = { version = "4.0.27", features = ["derive"] }
-thiserror    = { version = "1.0.37" }
-anyhow       = { version = "1.0.66" }
+app            = { path = "./app" }
+cli            = { path = "./cli" }
+wallet         = { path = "./wallet" }
+miner          = { path = "./miner" }
+rpc            = { path = "./rpc" }
+state          = { path = "./state" }
+logger         = { path = "./logger" }
+mpool          = { path = "./mpool" }
+gasestimator   = { path = "./gasestimator" }
+send           = { path = "./send" }
+clap           = { version = "4.0.27", features = ["derive"] }
+thiserror      = { version = "1.0.37" }
+anyhow         = { version = "1.0.66" }
+figlet-rs      = { version =  "0.1.4" }
+terminal-menu  = { version =  "2.0.4" }
+tokio          = { version = "1.22.0", features = ["macros"] }
+crossterm      = { version = "0.23.2" }
+log            = { version = "0.4.17" }
 
 [dependencies.app]
 workspace = true
@@ -48,4 +49,10 @@ workspace = true
 workspace = true
 
 [dependencies.anyhow]
+workspace = true
+
+[dependencies.tokio]
+workspace = true
+
+[dependencies.logger]
 workspace = true

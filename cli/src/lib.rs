@@ -5,6 +5,7 @@ use colored::Colorize;
 use forest_key_management::{
     json::KeyInfoJson,
     KeyInfo,
+    Key,
 };
 use fvm_shared::{
     crypto::signature::SignatureType,
@@ -18,6 +19,11 @@ use libp2p::{
     PeerId,
 };
 use thiserror::Error;
+use figlet_rs::FIGfont;
+use anyhow;
+use std::io::{self, Write};
+use terminal_menu::{menu, label, button, run, mut_menu};
+use crossterm::style::Color;
 
 use wallet;
 use miner::{Miner, CreateMinerReturn};
@@ -26,8 +32,47 @@ use state::wait_msg;
 use logger;
 use send::send;
 
+#[derive(PartialEq)]
+enum YesNo {
+    Yes,
+    No,
+}
+
+impl FromStr for YesNo {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "yes" => Ok(Self::Yes),
+            "no" => Ok(Self::No),
+            _ => Ok(Self::No),
+        }
+    }
+}
+
+#[derive(Debug)]
+enum AccountType {
+    Secp256k1,
+    BLS,
+}
+
+impl FromStr for AccountType {
+    type Err = std::num::ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Secp256k1" => Ok(Self::Secp256k1),
+            "BLS" => Ok(Self::BLS),
+            _ => Ok(Self::Secp256k1),
+        }
+    }
+}
+
+
 #[derive(Error, Debug)]
 pub enum CliError {
+    #[error("io call error")]
+    IOCallError(#[from] std::io::Error),
 }
 
 #[derive(Debug, Subcommand, Clone)]
@@ -40,6 +85,24 @@ pub enum Cmd {
 pub struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
+
+    #[clap(skip)]
+    owner: Address,
+    #[clap(skip)]
+    owner_key: Option<Key>,
+    #[clap(skip)]
+    owner_key_info_json: Option<KeyInfoJson>,
+    #[clap(skip)]
+    encoded_owner_key: String,
+
+    #[clap(skip)]
+    worker: Address,
+    #[clap(skip)]
+    worker_key: Option<Key>,
+    #[clap(skip)]
+    worker_key_info_json: Option<KeyInfoJson>,
+    #[clap(skip)]
+    encoded_worker_key: String,
 }
 
 impl Cli {
@@ -47,7 +110,108 @@ impl Cli {
         Ok(self)
     }
 
-    pub fn run(self) -> Result<(), CliError> {
+    pub fn run(&mut self) -> Result<(), CliError> {
+        Self::print_banner();
+        self.cli_main()
+    }
+
+    fn print_banner() {
+        let standard_font = FIGfont::standard().unwrap();
+        let figure = standard_font.convert("FIL Peggy");
+        assert!(figure.is_some());
+        println!("{}", figure.unwrap());
+    }
+
+    fn cli_main(&mut self) -> Result<(), CliError> {
+        self.account_handler()?;
+        self.print_myself()?;
+        Ok(())
+    }
+
+    fn account_handler(&mut self) -> Result<(), CliError> {
+        let yes_no = Cli::yes_no("Would you like to use exist account ?")?;
+        match yes_no {
+            YesNo::No => {
+                self.generate_account()?;
+            },
+            YesNo::Yes => {
+                self.fill_old_account()?;
+            },
+        }
+
+        Ok(())
+    }
+
+    fn fill_old_account(&mut self) -> Result<(), CliError> {
+        Ok(())
+    }
+
+    fn generate_account(&mut self) -> Result<(), CliError> {
+        let menu = menu(vec![
+            label("> Select owner account signature type:").colorize(Color::Green),
+            button("Secp256k1"),
+            button("BLS")
+        ]);
+        run(&menu);
+
+        let menu = mut_menu(&menu);
+        let account_type = menu.selected_item_name();
+        let account_type = match AccountType::from_str(account_type) {
+            Ok(AccountType::Secp256k1) => SignatureType::Secp256k1,
+            Ok(AccountType::BLS) => SignatureType::BLS,
+            Err(_) => SignatureType::Secp256k1,
+        };
+
+        let (address, encoded_key, key, key_info_json) = wallet::create_wallet(account_type);
+        self.owner = address;
+        self.encoded_owner_key = encoded_key.clone();
+        self.owner_key = Some(key.clone());
+        self.owner_key_info_json = Some(key_info_json.clone());
+
+        let yes_no = Cli::yes_no("Use different worker account from owner ?")?;
+        if yes_no != YesNo::Yes {
+            self.worker = address;
+            self.encoded_worker_key = encoded_key;
+            self.worker_key = Some(key);
+            self.worker_key_info_json = Some(key_info_json);
+            return Ok(());
+        }
+
+        let (address, encoded_key, key, key_info_json) = wallet::create_wallet(account_type);
+        self.worker = address;
+        self.encoded_worker_key = encoded_key;
+        self.worker_key = Some(key);
+        self.worker_key_info_json = Some(key_info_json);
+
+        Ok(())
+    }
+
+    fn yes_no(s: &str) -> Result<YesNo, CliError> {
+        print!("> {}{}", s.green(), " (yes | no): ".yellow());
+        io::stdout().flush().unwrap();
+
+        let mut yes_no = YesNo::Yes;
+        match scanf!("{}", yes_no) {
+            Ok(_) => Ok(yes_no),
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+    }
+
+    fn print_myself(&self) -> Result<(), CliError> {
+        let yes_no = Cli::yes_no("Would you like to display private key?")?;
+
+        println!("> {}", "Cli running information:".blue());
+        println!("  > {}{}", "Owner Address:".green(), format!(" {}", self.owner));
+        if yes_no == YesNo::Yes {
+            println!("  > {}{}", "Owner Private Key:".green(), format!(" {}", self.encoded_owner_key));
+        }
+        println!("  > {}{}", "Worker Address:".green(), format!(" {}", self.worker));
+        if yes_no == YesNo::Yes {
+            println!("  > {}{}", "Worker Private Key:".green(), format!(" {}", self.encoded_worker_key));
+        }
+
         Ok(())
     }
 }
@@ -88,24 +252,6 @@ fn select_menu() -> Result<MenuItem, String> {
     }
 }
 
-enum WalletMenuItem {
-    Secp256k1,
-    BLS,
-}
-
-impl FromStr for WalletMenuItem {
-    type Err = std::num::ParseIntError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let item = s.parse::<i32>()?;
-        match item {
-            1 => Ok(Self::Secp256k1),
-            2 => Ok(Self::BLS),
-            _ => Ok(Self::Secp256k1),
-        }
-    }
-}
-
 fn create_wallet(wallet_type: SignatureType) {
     let (address, priv_key, _, _) = wallet::create_wallet(wallet_type);
     println!("{}", " Create new wallet: ".yellow());
@@ -118,12 +264,12 @@ fn wallet_handler() {
     println!("{}{}", "  1".green(), ". Secp256k1".blue());
     println!("{}{}", "  2".green(), ". BLS".blue());
 
-    let mut wallet_type = WalletMenuItem::Secp256k1;
+    let mut wallet_type = AccountType::Secp256k1;
     match scanf!("{}", wallet_type) {
         Ok(_) => {
             let wallet_type = match wallet_type {
-                WalletMenuItem::Secp256k1 => SignatureType::Secp256k1,
-                WalletMenuItem::BLS => SignatureType::BLS,
+                AccountType::Secp256k1 => SignatureType::Secp256k1,
+                AccountType::BLS => SignatureType::BLS,
             };
             create_wallet(wallet_type)
         },

@@ -51,6 +51,18 @@ workspace = true
 [dependencies.logger]
 workspace = true
 
+[dependencies.figlet-rs]
+workspace = true
+
 [dependencies.libipld-core]
 version = "0.15"
 features = ["serde-codec"]
+
+[dependencies.terminal-menu]
+workspace = true
+
+[dependencies.crossterm]
+workspace = true
+
+[dependencies.log]
+workspace = true
