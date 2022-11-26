@@ -31,6 +31,7 @@ use crossterm::style::Color;
 use log::{info, error};
 use hex::FromHexError;
 use serde::{Serialize, Deserialize};
+use serde_with::{serde_as, DisplayFromStr};
 
 use wallet;
 use miner::{Miner, CreateMinerReturn};
@@ -175,19 +176,28 @@ impl Cli {
     }
 }
 
+#[serde_as]
 #[derive(Serialize, Deserialize)]
 struct Runner {
+    #[serde_as(as = "DisplayFromStr")]
     owner: Address,
+    #[serde(skip)]
     owner_key: Option<Key>,
+    #[serde(skip)]
     owner_key_info: Option<KeyInfo>,
     encoded_owner_key: String,
 
+    #[serde_as(as = "DisplayFromStr")]
     worker: Address,
+    #[serde(skip)]
     worker_key: Option<Key>,
+    #[serde(skip)]
     worker_key_info: Option<KeyInfo>,
     encoded_worker_key: String,
 
+    #[serde_as(as = "DisplayFromStr")]
     fund: Address,
+    #[serde(skip)]
     fund_key_info: Option<KeyInfo>,
     encoded_fund_key: String,
 
@@ -196,7 +206,9 @@ struct Runner {
     miner_keypair: Option<Keypair>,
     #[serde(skip)]
     miner_peer_id: Option<PeerId>,
+    #[serde_as(as = "DisplayFromStr")]
     miner_id_address: Address,
+    #[serde_as(as = "DisplayFromStr")]
     miner_robust_address: Address,
 
     rpc_host: String,
@@ -213,7 +225,7 @@ impl Runner {
             },
             Ok(None) => {},
             Err(err) => {
-                error!("{}{}", "> Fail to load exist runner".red(), err);
+                error!("{}: {}", "> Fail to load exist runner".red(), err);
             },
         }
 
@@ -245,7 +257,7 @@ impl Runner {
     }
 
     fn load() -> Result<Option<Self>, CliError> {
-        let yes_no = Runner::yes_no("Would you use exist miner ?")?;
+        let yes_no = Runner::yes_no("Would you use exist runner ?")?;
         if yes_no == YesNo::No {
             return Ok(None);
         }
@@ -276,7 +288,17 @@ impl Runner {
         let runner_file = menu.selected_item_name();
 
         let runner_str = std::fs::read_to_string(runner_file)?;
-        let runner: Self = serde_json::from_str(&runner_str)?;
+
+        let runner: Self;
+        match serde_json::from_str(&runner_str) {
+            Ok(r) => {
+                runner = r;
+            },
+            Err(err) => {
+                error!("{}", format!("> Fail parse json: {}", err).red());
+                return Err(CliError::ParseJsonError(err));
+            },
+        }
 
         runner.print_myself()?;
 

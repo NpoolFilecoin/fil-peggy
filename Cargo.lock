@@ -958,6 +958,7 @@ dependencies = [
  "send",
  "serde",
  "serde_json",
+ "serde_with",
  "state",
  "terminal-menu",
  "thiserror",

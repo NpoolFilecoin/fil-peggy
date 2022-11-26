@@ -74,3 +74,6 @@ workspace = true
 
 [dependencies.chrono]
 workspace = true
+
+[dependencies.serde_with]
+workspace = true
