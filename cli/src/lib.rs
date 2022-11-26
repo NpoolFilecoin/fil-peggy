@@ -10,7 +10,7 @@ use forest_key_management::{
 use fvm_shared::{
     crypto::signature::SignatureType,
     address::Address,
-    sector::{RegisteredSealProof, SectorSize},
+    sector::{RegisteredSealProof, SectorSize, RegisteredPoStProof},
     version::NetworkVersion,
     econ::TokenAmount,
 };
@@ -20,7 +20,7 @@ use libp2p::{
 };
 use thiserror::Error;
 use figlet_rs::FIGfont;
-use anyhow;
+use anyhow::{anyhow, Error as AnyhowError};
 use std::io::{self, Write};
 use terminal_menu::{menu, label, button, run, mut_menu};
 use crossterm::style::Color;
@@ -40,7 +40,7 @@ enum YesNo {
 }
 
 impl FromStr for YesNo {
-    type Err = anyhow::Error;
+    type Err = AnyhowError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -58,7 +58,7 @@ enum AccountType {
 }
 
 impl FromStr for AccountType {
-    type Err = anyhow::Error;
+    type Err = AnyhowError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -75,7 +75,7 @@ enum MinerAction {
 }
 
 impl FromStr for MinerAction {
-    type Err = anyhow::Error;
+    type Err = AnyhowError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -95,7 +95,7 @@ pub enum CliError {
     #[error("parse hex error")]
     ParseHexError(#[from] FromHexError),
     #[error("common error")]
-    CommonError(#[from] anyhow::Error),
+    CommonError(#[from] AnyhowError),
 }
 
 #[derive(Debug, Subcommand, Clone)]
@@ -108,41 +108,11 @@ pub enum Cmd {
 pub struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
-
-    #[clap(skip)]
-    owner: Address,
-    #[clap(skip)]
-    owner_key: Option<Key>,
-    #[clap(skip)]
-    owner_key_info: Option<KeyInfo>,
-    #[clap(skip)]
-    encoded_owner_key: String,
-
-    #[clap(skip)]
-    worker: Address,
-    #[clap(skip)]
-    worker_key: Option<Key>,
-    #[clap(skip)]
-    worker_key_info: Option<KeyInfo>,
-    #[clap(skip)]
-    encoded_worker_key: String,
-
-    #[clap(skip)]
-    fund: Address,
-    #[clap(skip)]
-    fund_key_info: Option<KeyInfo>,
-    #[clap(skip)]
-    encoded_fund_key: String,
 }
 
 impl Cli {
     pub fn parse(self) -> Result<Self, CliError> {
         Ok(self)
-    }
-
-    pub fn run(&mut self) -> Result<(), CliError> {
-        Self::print_banner();
-        self.cli_main()
     }
 
     fn print_banner() {
@@ -152,7 +122,56 @@ impl Cli {
         println!("{}", figure.unwrap());
     }
 
-    fn cli_main(&mut self) -> Result<(), CliError> {
+    pub fn run(&mut self) -> Result<(), CliError> {
+        Self::print_banner();
+        Runner::new().run_main()
+    }
+}
+
+struct Runner {
+    owner: Address,
+    owner_key: Option<Key>,
+    owner_key_info: Option<KeyInfo>,
+    encoded_owner_key: String,
+
+    worker: Address,
+    worker_key: Option<Key>,
+    worker_key_info: Option<KeyInfo>,
+    encoded_worker_key: String,
+
+    fund: Address,
+    fund_key_info: Option<KeyInfo>,
+    encoded_fund_key: String,
+
+    window_post_proof_type: Option<RegisteredPoStProof>,
+    miner_keypair: Option<Keypair>,
+    miner_peer_id: Option<PeerId>,
+}
+
+impl Runner {
+    pub fn new() -> Self {
+        Self {
+            owner: Address::default(),
+            owner_key: None,
+            owner_key_info: None,
+            encoded_owner_key: String::default(),
+
+            worker: Address::default(),
+            worker_key: None,
+            worker_key_info: None,
+            encoded_worker_key: String::default(),
+
+            fund: Address::default(),
+            fund_key_info: None,
+            encoded_fund_key: String::default(),
+
+            window_post_proof_type: None,
+            miner_keypair: None,
+            miner_peer_id: None,
+        }
+    }
+
+    fn run_main(&mut self) -> Result<(), CliError> {
         self.prepare_fund_account()?;
         self.account_handler()?;
         self.miner_handler()?;
@@ -161,7 +180,7 @@ impl Cli {
     }
 
     fn account_handler(&mut self) -> Result<(), CliError> {
-        let yes_no = Cli::yes_no("Would you like to use exist account ?")?;
+        let yes_no = Runner::yes_no("Would you like to use exist account ?")?;
         match yes_no {
             YesNo::No => {
                 self.generate_account()?;
@@ -294,7 +313,7 @@ impl Cli {
         self.owner_key = Some(key.clone());
         self.owner_key_info = Some(KeyInfo::from(key_info_json.clone()));
 
-        let yes_no = Cli::yes_no("Use different worker account from owner ?")?;
+        let yes_no = Runner::yes_no("Use different worker account from owner ?")?;
         if yes_no != YesNo::Yes {
             self.worker = address;
             self.encoded_worker_key = encoded_key;
@@ -326,7 +345,7 @@ impl Cli {
     }
 
     fn print_myself(&self) -> Result<(), CliError> {
-        let yes_no = Cli::yes_no("Would you like to display private key?")?;
+        let yes_no = Runner::yes_no("Would you like to display private key?")?;
 
         println!("> {}", "Cli running information:".blue());
         println!("  > {}{}", "Owner Address:".green(), format!(" {}", self.owner));
@@ -341,6 +360,10 @@ impl Cli {
         if yes_no == YesNo::Yes {
             println!("  > {}{}", "Fund Private Key:".green(), format!(" {}", self.encoded_fund_key));
         }
+
+        println!("  > {}{}", "Miner PoSt Proof:".green(), format!(" {:?}", self.window_post_proof_type));
+        println!("  > {}{}", "Miner Peer ID:".green(), format!(" {:?}", self.miner_peer_id));
+        println!("  > {}{}", "Miner KeyPair:".green(), format!(" {:?}", self.miner_keypair));
 
         Ok(())
     }
@@ -363,6 +386,46 @@ impl Cli {
     }
 
     fn create_miner(&mut self) -> Result<(), CliError> {
+        self.print_myself()?;
+
+        let yes_no = Runner::yes_no("Would you like to create miner with above ^ information?")?;
+        if yes_no == YesNo::No {
+            return Ok(());
+        }
+
+        let menu = menu(vec![
+            label("> Select miner's sector size:").colorize(Color::Green),
+            button("32GiB"),
+            button("64GiB"),
+            button("2KiB")
+        ]);
+        run(&menu);
+
+        let menu = mut_menu(&menu);
+        let sector_size = menu.selected_item_name();
+
+        let sector_size =  match sector_size {
+            "32GiB" => SectorSize::_32GiB,
+            "64GiB" => SectorSize::_64GiB,
+            "2KiB" => SectorSize::_2KiB,
+            _ => SectorSize::_32GiB,
+        };
+
+        let seal_proof = RegisteredSealProof::from_sector_size(sector_size, NetworkVersion::V17);
+        match seal_proof.registered_window_post_proof() {
+            Ok(proof_type) => {
+                self.window_post_proof_type = Some(proof_type);
+            },
+            Err(err) => {
+                return Err(CliError::CommonError(anyhow!("{}", err)));
+            },
+        }
+
+        let gen_keypair = ed25519::Keypair::generate();
+        let net_keypair = Keypair::Ed25519(gen_keypair);
+        self.miner_keypair = Some(net_keypair.clone());
+        self.miner_peer_id = Some(PeerId::from(net_keypair.public()));
+
         Ok(())
     }
 
