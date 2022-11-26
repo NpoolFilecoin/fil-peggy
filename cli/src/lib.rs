@@ -108,6 +108,13 @@ pub struct Cli {
     worker_key_info: Option<KeyInfo>,
     #[clap(skip)]
     encoded_worker_key: String,
+
+    #[clap(skip)]
+    fund: Address,
+    #[clap(skip)]
+    fund_key_info: Option<KeyInfo>,
+    #[clap(skip)]
+    encoded_fund_key: String,
 }
 
 impl Cli {
@@ -128,6 +135,7 @@ impl Cli {
     }
 
     fn cli_main(&mut self) -> Result<(), CliError> {
+        self.prepare_fund_account()?;
         self.account_handler()?;
         self.print_myself()?;
         Ok(())
@@ -143,6 +151,40 @@ impl Cli {
                 self.fill_old_account()?;
             },
         }
+
+        Ok(())
+    }
+
+    fn prepare_fund_account(&mut self) -> Result<(), CliError> {
+        print!("> {}", "Fund address: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut fund: Address = Address::default();
+        match scanf!("{}", fund) {
+            Ok(_) => {
+                self.fund = fund;
+            },
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+
+        print!("> {}", "Fund private key: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut key: String = String::default();
+        match scanf!("{}", key) {
+            Ok(_) => {
+                self.encoded_fund_key = key;
+            },
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+
+        let key_info = hex::decode(&self.encoded_fund_key)?;
+        let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
+        self.fund_key_info = Some(KeyInfo::from(key_info));
 
         Ok(())
     }
@@ -275,6 +317,10 @@ impl Cli {
         println!("  > {}{}", "Worker Address:".green(), format!(" {}", self.worker));
         if yes_no == YesNo::Yes {
             println!("  > {}{}", "Worker Private Key:".green(), format!(" {}", self.encoded_worker_key));
+        }
+        println!("  > {}{}", "Fund Address:".green(), format!(" {}", self.fund));
+        if yes_no == YesNo::Yes {
+            println!("  > {}{}", "Fund Private Key:".green(), format!(" {}", self.encoded_fund_key));
         }
 
         Ok(())
