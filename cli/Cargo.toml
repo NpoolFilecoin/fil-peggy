@@ -9,10 +9,11 @@ hex = "0.4.3"
 serde_json = "1.0.89"
 fil_actor_power = "9.0.1"
 serde = "1.0.147"
+thiserror = "1.0.37"
+anyhow = "1.0.66"
 
 [dependencies.clap]
-version = "4.0.26"
-features = [ "derive" ]
+workspace = true
 
 [dependencies.scanf]
 version = "1.2.1"

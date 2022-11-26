@@ -1,6 +1,6 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
+use core::str::FromStr;
 use scanf::scanf;
-use std::str::FromStr;
 use colored::Colorize;
 use forest_key_management::{
     json::KeyInfoJson,
@@ -17,6 +17,7 @@ use libp2p::{
     identity::{ed25519, Keypair},
     PeerId,
 };
+use thiserror::Error;
 
 use wallet;
 use miner::{Miner, CreateMinerReturn};
@@ -25,9 +26,30 @@ use state::wait_msg;
 use logger;
 use send::send;
 
-#[derive(Parser, Debug)]
+#[derive(Error, Debug)]
+pub enum CliError {
+}
+
+#[derive(Debug, Subcommand, Clone)]
+pub enum Cmd {
+    Run {},
+}
+
+#[derive(Debug, Parser, Clone)]
 #[command(author, version, about, long_about = None)]
-struct Args {
+pub struct Cli {
+    #[command(subcommand)]
+    cmd: Cmd,
+}
+
+impl Cli {
+    pub fn parse(self) -> Result<Self, CliError> {
+        Ok(self)
+    }
+
+    pub fn run(self) -> Result<(), CliError> {
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -310,8 +332,6 @@ fn actor_handler() {
 }
 
 pub async fn cli_main() {
-    let _ = Args::parse();
-
     logger::initialize();
 
     loop {

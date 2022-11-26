@@ -5,6 +5,7 @@ edition = "2021"
 
 [workspace]
 members = [
+  "app",
   "cli",
   "wallet",
   "miner",
@@ -26,6 +27,7 @@ version = "1.22.0"
 features = ["macros"]
 
 [workspace.dependencies]
+app          = { path = "./app" }
 cli          = { path = "./cli" }
 wallet       = { path = "./wallet" }
 miner        = { path = "./miner" }
@@ -35,6 +37,15 @@ logger       = { path = "./logger" }
 mpool        = { path = "./mpool" }
 gasestimator = { path = "./gasestimator" }
 send         = { path = "./send" }
+clap         = { version = "4.0.27", features = ["derive"] }
+thiserror    = { version = "1.0.37" }
+anyhow       = { version = "1.0.66" }
 
-[dependencies.cli]
+[dependencies.app]
+workspace = true
+
+[dependencies.clap]
+workspace = true
+
+[dependencies.anyhow]
 workspace = true
