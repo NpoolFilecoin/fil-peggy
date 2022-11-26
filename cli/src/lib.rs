@@ -578,7 +578,6 @@ impl Runner {
 
 #[derive(Debug)]
 enum MenuItem {
-    Miner,
     Actor,
 }
 
@@ -588,143 +587,22 @@ impl FromStr for MenuItem {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let item = s.parse::<i32>()?;
         match item {
-            2 => Ok(Self::Miner),
             3 => Ok(Self::Actor),
-            _ => Ok(Self::Miner),
+            _ => Ok(Self::Actor),
         }
     }
 }
 
 fn select_menu() -> Result<MenuItem, String> {
     println!("{}", "Action you want:".green());
-    println!("{}{}", "  2".green(), ". Miner".blue());
     println!("{}{}", "  3".green(), ". Actor".blue());
 
-    let mut action = MenuItem::Miner;
+    let mut action = MenuItem::Actor;
     match scanf!("{}", action) {
         Ok(_) => {
             Ok(action)
         },
         Err(err) => Err(err.to_string()),
-    }
-}
-
-async fn create_miner() {
-    let mut owner: Address = Address::default();
-    println!("{}", "Enter miner's owner address:".green());
-    scanf!("{}", owner).unwrap();
-    println!("{}{}{}", "  You will use ".yellow(), owner, " as owner address.".yellow());
-
-    println!("{}", "Enter owner's key info:".green());
-    let mut key_info = String::default();
-    scanf!("{}", key_info).unwrap();
-    let key_info = hex::decode(&key_info).unwrap();
-    let key_info: KeyInfoJson = serde_json::from_slice(&key_info).unwrap();
-    println!("{}{:?}", "  KeyInfoJson: ".yellow(), key_info);
-    let key_info: KeyInfo = KeyInfo::from(key_info);
-
-    let mut worker: Address = Address::default();
-    println!("{}", "Enter miner's worker address:".green());
-    scanf!("{}", worker).unwrap();
-    println!("{}{}{}", "  You will use ".yellow(), worker, " as worker address.".yellow());
-
-    let mut fund_account: Address = Address::default();
-    println!("{}", "Enter fund account address:".green());
-    scanf!("{}", fund_account).unwrap();
-    println!("{}{}{}", "  You will use ".yellow(), fund_account, " as fund account.".yellow());
-
-    println!("{}", "Enter fund account's key info:".green());
-    let mut fund_key_info = String::default();
-    scanf!("{}", fund_key_info).unwrap();
-    let fund_key_info = hex::decode(&fund_key_info).unwrap();
-    let fund_key_info: KeyInfoJson = serde_json::from_slice(&fund_key_info).unwrap();
-    println!("{}{:?}", "  Fund KeyInfoJson: ".yellow(), fund_key_info);
-    let fund_key_info: KeyInfo = KeyInfo::from(fund_key_info);
-
-    println!("{}", "Enter miner's sector size:".green());
-    println!("{}{}", "  1".green(), ". 32GiB".blue());
-    println!("{}{}", "  2".green(), ". 64GiB".blue());
-    println!("{}{}", "  3".green(), ". 2KiB".blue());
-
-    let mut proof_type = 0;
-    scanf!("{}", proof_type).unwrap();
-    let sector_size =  match proof_type {
-        1 => SectorSize::_32GiB,
-        2 => SectorSize::_64GiB,
-        3 => SectorSize::_2KiB,
-        _ => SectorSize::_32GiB,
-    };
-
-    let seal_proof = RegisteredSealProof::from_sector_size(sector_size, NetworkVersion::V17);
-    let post_proof = seal_proof.registered_window_post_proof().unwrap();
-    println!("{}{:?}{}", "  You will use ".yellow(), post_proof, " as miner post proof.".yellow());
-
-    let gen_keypair = ed25519::Keypair::generate();
-    let net_keypair = Keypair::Ed25519(gen_keypair);
-    println!("{}", "  You peer id:".green());
-    println!("{}{:?}", "    Public key: ".yellow(), net_keypair.public());
-    println!("{}{:?}", "    Key pair: ".yellow(), net_keypair);
-    let peer_id = PeerId::from(net_keypair.public());
-    println!("{}{:?}", "    PeerId:".yellow(), peer_id);
-
-    let mut rpc_host = String::from("http://localhost:1234/rpc/v0");
-    println!("{}{}", "Enter wallet rpc endpoint:".green(), format!("(default {})", rpc_host));
-    scanf!("{}", rpc_host).unwrap();
-    println!("{}{}{}", "  You will use ".yellow(), rpc_host, " as your rpc host.".yellow());
-
-    let mut bearer_token = String::from("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.T-IbxWiqPOCak-ZBjXDbDkCBAGGMrPbQvfQTUxtIF10");
-    println!("{}{}", "Enter rpc bearer token: ".green(), format!("(default {})", bearer_token));
-    scanf!("{}", bearer_token).unwrap();
-    println!("{}{}{}", "You will use ".yellow(), bearer_token, " as your rpc access token.".yellow());
-
-    let rpc_cli = RpcEndpoint::new(rpc_host, bearer_token).unwrap();
-
-    let _ = send(rpc_cli.clone(), fund_account, fund_key_info.clone(), owner, TokenAmount::from_nano(100_000_000)).await.unwrap();
-    let _ = send(rpc_cli.clone(), fund_account, fund_key_info, worker, TokenAmount::from_nano(100_000_000)).await.unwrap();
-
-    let miner = Miner {
-        owner: owner,
-        owner_key_info: key_info.clone(),
-        worker: worker,
-        window_post_proof_type: post_proof,
-        peer_id: peer_id,
-        rpc: rpc_cli.clone(),
-        miner_id: None,
-        multiaddrs: None,
-    };
-    let res = miner.create_miner().await.unwrap();
-    println!("Create Miner -- {:?}", res.clone());
-
-    let ret = wait_msg::<CreateMinerReturn>(rpc_cli.clone(), res.clone()).await.unwrap();
-    println!("Create Miner:");
-    println!("  IDAddress: {}", ret.id_address);
-    println!("  RobustAddress: {}", ret.robust_address);
-}
-
-fn change_owner() {
-
-}
-
-async fn miner_handler() {
-    println!("{}", "Miner action you want:".green());
-    println!("{}{}", "  1".green(), ". Create".blue());
-    println!("{}{}", "  2".green(), ". ChangeOwner".blue());
-
-    let mut action = MinerAction::Create;
-    match scanf!("{}", action) {
-        Ok(_) => {
-            match action {
-                MinerAction::Create => {
-                    create_miner().await;
-                },
-                MinerAction::ChangeOwner => {
-                    change_owner();
-                },
-            }
-        },
-        Err(err) => {
-            println!("{}", format!("  Fail to get miner menu input: {}", err).red());
-        },
     }
 }
 
@@ -795,7 +673,6 @@ pub async fn cli_main() {
     loop {
         let menu = select_menu().unwrap();
         match menu {
-            MenuItem::Miner => miner_handler().await,
             MenuItem::Actor => actor_handler(),
         }
     }
