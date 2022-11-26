@@ -21,17 +21,22 @@ use libp2p::{
 use thiserror::Error;
 use figlet_rs::FIGfont;
 use anyhow::{anyhow, Error as AnyhowError};
-use std::io::{self, Write};
+use std::{
+    io::{self, Write},
+    time::SystemTime,
+};
+use chrono::{offset::Utc, DateTime};
 use terminal_menu::{menu, label, button, run, mut_menu};
 use crossterm::style::Color;
 use log::{info, error};
+use hex::FromHexError;
+use serde::{Serialize, Deserialize};
 
 use wallet;
 use miner::{Miner, CreateMinerReturn};
 use rpc::RpcEndpoint;
 use state::wait_msg;
 use send::send;
-use hex::FromHexError;
 
 #[derive(PartialEq)]
 enum YesNo {
@@ -157,11 +162,10 @@ impl Cli {
         Self::print_banner();
         match self.cmd {
             Cmd::CreateMiner {} => {
-                Runner::new().run_main().await
+                Runner::new().create_miner_main().await
             },
             Cmd::CreateActor {} => {
-                info!("CreateActor");
-                Ok(())
+                Runner::new().create_actor_main().await
             },
             Cmd::CostodyMiner {} => {
                 info!("CostidyMiner");
@@ -171,6 +175,7 @@ impl Cli {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 struct Runner {
     owner: Address,
     owner_key: Option<Key>,
@@ -187,18 +192,31 @@ struct Runner {
     encoded_fund_key: String,
 
     window_post_proof_type: Option<RegisteredPoStProof>,
+    #[serde(skip)]
     miner_keypair: Option<Keypair>,
+    #[serde(skip)]
     miner_peer_id: Option<PeerId>,
     miner_id_address: Address,
     miner_robust_address: Address,
 
     rpc_host: String,
     rpc_bearer_token: String,
+    #[serde(skip)]
     rpc: Option<RpcEndpoint>,
 }
 
 impl Runner {
     pub fn new() -> Self {
+        match Self::load() {
+            Ok(Some(runner)) => {
+                return runner;
+            },
+            Ok(None) => {},
+            Err(err) => {
+                error!("{}{}", "> Fail to load exist runner".red(), err);
+            },
+        }
+
         Self {
             owner: Address::default(),
             owner_key: None,
@@ -226,12 +244,56 @@ impl Runner {
         }
     }
 
-    async fn run_main(&mut self) -> Result<(), CliError> {
+    fn load() -> Result<Option<Self>, CliError> {
+        let yes_no = Runner::yes_no("Would you use exist miner ?")?;
+        if yes_no == YesNo::No {
+            return Ok(None);
+        }
+
+        let mut paths = Vec::new();
+        for dir in std::fs::read_dir("output")? {
+            let path = dir?.path();
+            if path.is_dir() {
+                continue
+            }
+            paths.push(format!("{}", path.display()));
+        }
+
+        if paths.len() == 0 {
+            return Ok(None);
+        }
+
+        let mut menus = Vec::new();
+        menus.push(label("> Select saved runner:").colorize(Color::Green));
+        for path in paths {
+            menus.push(button(path));
+        }
+
+        let menu = menu(menus);
+        run(&menu);
+
+        let menu = mut_menu(&menu);
+        let runner_file = menu.selected_item_name();
+
+        let runner_str = std::fs::read_to_string(runner_file)?;
+        let runner: Self = serde_json::from_str(&runner_str)?;
+
+        runner.print_myself()?;
+
+        Ok(Some(runner))
+    }
+
+    async fn create_actor_main(&mut self) -> Result<(), CliError> {
+        Ok(())
+    }
+
+    async fn create_miner_main(&mut self) -> Result<(), CliError> {
         self.prepare_fund_account()?;
         self.account_handler()?;
         self.prepare_rpc_endpoint()?;
         self.miner_handler().await?;
         self.print_myself()?;
+        self.save_myself()?;
         Ok(())
     }
 
@@ -460,6 +522,28 @@ impl Runner {
 
         println!("  > {}{}", "Rpc Host:".green(), format!(" {}", self.rpc_host));
         println!("  > {}{}", "Rpc Bearer Token:".green(), format!(" {}", self.rpc_bearer_token));
+
+        Ok(())
+    }
+
+    fn save_myself(&self) -> Result<(), CliError> {
+        match std::fs::create_dir("output") {
+            Ok(_) => {},
+            Err(err) => {
+                if err.kind() != std::io::ErrorKind::AlreadyExists {
+                    return Err(CliError::IOCallError(err));
+                }
+            },
+        }
+
+        let my_json = serde_json::to_string(self)?;
+        let now = SystemTime::now();
+        let datetime: DateTime<Utc> = now.into();
+
+        let filename = format!("output/peggy-{}.json", datetime.format("%d-%m-%Y-%H-%M-%s"));
+        std::fs::write(filename.clone(), my_json)?;
+
+        info!("> {}", format!("Result is saved at {}", filename).blue());
 
         Ok(())
     }

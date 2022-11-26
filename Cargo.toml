@@ -42,6 +42,8 @@ tokio          = { version = "1.22.0", features = ["macros"] }
 crossterm      = { version = "0.23.2" }
 log            = { version = "0.4.17" }
 url            = { version = "2.3.1" }
+serde          = { version = "1.0.147" }
+chrono         = { version = "0.4.23" }
 
 [dependencies.app]
 workspace = true
