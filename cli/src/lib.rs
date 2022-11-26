@@ -283,7 +283,6 @@ impl Cli {
 
 #[derive(Debug)]
 enum MenuItem {
-    Wallet,
     Miner,
     Actor,
 }
@@ -294,53 +293,24 @@ impl FromStr for MenuItem {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let item = s.parse::<i32>()?;
         match item {
-            1 => Ok(Self::Wallet),
             2 => Ok(Self::Miner),
             3 => Ok(Self::Actor),
-            _ => Ok(Self::Wallet),
+            _ => Ok(Self::Miner),
         }
     }
 }
 
 fn select_menu() -> Result<MenuItem, String> {
     println!("{}", "Action you want:".green());
-    println!("{}{}", "  1".green(), ". Wallet".blue());
     println!("{}{}", "  2".green(), ". Miner".blue());
     println!("{}{}", "  3".green(), ". Actor".blue());
 
-    let mut action = MenuItem::Wallet;
+    let mut action = MenuItem::Miner;
     match scanf!("{}", action) {
         Ok(_) => {
             Ok(action)
         },
         Err(err) => Err(err.to_string()),
-    }
-}
-
-fn create_wallet(wallet_type: SignatureType) {
-    let (address, priv_key, _, _) = wallet::create_wallet(wallet_type);
-    println!("{}", " Create new wallet: ".yellow());
-    println!("{}{}", "   Address: ".yellow(), address);
-    println!("{}{:?}", "   KeyInfo: ".yellow(), priv_key);
-}
-
-fn wallet_handler() {
-    println!("{}", "Wallet action you want:".green());
-    println!("{}{}", "  1".green(), ". Secp256k1".blue());
-    println!("{}{}", "  2".green(), ". BLS".blue());
-
-    let mut wallet_type = AccountType::Secp256k1;
-    match scanf!("{}", wallet_type) {
-        Ok(_) => {
-            let wallet_type = match wallet_type {
-                AccountType::Secp256k1 => SignatureType::Secp256k1,
-                AccountType::BLS => SignatureType::BLS,
-            };
-            create_wallet(wallet_type)
-        },
-        Err(err) => {
-            println!("{}", format!("  Fail to get wallet type input: {}", err).red());
-        },
     }
 }
 
@@ -548,7 +518,6 @@ pub async fn cli_main() {
     loop {
         let menu = select_menu().unwrap();
         match menu {
-            MenuItem::Wallet => wallet_handler(),
             MenuItem::Miner => miner_handler().await,
             MenuItem::Actor => actor_handler(),
         }
