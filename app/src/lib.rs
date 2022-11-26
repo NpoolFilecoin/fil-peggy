@@ -42,6 +42,11 @@ impl Cmd {
     }
 
     pub fn run(self) -> anyhow::Result<(), AppError> {
+        match self {
+            Self::Cli(cmd) => {
+                let _ = cmd.run()?;
+            },
+        }
         Ok(())
     }
 }
