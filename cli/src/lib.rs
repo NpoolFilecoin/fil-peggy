@@ -31,6 +31,7 @@ use rpc::RpcEndpoint;
 use state::wait_msg;
 use logger;
 use send::send;
+use hex::FromHexError;
 
 #[derive(PartialEq)]
 enum YesNo {
@@ -73,6 +74,10 @@ impl FromStr for AccountType {
 pub enum CliError {
     #[error("io call error")]
     IOCallError(#[from] std::io::Error),
+    #[error("parse json error")]
+    ParseJsonError(#[from] serde_json::Error),
+    #[error("parse hex error")]
+    ParseHexError(#[from] FromHexError),
 }
 
 #[derive(Debug, Subcommand, Clone)]
@@ -91,7 +96,7 @@ pub struct Cli {
     #[clap(skip)]
     owner_key: Option<Key>,
     #[clap(skip)]
-    owner_key_info_json: Option<KeyInfoJson>,
+    owner_key_info: Option<KeyInfo>,
     #[clap(skip)]
     encoded_owner_key: String,
 
@@ -100,7 +105,7 @@ pub struct Cli {
     #[clap(skip)]
     worker_key: Option<Key>,
     #[clap(skip)]
-    worker_key_info_json: Option<KeyInfoJson>,
+    worker_key_info: Option<KeyInfo>,
     #[clap(skip)]
     encoded_worker_key: String,
 }
@@ -143,6 +148,66 @@ impl Cli {
     }
 
     fn fill_old_account(&mut self) -> Result<(), CliError> {
+        print!("> {}", "Owner address: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut owner: Address = Address::default();
+        match scanf!("{}", owner) {
+            Ok(_) => {
+                self.owner = owner;
+            },
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+
+        print!("> {}", "Owner private key: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut key: String = String::default();
+        match scanf!("{}", key) {
+            Ok(_) => {
+                self.encoded_owner_key = key;
+            },
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+
+        let key_info = hex::decode(&self.encoded_owner_key)?;
+        let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
+        self.owner_key_info = Some(KeyInfo::from(key_info));
+
+        print!("> {}", "Worker address: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut worker: Address = Address::default();
+        match scanf!("{}", worker) {
+            Ok(_) => {
+                self.worker = worker;
+            },
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+
+        print!("> {}", "Worker private key: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut key: String = String::default();
+        match scanf!("{}", key) {
+            Ok(_) => {
+                self.encoded_worker_key = key;
+            },
+            Err(err) => {
+                return Err(CliError::IOCallError(err));
+            },
+        }
+
+        let key_info = hex::decode(&self.encoded_worker_key)?;
+        let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
+        self.worker_key_info = Some(KeyInfo::from(key_info));
+
         Ok(())
     }
 
@@ -166,14 +231,14 @@ impl Cli {
         self.owner = address;
         self.encoded_owner_key = encoded_key.clone();
         self.owner_key = Some(key.clone());
-        self.owner_key_info_json = Some(key_info_json.clone());
+        self.owner_key_info = Some(KeyInfo::from(key_info_json.clone()));
 
         let yes_no = Cli::yes_no("Use different worker account from owner ?")?;
         if yes_no != YesNo::Yes {
             self.worker = address;
             self.encoded_worker_key = encoded_key;
             self.worker_key = Some(key);
-            self.worker_key_info_json = Some(key_info_json);
+            self.worker_key_info = Some(KeyInfo::from(key_info_json));
             return Ok(());
         }
 
@@ -181,7 +246,7 @@ impl Cli {
         self.worker = address;
         self.encoded_worker_key = encoded_key;
         self.worker_key = Some(key);
-        self.worker_key_info_json = Some(key_info_json);
+        self.worker_key_info = Some(KeyInfo::from(key_info_json));
 
         Ok(())
     }
