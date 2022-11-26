@@ -86,6 +86,27 @@ impl FromStr for MinerAction {
     }
 }
 
+enum ActorAction {
+    Compile,
+    Install,
+    Create,
+    TakeOwner,
+}
+
+impl FromStr for ActorAction {
+    type Err = AnyhowError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Compile" => Ok(Self::Compile),
+            "Install" => Ok(Self::Install),
+            "Create" => Ok(Self::Create),
+            "TakeOwner" => Ok(Self::TakeOwner),
+            _ => Ok(Self::Compile),
+        }
+    }
+}
+
 #[derive(Error, Debug)]
 pub enum CliError {
     #[error("io call error")]
@@ -108,7 +129,9 @@ pub enum CliError {
 
 #[derive(Debug, Subcommand, Clone)]
 pub enum Cmd {
-    Run {},
+    CreateMiner {},
+    CreateActor {},
+    CostodyMiner {},
 }
 
 #[derive(Debug, Parser, Clone)]
@@ -132,7 +155,19 @@ impl Cli {
 
     pub async fn run(&mut self) -> Result<(), CliError> {
         Self::print_banner();
-        Runner::new().run_main().await
+        match self.cmd {
+            Cmd::CreateMiner {} => {
+                Runner::new().run_main().await
+            },
+            Cmd::CreateActor {} => {
+                info!("CreateActor");
+                Ok(())
+            },
+            Cmd::CostodyMiner {} => {
+                info!("CostidyMiner");
+                Ok(())
+            },
+        }
     }
 }
 
