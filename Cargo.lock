@@ -5194,6 +5194,7 @@ dependencies = [
  "forest_key_management",
  "fvm_ipld_encoding 0.2.2",
  "fvm_shared",
+ "hex 0.4.3",
  "libp2p",
  "mpool",
  "rpc",
