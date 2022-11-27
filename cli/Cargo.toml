@@ -32,6 +32,9 @@ git = "https://github.com/ChainSafe/forest.git"
 version = "2.0.0"
 features = [ "arb" ]
 
+[dependencies.forest_json]
+workspace = true
+
 [dependencies.wallet]
 workspace = true
 
@@ -76,4 +79,13 @@ workspace = true
 workspace = true
 
 [dependencies.serde_with]
+workspace = true
+
+[dependencies.git2]
+workspace = true
+
+[dependencies.actor]
+workspace = true
+
+[dependencies.resolve-path]
 workspace = true

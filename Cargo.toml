@@ -23,28 +23,33 @@ name = "peggy"
 path = "peggy/main.rs"
 
 [workspace.dependencies]
-app            = { path = "./app" }
-cli            = { path = "./cli" }
-wallet         = { path = "./wallet" }
-miner          = { path = "./miner" }
-rpc            = { path = "./rpc" }
-state          = { path = "./state" }
-logger         = { path = "./logger" }
-mpool          = { path = "./mpool" }
-gasestimator   = { path = "./gasestimator" }
-send           = { path = "./send" }
-clap           = { version = "4.0.27", features = ["derive"] }
-thiserror      = { version = "1.0.37" }
-anyhow         = { version = "1.0.66" }
-figlet-rs      = { version =  "0.1.4" }
-terminal-menu  = { version =  "2.0.4" }
-tokio          = { version = "1.22.0", features = ["macros"] }
-crossterm      = { version = "0.23.2" }
-log            = { version = "0.4.17" }
-url            = { version = "2.3.1" }
-serde          = { version = "1.0.147" }
-chrono         = { version = "0.4.23" }
-serde_with     = { version = "2.1.0" }
+forest_key_management    = { version = "0.2.0", git = "https://github.com/ChainSafe/forest.git" }
+forest_json              = { version = "0.2.0", git = "https://github.com/ChainSafe/forest.git" }
+app                      = { path = "./app" }
+cli                      = { path = "./cli" }
+wallet                   = { path = "./wallet" }
+miner                    = { path = "./miner" }
+rpc                      = { path = "./rpc" }
+state                    = { path = "./state" }
+logger                   = { path = "./logger" }
+mpool                    = { path = "./mpool" }
+gasestimator             = { path = "./gasestimator" }
+send                     = { path = "./send" }
+actor                    = { path = "./actor" }
+clap                     = { version = "4.0.27", features = ["derive"] }
+thiserror                = { version = "1.0.37" }
+anyhow                   = { version = "1.0.66" }
+figlet-rs                = { version =  "0.1.4" }
+terminal-menu            = { version =  "2.0.4" }
+tokio                    = { version = "1.22.0", features = ["macros"] }
+crossterm                = { version = "0.23.2" }
+log                      = { version = "0.4.17" }
+url                      = { version = "2.3.1" }
+serde                    = { version = "1.0.147" }
+chrono                   = { version = "0.4.23" }
+serde_with               = { version = "2.1.0" }
+git2                     = { version = "0.15.0" }
+resolve-path             = { version = "0.1.0" }
 
 [dependencies.app]
 workspace = true

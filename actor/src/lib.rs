@@ -1,60 +1,32 @@
-use clap::Parser;
-use scanf::scanf;
-use std::str::FromStr;
-use colored::Colorize;
-use forest_key_management::{
-    json::KeyInfoJson,
-    KeyInfo,
-};
-use fvm_shared::{
-    crypto::signature::SignatureType,
-    address::Address,
-    sector::{RegisteredSealProof, SectorSize},
-    version::NetworkVersion,
-    message::Message,
-    econ::TokenAmount,
-};
-use fil_actor_power::{
-    CreateMinerParams,
-};
-use libp2p::{
-    identity::{ed25519, Keypair},
-    PeerId,
-};
-use fvm_ipld_encoding::{
-    RawBytes,
-    BytesDe,
-    Cbor,
-};
-use fil_actors_runtime::STORAGE_POWER_ACTOR_ADDR;
-use forest_message::signed_message::SignedMessage;
-use forest_json::{
-    signed_message::json::SignedMessageJson,
-    cid::CidJson,
-};
-use reqwest::{
-    blocking,
-    header::{CONTENT_TYPE, AUTHORIZATION},
-};
-use jsonrpc_v2::RequestObject;
-use forest_rpc_api::{
-    mpool_api,
-    state_api,
-};
-use serde_json::json;
+use git2::{self, Repository};
+use thiserror::Error;
+use std::path::PathBuf;
 
-fn compile_actor() {
-    println!("{}", " Try compile actor".yellow());
+#[derive(Debug, Error)]
+pub enum ActorError {
+    #[error("git call error")]
+    GitCallError(#[from] git2::Error),
+    #[error("io call error")]
+    IOCallError(#[from] std::io::Error),
 }
 
-fn deploy_actor() {
-    println!("{}", " Try deploy actor".yellow());
+pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorError> {
+    let _ = Repository::clone(repo_url, target_path)?;
+    Ok(())
 }
 
-fn create_actor() {
-    println!("{}", " Try create actor".yellow());
+pub fn compile_actor() {
+    println!("{}", " Try compile actor");
 }
 
-fn take_owner() {
-    println!("{}", " Try take owner".yellow());
+pub fn deploy_actor() {
+    println!("{}", " Try deploy actor");
+}
+
+pub fn create_actor() {
+    println!("{}", " Try create actor");
+}
+
+pub fn take_owner() {
+    println!("{}", " Try take owner");
 }

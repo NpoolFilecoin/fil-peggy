@@ -32,12 +32,18 @@ use log::{info, error};
 use hex::FromHexError;
 use serde::{Serialize, Deserialize};
 use serde_with::{serde_as, DisplayFromStr};
+use std::path::PathBuf;
+use forest_json::{
+    cid::CidJson,
+};
+use resolve_path::PathResolveExt;
 
 use wallet;
 use miner::{Miner, CreateMinerReturn};
 use rpc::RpcEndpoint;
 use state::wait_msg;
 use send::send;
+use actor::clone_actor;
 
 #[derive(PartialEq)]
 enum YesNo {
@@ -131,6 +137,8 @@ pub enum CliError {
     MinerCallError(#[from] miner::MinerError),
     #[error("state call error")]
     StateCallError(#[from] state::StateError),
+    #[error("actor call error")]
+    ActorCallError(#[from] actor::ActorError),
 }
 
 #[derive(Debug, Subcommand, Clone)]
@@ -215,6 +223,19 @@ struct Runner {
     rpc_bearer_token: String,
     #[serde(skip)]
     rpc: Option<RpcEndpoint>,
+
+    #[serde(default = "String::default")]
+    actor_repo_url: String,
+    #[serde(default = "PathBuf::default")]
+    actor_path: PathBuf,
+
+    actor_code_id: Option<CidJson>,
+    #[serde_as(as = "DisplayFromStr")]
+    #[serde(default = "Address::default")]
+    actor_id_address: Address,
+    #[serde_as(as = "DisplayFromStr")]
+    #[serde(default = "Address::default")]
+    actor_robust_address: Address,
 }
 
 impl Runner {
@@ -253,6 +274,13 @@ impl Runner {
             rpc_host: String::default(),
             rpc_bearer_token: String::default(),
             rpc: None,
+
+            actor_repo_url: String::default(),
+            actor_path: PathBuf::default(),
+
+            actor_code_id: None,
+            actor_id_address: Address::default(),
+            actor_robust_address: Address::default(),
         }
     }
 
@@ -306,6 +334,49 @@ impl Runner {
     }
 
     async fn create_actor_main(&mut self) -> Result<(), CliError> {
+        self.actor_repo_handler().await?;
+        self.compile_actor()?;
+        self.install_actor()?;
+        self.create_actor()?;
+        self.actor_take_owner()?;
+        self.print_myself()?;
+        self.save_myself()?;
+        Ok(())
+    }
+
+    async fn actor_repo_handler(&mut self) -> Result<(), CliError> {
+        print!("> {}", "Actor git repository: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut repo_url = String::default();
+        scanf!("{}", repo_url)?;
+
+        print!("> {}", "Clone to: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut target_path = PathBuf::default();
+        scanf!("{}", target_path)?;
+
+        self.actor_repo_url = repo_url.clone();
+        self.actor_path = target_path.clone().resolve().to_path_buf();
+        clone_actor(&repo_url, target_path)?;
+
+        Ok(())
+    }
+
+    fn compile_actor(&mut self) -> Result<(), CliError> {
+        Ok(())
+    }
+
+    fn install_actor(&mut self) -> Result<(), CliError> {
+        Ok(())
+    }
+
+    fn create_actor(&mut self) -> Result<(), CliError> {
+        Ok(())
+    }
+
+    fn actor_take_owner(&mut self) -> Result<(), CliError> {
         Ok(())
     }
 
@@ -545,6 +616,13 @@ impl Runner {
         println!("  > {}{}", "Rpc Host:".green(), format!(" {}", self.rpc_host));
         println!("  > {}{}", "Rpc Bearer Token:".green(), format!(" {}", self.rpc_bearer_token));
 
+        println!("  > {}{}", "Actor Repo Url:".green(), format!(" {}", self.actor_repo_url));
+        println!("  > {}{}", "Actor Path:".green(), format!(" {}", self.actor_path.display()));
+
+        println!("  > {}{}", "Actor Code ID:".green(), format!(" {:?}", self.actor_code_id));
+        println!("  > {}{}", "Actor ID Address:".green(), format!(" {}", self.actor_id_address));
+        println!("  > {}{}", "Actor Robust Address:".green(), format!(" {}", self.actor_robust_address));
+
         Ok(())
     }
 
@@ -558,7 +636,7 @@ impl Runner {
             },
         }
 
-        let my_json = serde_json::to_string(self)?;
+        let my_json = serde_json::to_string_pretty(self)?;
         let now = SystemTime::now();
         let datetime: DateTime<Utc> = now.into();
 
