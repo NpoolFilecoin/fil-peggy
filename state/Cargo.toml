@@ -3,32 +3,38 @@ name = "state"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-serde = "1.0.147"
-serde_json = "1.0.89"
-fvm_shared = "2.0.0"
-thiserror = "1.0.37"
-libipld-core = "0.15.0"
-log = "0.4.17"
+[dependencies.serde]
+workspace = true
+
+[dependencies.serde_json]
+workspace = true
+
+[dependencies.fvm_shared]
+workspace = true
+
+[dependencies.thiserror]
+workspace = true
+
+[dependencies.libipld-core]
+workspace = true
+
+[dependencies.log]
+workspace = true
 
 [dependencies.forest_json]
-version = "0.2.0"
-git = "https://github.com/ChainSafe/forest.git"
+workspace = true
 
 [dependencies.rpc]
 workspace = true
 
 [dependencies.forest_rpc-api]
-version = "0.2.0"
-git = "https://github.com/ChainSafe/forest.git"
+workspace = true
 
 [dependencies.forest_blocks]
-version = "0.2.0"
-git = "https://github.com/ChainSafe/forest.git"
+workspace = true
 
 [dependencies.forest_ipld]
-version = "0.2.0"
-git = "https://github.com/ChainSafe/forest.git"
+workspace = true
 
 
 

@@ -59,6 +59,7 @@ scanf                    = { version = "1.2.1" }
 colored                  = { version = "2.0.0" }
 forest_key_management    = { version = "0.2.0", git = "https://github.com/ChainSafe/forest.git" }
 forest_json              = { version = "0.2.0", git = "https://github.com/ChainSafe/forest.git" }
+forest_blocks            = { version = "0.2.0", git = "https://github.com/ChainSafe/forest.git" }
 forest_message           = { version = "0.8.0", git = "https://github.com/ChainSafe/forest.git" }
 forest_rpc-api           = { version = "0.2.0", git = "https://github.com/ChainSafe/forest.git" }
 forest_ipld              = { version = "0.2.0", git = "https://github.com/ChainSafe/forest.git" }
