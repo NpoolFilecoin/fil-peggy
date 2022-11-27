@@ -3,7 +3,10 @@ use thiserror::Error;
 use std::path::PathBuf;
 use cargo::{
     core::{Workspace, shell::Shell, compiler::CompileMode},
-    util::config::Config,
+    util::{
+        interning::InternedString,
+        config::Config,
+    },
     ops::{compile, CompileOptions},
 };
 use anyhow::{anyhow, Error as AnyhowError};
@@ -26,9 +29,13 @@ pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorErro
 pub fn compile_actor(target_path: PathBuf) -> Result<PathBuf, ActorError> {
     let home = dirs::home_dir().ok_or(ActorError::CommonError(anyhow!("invalid home")))?;
     let cfg = Config::new(Shell::default(), target_path.clone(), home);
-    let workspace = Workspace::new(&target_path.join("Cargo.toml"),&cfg)?;
-    let compile_opt = CompileOptions::new(&cfg, CompileMode::Build)?;
-    compile(&workspace, &compile_opt)?;
+
+    let workspace = Workspace::new(&target_path.join("Cargo.toml"), &cfg)?;
+    let mut compile_opts = CompileOptions::new(&cfg, CompileMode::Build)?;
+
+    compile_opts.build_config.requested_profile = InternedString::new("release");
+
+    compile(&workspace, &compile_opts)?;
     Ok(PathBuf::default())
 }
 
