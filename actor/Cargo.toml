@@ -60,3 +60,12 @@ workspace = true
 
 [dependencies.thiserror]
 workspace = true
+
+[dependencies.cargo]
+workspace = true
+
+[dependencies.dirs]
+workspace = true
+
+[dependencies.anyhow]
+workspace = true

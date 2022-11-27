@@ -50,6 +50,8 @@ chrono                   = { version = "0.4.23" }
 serde_with               = { version = "2.1.0" }
 git2                     = { version = "0.15.0" }
 resolve-path             = { version = "0.1.0" }
+cargo                    = { version = "0.66.0" }
+dirs                     = { version = "4.0.0" }
 
 [dependencies.app]
 workspace = true

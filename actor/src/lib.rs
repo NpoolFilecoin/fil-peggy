@@ -1,6 +1,12 @@
 use git2::{self, Repository};
 use thiserror::Error;
 use std::path::PathBuf;
+use cargo::{
+    core::{Workspace, shell::Shell, compiler::CompileMode},
+    util::config::Config,
+    ops::{compile, CompileOptions},
+};
+use anyhow::{anyhow, Error as AnyhowError};
 
 #[derive(Debug, Error)]
 pub enum ActorError {
@@ -8,6 +14,8 @@ pub enum ActorError {
     GitCallError(#[from] git2::Error),
     #[error("io call error")]
     IOCallError(#[from] std::io::Error),
+    #[error("common error")]
+    CommonError(#[from] AnyhowError),
 }
 
 pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorError> {
@@ -15,11 +23,16 @@ pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorErro
     Ok(())
 }
 
-pub fn compile_actor() {
-    println!("{}", " Try compile actor");
+pub fn compile_actor(target_path: PathBuf) -> Result<PathBuf, ActorError> {
+    let home = dirs::home_dir().ok_or(ActorError::CommonError(anyhow!("invalid home")))?;
+    let cfg = Config::new(Shell::default(), target_path.clone(), home);
+    let workspace = Workspace::new(&target_path.join("Cargo.toml"),&cfg)?;
+    let compile_opt = CompileOptions::new(&cfg, CompileMode::Build)?;
+    compile(&workspace, &compile_opt)?;
+    Ok(PathBuf::default())
 }
 
-pub fn deploy_actor() {
+pub fn install_actor() {
     println!("{}", " Try deploy actor");
 }
 

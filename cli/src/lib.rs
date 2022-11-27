@@ -43,7 +43,10 @@ use miner::{Miner, CreateMinerReturn};
 use rpc::RpcEndpoint;
 use state::wait_msg;
 use send::send;
-use actor::clone_actor;
+use actor::{
+    clone_actor,
+    compile_actor,
+};
 
 #[derive(PartialEq)]
 enum YesNo {
@@ -228,6 +231,8 @@ struct Runner {
     actor_repo_url: String,
     #[serde(default = "PathBuf::default")]
     actor_path: PathBuf,
+    #[serde(default = "PathBuf::default")]
+    actor_wasm_path: PathBuf,
 
     actor_code_id: Option<CidJson>,
     #[serde_as(as = "DisplayFromStr")]
@@ -277,6 +282,7 @@ impl Runner {
 
             actor_repo_url: String::default(),
             actor_path: PathBuf::default(),
+            actor_wasm_path: PathBuf::default(),
 
             actor_code_id: None,
             actor_id_address: Address::default(),
@@ -345,6 +351,12 @@ impl Runner {
     }
 
     async fn actor_repo_handler(&mut self) -> Result<(), CliError> {
+        let yes_no = Runner::yes_no("Would you use exist repository ?")?;
+        if yes_no == YesNo::Yes {
+            self.actor_wasm_path = compile_actor(self.actor_path.clone())?;
+            return Ok(());
+        }
+
         print!("> {}", "Actor git repository: ".green());
         io::stdout().flush().unwrap();
 
@@ -359,7 +371,9 @@ impl Runner {
 
         self.actor_repo_url = repo_url.clone();
         self.actor_path = target_path.clone().resolve().to_path_buf();
-        clone_actor(&repo_url, target_path)?;
+
+        clone_actor(&repo_url, target_path.clone())?;
+        compile_actor(target_path)?;
 
         Ok(())
     }
@@ -618,6 +632,7 @@ impl Runner {
 
         println!("  > {}{}", "Actor Repo Url:".green(), format!(" {}", self.actor_repo_url));
         println!("  > {}{}", "Actor Path:".green(), format!(" {}", self.actor_path.display()));
+        println!("  > {}{}", "Actor WASM Path:".green(), format!(" {}", self.actor_wasm_path.display()));
 
         println!("  > {}{}", "Actor Code ID:".green(), format!(" {:?}", self.actor_code_id));
         println!("  > {}{}", "Actor ID Address:".green(), format!(" {}", self.actor_id_address));
