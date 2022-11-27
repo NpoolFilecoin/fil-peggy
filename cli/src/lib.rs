@@ -291,7 +291,7 @@ impl Runner {
     }
 
     fn load() -> Result<Option<Self>, CliError> {
-        let yes_no = Runner::yes_no("Would you use exist runner ?")?;
+        let yes_no = Runner::yes_no("Would you use exist runner?")?;
         if yes_no == YesNo::No {
             return Ok(None);
         }
@@ -351,7 +351,7 @@ impl Runner {
     }
 
     async fn actor_repo_handler(&mut self) -> Result<(), CliError> {
-        let yes_no = Runner::yes_no("Would you use exist repository ?")?;
+        let yes_no = Runner::yes_no("Would you use exist repository?")?;
         if yes_no == YesNo::Yes {
             self.actor_wasm_path = compile_actor(self.actor_path.clone())?;
             return Ok(());
@@ -373,7 +373,7 @@ impl Runner {
         self.actor_path = target_path.clone().resolve().to_path_buf();
 
         clone_actor(&repo_url, target_path.clone())?;
-        compile_actor(target_path)?;
+        self.actor_wasm_path = compile_actor(target_path)?;
 
         Ok(())
     }
@@ -405,7 +405,7 @@ impl Runner {
     }
 
     fn account_handler(&mut self) -> Result<(), CliError> {
-        let yes_no = Runner::yes_no("Would you like to use exist account ?")?;
+        let yes_no = Runner::yes_no("Would you like to use exist account?")?;
         match yes_no {
             YesNo::No => {
                 self.generate_account()?;
@@ -574,7 +574,7 @@ impl Runner {
         self.owner_key = Some(key.clone());
         self.owner_key_info = Some(KeyInfo::from(key_info_json.clone()));
 
-        let yes_no = Runner::yes_no("Use different worker account from owner ?")?;
+        let yes_no = Runner::yes_no("Use different worker account from owner?")?;
         if yes_no != YesNo::Yes {
             self.worker = address;
             self.encoded_worker_key = encoded_key;
