@@ -3,34 +3,41 @@ name = "cli"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-libp2p = "0.49.0"
-hex = "0.4.3"
-serde_json = "1.0.89"
-fil_actor_power = "9.0.1"
-thiserror = "1.0.37"
-anyhow = "1.0.66"
+[dependencies.libp2p]
+workspace = true
+
+[dependencies.hex]
+workspace = true
+
+[dependencies.serde_json]
+workspace = true
+
+[dependencies.fil_actor_power]
+workspace = true
+
+[dependencies.thiserror]
+workspace = true
+
+[dependencies.anyhow]
+workspace = true
 
 [dependencies.clap]
 workspace = true
 
 [dependencies.scanf]
-version = "1.2.1"
+workspace = true
 
 [dependencies.colored]
-version = "2.0.0"
+workspace = true
 
 [dependencies.forest_key_management]
-version = "0.2.0"
-git = "https://github.com/ChainSafe/forest.git"
+workspace = true
 
 [dependencies.forest_ipld]
-version = "0.2.0"
-git = "https://github.com/ChainSafe/forest.git"
+workspace = true
 
 [dependencies.fvm_shared]
-version = "2.0.0"
-features = [ "arb" ]
+workspace = true
 
 [dependencies.forest_json]
 workspace = true
@@ -57,8 +64,7 @@ workspace = true
 workspace = true
 
 [dependencies.libipld-core]
-version = "0.15"
-features = ["serde-codec"]
+workspace = true
 
 [dependencies.terminal-menu]
 workspace = true
