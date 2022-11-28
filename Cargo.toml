@@ -47,9 +47,6 @@ serde                    = { version = "1.0.147" }
 chrono                   = { version = "0.4.23" }
 serde_with               = { version = "2.1.0" }
 git2                     = { version = "0.15.0" }
-resolve-path             = { version = "0.1.0" }
-cargo                    = { version = "0.66.0" }
-dirs                     = { version = "4.0.0" }
 serde_json               = { version = "1.0.88" }
 hex                      = { version = "0.4.3" }
 fil_actor_power          = { version = "9.0.1" }
@@ -70,6 +67,8 @@ reqwest                  = { version = "0.11.13", features = ["blocking", "json"
 jsonrpc-v2               = { version = "0.11", features = ["easy-errors", "macros", "bytes-v05"], default-features = false }
 libipld-core             = { version = "0.15", features = ["serde-codec"] }
 num-bigint               = { version = "0.4.3" }
+fil_actor_init           = { git = "https://github.com/filecoin-project/builtin-actors.git", branch = "next", features = ["m2-native"] }
+resolve-path             = { version = "0.1.0" }
 
 [dependencies.app]
 workspace = true
