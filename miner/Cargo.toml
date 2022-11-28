@@ -41,3 +41,6 @@ workspace = true
 
 [dependencies.serde]
 workspace = true
+
+[dependencies.state]
+workspace = true

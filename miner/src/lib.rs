@@ -23,7 +23,9 @@ use rpc::RpcEndpoint;
 use serde::Deserialize;
 use thiserror::Error;
 use std::str::FromStr;
+
 use mpool::{mpool_push, MpoolError};
+use state::{wait_msg, StateError};
 
 #[derive(Error, Debug)]
 pub enum MinerError {
@@ -31,12 +33,14 @@ pub enum MinerError {
     MissIDAddress,
     #[error("miss RobustAddress in string")]
     MissRobustAddress,
-    #[error("json parse error")]
+    #[error("json parse error: {0}")]
     JsonParseError(#[from] serde_json::Error),
-    #[error("address parse error")]
+    #[error("address parse error: {0}")]
     AddressParseError(#[from] fvm_shared::address::Error),
-    #[error("mpool call error")]
-    MpoolCallError(#[from] MpoolError)
+    #[error("mpool call error: {0}")]
+    MpoolCallError(#[from] MpoolError),
+    #[error("state call error: {0}")]
+    StateCallError(#[from] StateError),
 }
 
 #[derive(Default)]
@@ -81,7 +85,7 @@ pub struct Miner {
 }
 
 impl Miner {
-    pub async fn create_miner(&self) -> Result<CidJson, MinerError> {
+    pub async fn create_miner(&self) -> Result<CreateMinerReturn, MinerError> {
         let params = CreateMinerParams {
             owner: self.owner,
             worker: self.worker,
@@ -89,6 +93,7 @@ impl Miner {
             peer: self.peer_id.to_bytes(),
             multiaddrs: vec![BytesDe("peggy-miner".as_bytes().to_vec())],
         };
+
         match mpool_push::<_, CidJson>(
             self.rpc.clone(),
             self.owner,
@@ -98,9 +103,18 @@ impl Miner {
             TokenAmount::from_atto(0),
             params,
         ).await {
-            Ok(res) => Ok(res),
+            Ok(res) => {
+                match wait_msg::<CreateMinerReturn>(
+                    self.rpc.clone().debug(),
+                    res.clone(),
+                ).await {
+                    Ok(ret) => Ok(ret),
+                    Err(err) => Err(MinerError::StateCallError(err)),
+                }
+            },
             Err(err) => Err(MinerError::MpoolCallError(err)),
         }
+
     }
 
     pub fn change_owner(&self) -> Result<String, &str> {

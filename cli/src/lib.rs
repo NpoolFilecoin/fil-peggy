@@ -39,9 +39,8 @@ use forest_json::{
 use resolve_path::PathResolveExt;
 
 use wallet;
-use miner::{Miner, CreateMinerReturn};
+use miner::Miner;
 use rpc::RpcEndpoint;
-use state::wait_msg;
 use send::send;
 use actor::{
     clone_actor,
@@ -838,13 +837,8 @@ impl Runner {
             },
         };
 
-        info!("{}", "> Wait create miner".yellow());
-        let ret = wait_msg::<CreateMinerReturn>(
-            rpc_cli.clone(),
-            res.clone(),
-        ).await?;
-        self.miner_id_address = ret.id_address;
-        self.miner_robust_address = ret.robust_address;
+        self.miner_id_address = res.id_address;
+        self.miner_robust_address = res.robust_address;
 
         Ok(())
     }
