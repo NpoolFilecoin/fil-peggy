@@ -4,11 +4,9 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error as AnyhowError};
 use std::process::{Command, Stdio};
 use std::string::FromUtf8Error;
-use fil_actor_init::{InstallParams, InstallReturn};
+use fil_actor_init::InstallParams;
 use fil_actors_runtime::INIT_ACTOR_ADDR;
 use forest_key_management::KeyInfo;
-use mpool::{mpool_push, MpoolError};
-use rpc::RpcEndpoint;
 use fvm_shared::{
     econ::TokenAmount,
     address::Address,
@@ -19,6 +17,13 @@ use fvm_ipld_encoding_3::{
 use forest_json::{
     cid::CidJson,
 };
+use serde::{Serialize, Deserialize};
+use std::str::FromStr;
+use cid::Cid;
+
+use mpool::{mpool_push, MpoolError};
+use rpc::RpcEndpoint;
+use state::{wait_msg, StateError};
 
 #[derive(Debug, Error)]
 pub enum ActorError {
@@ -34,6 +39,8 @@ pub enum ActorError {
     ParseUtf8Error(#[from] FromUtf8Error),
     #[error("mpool call error: {0}")]
     MpoolCallError(#[from] MpoolError),
+    #[error("state call error: {0}")]
+    StateCallError(#[from] StateError),
 }
 
 pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorError> {
@@ -72,6 +79,32 @@ pub fn compile_actor(target_path: PathBuf) -> Result<PathBuf, ActorError> {
     Ok(wasm_path)
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct InstallReturn {
+    pub code_cid: CidJson,
+    pub installed: bool,
+}
+
+impl FromStr for InstallReturn {
+    type Err = ActorError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match serde_json::from_str::<Self>(s) {
+            Ok(ret) => Ok(ret),
+            Err(err) => Err(ActorError::ParseJsonError(err)),
+        }
+    }
+}
+
+impl Default for InstallReturn {
+    fn default() -> Self {
+        Self {
+            code_cid: CidJson(Cid::from_str("bafyreibjo4xmgaevkgud7mbifn3dzp4v4lyaui4yvqp3f2bqwtxcjrdqg4").unwrap() as Cid),
+            installed: false,
+        }
+    }
+}
+
 pub async fn install_actor(
     rpc: RpcEndpoint,
     target_path: PathBuf,
@@ -84,17 +117,21 @@ pub async fn install_actor(
         code: code,
     };
 
-    let ret = mpool_push::<_, InstallReturn>(
-        rpc,
+    match mpool_push::<_, CidJson>(
+        rpc.clone().debug(),
         from,
         from_key_info,
         INIT_ACTOR_ADDR,
         4,
         TokenAmount::from_atto(0),
-        vec![params],
-    ).await?;
-
-    Ok((CidJson(ret.code_cid), ret.installed))
+        params,
+    ).await {
+        Ok(res) => {
+            let ret = wait_msg::<InstallReturn>(rpc.debug(), res.clone()).await?;
+            Ok((ret.code_cid, ret.installed))
+        },
+        Err(err) => Err(ActorError::MpoolCallError(err)),
+    }
 }
 
 pub fn create_actor() {

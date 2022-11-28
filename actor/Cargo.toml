@@ -38,3 +38,13 @@ workspace = true
 
 [dependencies.forest_json]
 workspace = true
+
+[dependencies.serde]
+workspace = true
+
+[dependencies.state]
+workspace = true
+
+[dependencies.cid]
+workspace = true
+
