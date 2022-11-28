@@ -167,7 +167,9 @@ pub async fn install_actor(
 }
 
 #[derive(Serialize, Deserialize, Default)]
+#[serde(rename_all = "PascalCase")]
 pub struct ExecReturn {
+    #[serde(rename = "IDAddress")]
     pub id_address: Address,
     pub robust_address: Address,
 }
@@ -176,10 +178,23 @@ impl FromStr for ExecReturn {
     type Err = ActorError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match serde_json::from_str::<Self>(s) {
-            Ok(ret) => Ok(ret),
-            Err(err) => Err(ActorError::ParseJsonError(err)),
+        #[derive(Deserialize)]
+        #[serde(rename_all = "PascalCase")]
+        struct T {
+            #[serde(rename = "IDAddress")]
+            id_address: String,
+            robust_address: String,
         }
+
+        let v = serde_json::from_str::<T>(s)?;
+
+        let id_address = Address::from_str(&v.id_address)?;
+        let robust_address = Address::from_str(&v.robust_address)?;
+
+        Ok(Self {
+            id_address,
+            robust_address,
+        })
     }
 }
 

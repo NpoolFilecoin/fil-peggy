@@ -355,6 +355,7 @@ impl Runner {
 
     async fn create_actor_main(&mut self) -> Result<(), CliError> {
         self.actor_repo_handler().await?;
+        self.save_myself()?;
         self.compile_actor()?;
         self.install_actor().await?;
         self.create_actor().await?;
