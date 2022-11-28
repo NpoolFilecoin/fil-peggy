@@ -8,7 +8,14 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "fil_actor_init 10.0.0-alpha.1",
+ "fil_actors_runtime 10.0.0-alpha.1 (git+https://github.com/filecoin-project/builtin-actors.git)",
+ "forest_json",
+ "forest_key_management",
+ "fvm_ipld_encoding 0.3.0",
+ "fvm_shared 2.0.0",
  "git2",
+ "mpool",
+ "rpc",
  "serde_json",
  "thiserror",
 ]

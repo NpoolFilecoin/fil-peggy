@@ -4,6 +4,21 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error as AnyhowError};
 use std::process::{Command, Stdio};
 use std::string::FromUtf8Error;
+use fil_actor_init::{InstallParams, InstallReturn};
+use fil_actors_runtime::INIT_ACTOR_ADDR;
+use forest_key_management::KeyInfo;
+use mpool::{mpool_push, MpoolError};
+use rpc::RpcEndpoint;
+use fvm_shared::{
+    econ::TokenAmount,
+    address::Address,
+};
+use fvm_ipld_encoding_3::{
+    RawBytes,
+};
+use forest_json::{
+    cid::CidJson,
+};
 
 #[derive(Debug, Error)]
 pub enum ActorError {
@@ -17,6 +32,8 @@ pub enum ActorError {
     ParseJsonError(#[from] serde_json::Error),
     #[error("parse utf8 error")]
     ParseUtf8Error(#[from] FromUtf8Error),
+    #[error("mpool call error")]
+    MpoolCallError(#[from] MpoolError),
 }
 
 pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorError> {
@@ -53,8 +70,29 @@ pub fn compile_actor(target_path: PathBuf) -> Result<PathBuf, ActorError> {
     Ok(wasm_path)
 }
 
-pub fn install_actor() {
-    println!("{}", " Try deploy actor");
+pub async fn install_actor(
+    rpc: RpcEndpoint,
+    target_path: PathBuf,
+    from: Address,
+    from_key_info: KeyInfo,
+) -> Result<(CidJson, bool), ActorError> {
+    let code = std::fs::read(target_path)?;
+    let code = RawBytes::from(code);
+    let params = InstallParams {
+        code: code,
+    };
+
+    let ret = mpool_push::<_, InstallReturn>(
+        rpc,
+        from,
+        from_key_info,
+        INIT_ACTOR_ADDR,
+        4,
+        TokenAmount::from_atto(0),
+        vec![params],
+    ).await?;
+
+    Ok((CidJson(ret.code_cid), ret.installed))
 }
 
 pub fn create_actor() {

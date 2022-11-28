@@ -52,6 +52,7 @@ hex                      = { version = "0.4.3" }
 fil_actor_power          = { version = "9.0.1" }
 libp2p                   = { version = "0.49.0" }
 fvm_ipld_encoding        = { version = "0.2.2" }
+fvm_ipld_encoding_3      = { version = "0.3.0", package = "fvm_ipld_encoding" }
 scanf                    = { version = "1.2.1" }
 colored                  = { version = "2.0.0" }
 forest_key_management    = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }

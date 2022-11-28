@@ -28,7 +28,7 @@ use std::{
 use chrono::{offset::Utc, DateTime};
 use terminal_menu::{menu, label, button, run, mut_menu};
 use crossterm::style::Color;
-use log::{info, error};
+use log::{info, error, warn};
 use hex::FromHexError;
 use serde::{Serialize, Deserialize};
 use serde_with::{serde_as, DisplayFromStr};
@@ -46,6 +46,7 @@ use send::send;
 use actor::{
     clone_actor,
     compile_actor,
+    install_actor,
 };
 
 #[derive(PartialEq)]
@@ -342,7 +343,7 @@ impl Runner {
     async fn create_actor_main(&mut self) -> Result<(), CliError> {
         self.actor_repo_handler().await?;
         self.compile_actor()?;
-        self.install_actor()?;
+        self.install_actor().await?;
         self.create_actor()?;
         self.actor_take_owner()?;
         self.print_myself()?;
@@ -353,7 +354,6 @@ impl Runner {
     async fn actor_repo_handler(&mut self) -> Result<(), CliError> {
         let yes_no = Runner::yes_no("Would you use exist repository?")?;
         if yes_no == YesNo::Yes {
-            self.actor_wasm_path = compile_actor(self.actor_path.clone())?;
             return Ok(());
         }
 
@@ -373,16 +373,48 @@ impl Runner {
         self.actor_path = target_path.clone().resolve().to_path_buf();
 
         clone_actor(&repo_url, target_path.clone())?;
-        self.actor_wasm_path = compile_actor(target_path)?;
 
         Ok(())
     }
 
     fn compile_actor(&mut self) -> Result<(), CliError> {
+        self.actor_wasm_path = compile_actor(self.actor_path.clone())?;
         Ok(())
     }
 
-    fn install_actor(&mut self) -> Result<(), CliError> {
+    async fn install_actor(&mut self) -> Result<(), CliError> {
+        let rpc_cli: RpcEndpoint;
+        match &self.rpc {
+            Some(rpc) => {
+                rpc_cli = rpc.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid rpc")));
+            },
+        }
+
+        let owner_key_info: KeyInfo;
+        match &self.owner_key_info {
+            Some(key_info) => {
+                owner_key_info = key_info.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid owner key info")));
+            }
+        }
+
+        let (code_cid, installed) = install_actor(
+            rpc_cli,
+            self.actor_path.clone(),
+            self.owner,
+            owner_key_info.clone(),
+        ).await?;
+
+        self.actor_code_id = Some(code_cid.clone());
+        if !installed {
+            warn!("> Actor {:?} may be already installed", code_cid);
+        }
+
         Ok(())
     }
 
