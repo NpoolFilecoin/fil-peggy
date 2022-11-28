@@ -4,7 +4,12 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error as AnyhowError};
 use std::process::{Command, Stdio};
 use std::string::FromUtf8Error;
-use fil_actor_init::{InstallParams, InstallReturn as InstallReturn1};
+use fil_actor_init::{
+    InstallParams,
+    InstallReturn as InstallReturn1,
+    ExecParams,
+    ExecReturn as ExecReturn1,
+};
 use fil_actors_runtime::INIT_ACTOR_ADDR;
 use forest_key_management::KeyInfo;
 use fvm_shared::{
@@ -47,6 +52,8 @@ pub enum ActorError {
     DecodeBase64Error(#[from] base64::DecodeError),
     #[error("decode ipld error: {0}")]
     DecodeIpldError(#[from] fvm_ipld_encoding_3::Error),
+    #[error("parse address error")]
+    ParseAddressError(#[from] fvm_shared::address::Error),
 }
 
 pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorError> {
@@ -149,8 +156,65 @@ pub async fn install_actor(
     }
 }
 
-pub fn create_actor() {
-    println!("{}", " Try create actor");
+#[derive(Serialize, Deserialize, Default)]
+pub struct ExecReturn {
+    pub id_address: Address,
+    pub robust_address: Address,
+}
+
+impl FromStr for ExecReturn {
+    type Err = ActorError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match serde_json::from_str::<Self>(s) {
+            Ok(ret) => Ok(ret),
+            Err(err) => Err(ActorError::ParseJsonError(err)),
+        }
+    }
+}
+
+pub async fn create_actor(
+    rpc: RpcEndpoint,
+    actor_code_id: CidJson,
+    from: Address,
+    from_key_info: KeyInfo,
+) -> Result<(Address, Address), ActorError> {
+    let CidJson(_cid) = actor_code_id;
+    let params = ExecParams {
+        code_cid: _cid,
+        constructor_params: RawBytes::new(Vec::new()),
+    };
+
+    match mpool_push::<_, CidJson>(
+        rpc.clone(),
+        from,
+        from_key_info,
+        INIT_ACTOR_ADDR,
+        2,
+        TokenAmount::from_atto(0),
+        params,
+    ).await {
+        Ok(res) => {
+            match wait_msg::<ExecReturn>(rpc, res.clone()).await {
+                Ok(ret) => Ok((
+                    Address::from_str(&ret.id_address.to_string())?,
+                    Address::from_str(&ret.robust_address.to_string())?,
+                )),
+                Err(StateError::ParseByYourSelf(s)) => {
+                    warn!("> State cannot parse {}, parse by youself!", &s);
+                    let s = base64::decode_config(&s, base64::STANDARD)?;
+                    let b = RawBytes::new(s);
+                    let ret: ExecReturn1 = RawBytes::deserialize(&b)?;
+                    Ok((
+                        Address::from_str(&ret.id_address.to_string())?,
+                        Address::from_str(&ret.robust_address.to_string())?,
+                    ))
+                },
+                Err(err) => Err(ActorError::StateCallError(err)),
+            }
+        },
+        Err(err) => Err(ActorError::MpoolCallError(err)),
+    }
 }
 
 pub fn take_owner() {

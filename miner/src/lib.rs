@@ -105,7 +105,7 @@ impl Miner {
         ).await {
             Ok(res) => {
                 match wait_msg::<CreateMinerReturn>(
-                    self.rpc.clone().debug(),
+                    self.rpc.clone(),
                     res.clone(),
                 ).await {
                     Ok(ret) => Ok(ret),

@@ -46,6 +46,7 @@ use actor::{
     clone_actor,
     compile_actor,
     install_actor,
+    create_actor,
 };
 
 #[derive(PartialEq)]
@@ -353,7 +354,7 @@ impl Runner {
         self.actor_repo_handler().await?;
         self.compile_actor()?;
         self.install_actor().await?;
-        self.create_actor()?;
+        self.create_actor().await?;
         self.actor_take_owner()?;
         self.print_myself()?;
         self.save_myself()?;
@@ -430,7 +431,48 @@ impl Runner {
         Ok(())
     }
 
-    fn create_actor(&mut self) -> Result<(), CliError> {
+    async fn create_actor(&mut self) -> Result<(), CliError> {
+        let rpc_cli: RpcEndpoint;
+        match &self.rpc {
+            Some(rpc) => {
+                rpc_cli = rpc.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid rpc")));
+            },
+        }
+
+        let owner_key_info: KeyInfo;
+        match &self.owner_key_info {
+            Some(key_info) => {
+                owner_key_info = key_info.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid owner key info")));
+            }
+        }
+
+        let actor_code_id: &CidJson;
+        match &self.actor_code_id {
+            Some(code_id) => {
+                actor_code_id = code_id;
+            },
+            None => {
+                return Err(CliError::CommonError(anyhow!("invalid actor code id")));
+            },
+        }
+
+        info!("{}{:?}", "> Creating ... ".blue(), actor_code_id.clone());
+        let (id_address, robust_address) = create_actor(
+            rpc_cli,
+            actor_code_id.clone(),
+            self.owner,
+            owner_key_info.clone(),
+        ).await?;
+
+        self.actor_id_address = id_address;
+        self.actor_robust_address = robust_address;
+
         Ok(())
     }
 
