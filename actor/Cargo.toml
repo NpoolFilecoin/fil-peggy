@@ -9,6 +9,9 @@ workspace = true
 [dependencies.git2]
 workspace = true
 
+[dependencies.serde_json]
+workspace = true
+
 [dependencies.thiserror]
 workspace = true
 
