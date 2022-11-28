@@ -23,6 +23,7 @@ use rpc::RpcEndpoint;
 use serde::Deserialize;
 use thiserror::Error;
 use std::str::FromStr;
+use serde_json;
 
 use mpool::{mpool_push, MpoolError};
 use state::{wait_msg, StateError};
@@ -73,51 +74,69 @@ impl FromStr for CreateMinerReturn {
     }
 }
 
-pub struct Miner {
-    pub owner: Address,
-    pub owner_key_info: KeyInfo,
-    pub worker: Address,
-    pub window_post_proof_type: RegisteredPoStProof,
-    pub peer_id: PeerId,
-    pub rpc: RpcEndpoint,
-    pub miner_id: Option<Address>,
-    pub multiaddrs: Option<Vec<BytesDe>>,
+pub async fn create_miner(
+    rpc: RpcEndpoint,
+    owner: Address,
+    owner_key_info: KeyInfo,
+    worker: Address,
+    window_post_proof_type: RegisteredPoStProof,
+    peer_id: PeerId,
+) -> Result<(Address, Address), MinerError> {
+    let params = CreateMinerParams {
+        owner: owner,
+        worker: worker,
+        window_post_proof_type: window_post_proof_type,
+        peer: peer_id.to_bytes(),
+        multiaddrs: vec![BytesDe("peggy.miner".as_bytes().to_vec())],
+    };
+
+    match mpool_push::<_, CidJson>(
+        rpc.clone(),
+        owner,
+        owner_key_info,
+        STORAGE_POWER_ACTOR_ADDR,
+        2,
+        TokenAmount::from_atto(0),
+        params,
+    ).await {
+        Ok(res) => {
+            match wait_msg::<CreateMinerReturn>(
+                rpc.clone(),
+                res.clone(),
+            ).await {
+                Ok(ret) => Ok((ret.id_address, ret.robust_address)),
+                Err(err) => Err(MinerError::StateCallError(err)),
+            }
+        },
+        Err(err) => Err(MinerError::MpoolCallError(err)),
+    }
 }
 
-impl Miner {
-    pub async fn create_miner(&self) -> Result<CreateMinerReturn, MinerError> {
-        let params = CreateMinerParams {
-            owner: self.owner,
-            worker: self.worker,
-            window_post_proof_type: self.window_post_proof_type,
-            peer: self.peer_id.to_bytes(),
-            multiaddrs: vec![BytesDe("peggy-miner".as_bytes().to_vec())],
-        };
-
-        match mpool_push::<_, CidJson>(
-            self.rpc.clone(),
-            self.owner,
-            self.owner_key_info.clone(),
-            STORAGE_POWER_ACTOR_ADDR,
-            2,
-            TokenAmount::from_atto(0),
-            params,
-        ).await {
-            Ok(res) => {
-                match wait_msg::<CreateMinerReturn>(
-                    self.rpc.clone(),
-                    res.clone(),
-                ).await {
-                    Ok(ret) => Ok(ret),
-                    Err(err) => Err(MinerError::StateCallError(err)),
-                }
-            },
-            Err(err) => Err(MinerError::MpoolCallError(err)),
-        }
-
-    }
-
-    pub fn change_owner(&self) -> Result<String, &str> {
-        Ok(String::default())
+pub async fn change_owner(
+    rpc: RpcEndpoint,
+    owner: Address,
+    owner_key_info: KeyInfo,
+    miner_id: Address,
+    new_owner_id: Address,
+) -> Result<(), MinerError> {
+    match mpool_push::<_, CidJson>(
+        rpc.clone(),
+        owner,
+        owner_key_info,
+        miner_id,
+        23,
+        TokenAmount::from_atto(0),
+        new_owner_id,
+    ).await {
+        Ok(res) => {
+            match wait_msg::<serde_json::Value>(
+                rpc,
+                res,
+            ).await {
+                Ok(_) => Ok(()),
+                Err(err) => Err(MinerError::StateCallError(err)),
+            }
+        },
+        Err(err) => Err(MinerError::MpoolCallError(err)),
     }
 }

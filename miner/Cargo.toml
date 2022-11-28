@@ -9,9 +9,6 @@ workspace = true
 [dependencies.hex]
 workspace = true
 
-[dependencies.serde_json]
-workspace = true
-
 [dependencies.fil_actor_power]
 workspace = true
 
@@ -43,4 +40,7 @@ workspace = true
 workspace = true
 
 [dependencies.state]
+workspace = true
+
+[dependencies.serde_json]
 workspace = true

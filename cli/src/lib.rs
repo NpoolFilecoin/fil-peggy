@@ -39,7 +39,7 @@ use forest_json::{
 use resolve_path::PathResolveExt;
 
 use wallet;
-use miner::Miner;
+use miner;
 use rpc::RpcEndpoint;
 use send::send;
 use actor::{
@@ -149,6 +149,7 @@ pub enum CliError {
 pub enum Cmd {
     CreateMiner {},
     CreateActor {},
+    ChangeOwner {},
     CostodyMiner {},
 }
 
@@ -179,6 +180,9 @@ impl Cli {
             },
             Cmd::CreateActor {} => {
                 Runner::new().create_actor_main().await
+            },
+            Cmd::ChangeOwner {} => {
+                Runner::new().change_owner_main().await
             },
             Cmd::CostodyMiner {} => {
                 info!("CostidyMiner");
@@ -295,7 +299,7 @@ impl Runner {
     }
 
     fn load() -> Result<Option<Self>, CliError> {
-        let yes_no = Runner::yes_no("Would you use exist runner?")?;
+        let yes_no = Runner::yes_no("Would you use exist runner?", true)?;
         if yes_no == YesNo::No {
             return Ok(None);
         }
@@ -365,8 +369,58 @@ impl Runner {
         Ok(())
     }
 
+    async fn change_owner(&self) -> Result<(), CliError> {
+        let yes_no = Runner::yes_no(&format!(
+            "{}{}{}{}{}{}",
+            "Would you like to change ".bright_green(),
+            self.miner_id_address,
+            "'s owner from ".bright_green(),
+            self.owner,
+            " to ".bright_green(),
+            self.actor_id_address,
+        ), false)?;
+        if yes_no == YesNo::No {
+            return Ok(());
+        }
+
+        let rpc_cli: RpcEndpoint;
+        match &self.rpc {
+            Some(rpc) => {
+                rpc_cli = rpc.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid rpc")));
+            },
+        }
+
+        let owner_key_info: KeyInfo;
+        match &self.owner_key_info {
+            Some(key_info) => {
+                owner_key_info = key_info.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid owner key info")));
+            }
+        }
+
+        match miner::change_owner(
+            rpc_cli,
+            self.owner,
+            owner_key_info,
+            self.miner_id_address,
+            self.actor_id_address,
+        ).await {
+            Ok(_) => Ok(()),
+            Err(err) => Err(CliError::MinerCallError(err)),
+        }
+    }
+
+    async fn change_owner_main(&self) -> Result<(), CliError> {
+        self.change_owner().await
+    }
+
     async fn actor_repo_handler(&mut self) -> Result<(), CliError> {
-        let yes_no = Runner::yes_no("Would you use exist repository?")?;
+        let yes_no = Runner::yes_no("Would you use exist repository?", true)?;
         if yes_no == YesNo::Yes {
             return Ok(());
         }
@@ -393,14 +447,14 @@ impl Runner {
         self.actor_repo_rev = repo_rev.clone();
         self.actor_path = target_path.clone().resolve().to_path_buf();
 
-        info!("{}{}{}{}", "> Cloning ...".blue(), repo_url.clone(), " -> ".yellow(), target_path.clone().display());
+        info!("{}{}{}{}", "> Cloning ...".blue().bold(), repo_url.clone(), " -> ".yellow(), target_path.clone().display());
         clone_actor(&repo_url, &repo_rev, target_path.clone())?;
 
         Ok(())
     }
 
     fn compile_actor(&mut self) -> Result<(), CliError> {
-        info!("{}{}", "> Compiling ...".blue(), self.actor_path.clone().display());
+        info!("{}{}", "> Compiling ...".blue().bold(), self.actor_path.clone().display());
         self.actor_wasm_path = compile_actor(self.actor_path.clone())?;
         Ok(())
     }
@@ -426,7 +480,7 @@ impl Runner {
             }
         }
 
-        info!("{}{}", "> Installing ... ".blue(), self.actor_wasm_path.clone().display());
+        info!("{}{}", "> Installing ... ".blue().bold(), self.actor_wasm_path.clone().display());
         let (code_cid, installed) = install_actor(
             rpc_cli,
             self.actor_wasm_path.clone(),
@@ -473,7 +527,7 @@ impl Runner {
             },
         }
 
-        info!("{}{:?}", "> Creating ... ".blue(), actor_code_id.clone());
+        info!("{}{:?}", "> Creating ... ".blue().bold(), actor_code_id.clone());
         let (id_address, robust_address) = create_actor(
             rpc_cli,
             actor_code_id.clone(),
@@ -502,7 +556,7 @@ impl Runner {
     }
 
     fn account_handler(&mut self) -> Result<(), CliError> {
-        let yes_no = Runner::yes_no("Would you like to use exist account?")?;
+        let yes_no = Runner::yes_no("Would you like to use exist account?", true)?;
         match yes_no {
             YesNo::No => {
                 self.generate_account()?;
@@ -671,7 +725,7 @@ impl Runner {
         self.owner_key = Some(key.clone());
         self.owner_key_info = Some(KeyInfo::from(key_info_json.clone()));
 
-        let yes_no = Runner::yes_no("Use different worker account from owner?")?;
+        let yes_no = Runner::yes_no("Use different worker account from owner?", true)?;
         if yes_no != YesNo::Yes {
             self.worker = address;
             self.encoded_worker_key = encoded_key;
@@ -689,8 +743,11 @@ impl Runner {
         Ok(())
     }
 
-    fn yes_no(s: &str) -> Result<YesNo, CliError> {
-        print!("> {}{}", s.green(), " (yes | no): ".yellow());
+    fn yes_no(s: &str, label_color: bool) -> Result<YesNo, CliError> {
+        match label_color {
+            true => print!("> {}{}", s.bright_green().bold(), " (yes | no): ".yellow()),
+            _ => print!("> {}{}", s, " (yes | no): ".yellow()),
+        } 
         io::stdout().flush().unwrap();
 
         let mut yes_no = YesNo::Yes;
@@ -703,9 +760,9 @@ impl Runner {
     }
 
     fn print_myself(&self) -> Result<(), CliError> {
-        let yes_no = Runner::yes_no("Would you like to display private key?")?;
+        let yes_no = Runner::yes_no("Would you like to display private key?", true)?;
 
-        println!("> {}", "Cli running information:".blue());
+        println!("> {}", "Cli running information:".blue().bold());
         println!("  > {}{}", "Owner Address:".green(), format!(" {}", self.owner));
         if yes_no == YesNo::Yes {
             println!("  > {}{}", "Owner Private Key:".green(), format!(" {}", self.encoded_owner_key));
@@ -756,7 +813,7 @@ impl Runner {
         let filename = format!("output/peggy-{}.json", datetime.format("%d-%m-%Y-%H-%M-%s"));
         std::fs::write(filename.clone(), my_json)?;
 
-        info!("> {}", format!("Result is saved at {}", filename).blue());
+        info!("> {}", format!("Result is saved at {}", filename).blue().bold());
 
         Ok(())
     }
@@ -773,7 +830,7 @@ impl Runner {
         let action = menu.selected_item_name();
         match MinerAction::from_str(action) {
             Ok(MinerAction::Create) => self.create_miner().await,
-            Ok(MinerAction::ChangeOwner) => self.change_owner(),
+            Ok(MinerAction::ChangeOwner) => self.change_owner().await,
             Err(err) => Err(CliError::CommonError(err)),
         }
     }
@@ -781,7 +838,7 @@ impl Runner {
     async fn create_miner(&mut self) -> Result<(), CliError> {
         self.print_myself()?;
 
-        let yes_no = Runner::yes_no("Would you like to create miner with above ^ information?")?;
+        let yes_no = Runner::yes_no("Would you like to create miner with above ^ information?", true)?;
         if yes_no == YesNo::No {
             return Ok(());
         }
@@ -869,19 +926,15 @@ impl Runner {
 
         self.print_myself()?;
 
-        let miner = Miner {
-            owner: self.owner,
-            owner_key_info: owner_key_info.clone(),
-            worker: self.worker,
-            window_post_proof_type: self.window_post_proof_type.ok_or(anyhow!("invalid proof type"))?,
-            peer_id: self.miner_peer_id.ok_or(anyhow!("invalid peer id"))?,
-            rpc: rpc_cli.clone(),
-            miner_id: None,
-            multiaddrs: None,
-        };
-
         info!("{}", "> Create miner".yellow());
-        let res = match miner.create_miner().await {
+        let (id_address, robust_address) = match miner::create_miner(
+            rpc_cli.clone(),
+            self.owner,
+            owner_key_info.clone(),
+            self.worker,
+            self.window_post_proof_type.ok_or(anyhow!("invalid proof type"))?,
+            self.miner_peer_id.ok_or(anyhow!("invalid peer id"))?,
+        ).await {
             Ok(res) => {
                 res
             },
@@ -891,13 +944,9 @@ impl Runner {
             },
         };
 
-        self.miner_id_address = res.id_address;
-        self.miner_robust_address = res.robust_address;
+        self.miner_id_address = id_address;
+        self.miner_robust_address = robust_address;
 
-        Ok(())
-    }
-
-    fn change_owner(&mut self) -> Result<(), CliError> {
         Ok(())
     }
 }
