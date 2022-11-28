@@ -169,7 +169,7 @@ impl Cli {
         let standard_font = FIGfont::standard().unwrap();
         let figure = standard_font.convert("FIL Peggy");
         assert!(figure.is_some());
-        println!("{}", figure.unwrap());
+        println!("{}", format!("{}", figure.unwrap()).blue().bold());
     }
 
     pub async fn run(&mut self) -> Result<(), CliError> {
