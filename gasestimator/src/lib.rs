@@ -14,7 +14,7 @@ use serde_json::json;
 
 #[derive(Error, Debug)]
 pub enum GasEstimatorError {
-    #[error("rpc request error")]
+    #[error("rpc request error: {0}")]
     RpcRequestError(#[from] RpcError),
 }
 

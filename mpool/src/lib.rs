@@ -30,17 +30,17 @@ use log::error;
 
 #[derive(Error, Debug)]
 pub enum MpoolError {
-    #[error("rpc request error")]
+    #[error("rpc request error: {0}")]
     RpcRequestError(#[from] RpcError),
-    #[error("fvm ipld encoding error")]
+    #[error("fvm ipld encoding error: {0}")]
     FvmIpldEncodingError(#[from] fvm_ipld_encoding::Error),
-    #[error("key management error")]
+    #[error("key management error: {0}")]
     KeyManagementError(#[from] forest_key_management::Error),
-    #[error("anyhow error")]
+    #[error("anyhow error: {0}")]
     AnyhowError(#[from] anyhow::Error),
-    #[error("gas estimator error")]
+    #[error("gas estimator error: {0}")]
     EstimateGasError(#[from] GasEstimatorError),
-    #[error("wallet call error")]
+    #[error("wallet call error: {0}")]
     WalletCallError(#[from] WalletError),
     #[error("insufficient funds")]
     InsufficientFunds,

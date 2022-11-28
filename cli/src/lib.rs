@@ -382,14 +382,14 @@ impl Runner {
         self.actor_repo_url = repo_url.clone();
         self.actor_path = target_path.clone().resolve().to_path_buf();
 
-        info!("{}{}{}{:?}", "> Cloning ...".blue(), repo_url.clone(), " -> ".yellow(), target_path.clone());
+        info!("{}{}{}{}", "> Cloning ...".blue(), repo_url.clone(), " -> ".yellow(), target_path.clone().display());
         clone_actor(&repo_url, target_path.clone())?;
 
         Ok(())
     }
 
     fn compile_actor(&mut self) -> Result<(), CliError> {
-        info!("{}{:?}", "> Compiling ...".blue(), self.actor_path.clone());
+        info!("{}{}", "> Compiling ...".blue(), self.actor_path.clone().display());
         self.actor_wasm_path = compile_actor(self.actor_path.clone())?;
         Ok(())
     }
@@ -415,9 +415,9 @@ impl Runner {
             }
         }
 
-        info!("{}{:?}", "> Installing ... ".blue(), self.actor_wasm_path.clone());
+        info!("{}{}", "> Installing ... ".blue(), self.actor_wasm_path.clone().display());
         let (code_cid, installed) = install_actor(
-            rpc_cli,
+            rpc_cli.debug(),
             self.actor_wasm_path.clone(),
             self.owner,
             owner_key_info.clone(),

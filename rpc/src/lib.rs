@@ -46,7 +46,7 @@ impl FromStr for RpcEndpoint {
 
 #[derive(Error, Debug)]
 pub enum RpcError {
-    #[error("low level error")]
+    #[error("low level error: {0}")]
     LowLevelError(#[from] reqwest::Error),
     #[error("fail request")]
     RequestError,
@@ -54,7 +54,7 @@ pub enum RpcError {
     RpcApplicationError,
     #[error("rpc response parse error")]
     RpcResponseParseError,
-    #[error("rpc application result parse error")]
+    #[error("rpc application result parse error: {0}")]
     RpcApplicationResultParseError(#[from] serde_json::Error),
     #[error("unknown error")]
     Unknown,
