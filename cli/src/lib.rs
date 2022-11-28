@@ -284,6 +284,7 @@ impl Runner {
             rpc: None,
 
             actor_repo_url: String::default(),
+            actor_repo_rev: String::default(),
             actor_path: PathBuf::default(),
             actor_wasm_path: PathBuf::default(),
 

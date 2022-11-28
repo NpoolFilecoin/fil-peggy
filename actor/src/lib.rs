@@ -59,7 +59,7 @@ pub fn clone_actor(repo_url: &str, repo_rev: &str, target_path: PathBuf) -> Resu
         .stderr(Stdio::inherit())
         .arg("clone")
         .arg(format!("{}", repo_url))
-        .arg(format!("{}", target_path))
+        .arg(format!("{}", target_path.display()))
         .output()?;
     Command::new("git")
         .current_dir(target_path.clone())
