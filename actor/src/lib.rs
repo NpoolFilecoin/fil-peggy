@@ -32,7 +32,7 @@ pub enum ActorError {
     ParseJsonError(#[from] serde_json::Error),
     #[error("parse utf8 error")]
     ParseUtf8Error(#[from] FromUtf8Error),
-    #[error("mpool call error")]
+    #[error("mpool call error `{0}`")]
     MpoolCallError(#[from] MpoolError),
 }
 

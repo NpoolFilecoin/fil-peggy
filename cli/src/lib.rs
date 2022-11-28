@@ -141,7 +141,7 @@ pub enum CliError {
     MinerCallError(#[from] miner::MinerError),
     #[error("state call error")]
     StateCallError(#[from] state::StateError),
-    #[error("actor call error")]
+    #[error("actor call error `{0}`")]
     ActorCallError(#[from] actor::ActorError),
 }
 
