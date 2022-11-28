@@ -102,7 +102,7 @@ Smart contract address cannot be used as miner's worker.
 - [X] Restructure command parameter and persistent method
 - [ ] Native actor code support take owner of miner
 - [X] Compile native actor code
-- [ ] Install actor
+- [X] Install actor
 - [ ] Create actor
 - [ ] Host code support invoke take owner
 - [ ] Native actor code support other miner action
