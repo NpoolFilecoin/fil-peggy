@@ -230,6 +230,8 @@ struct Runner {
 
     #[serde(default = "String::default")]
     actor_repo_url: String,
+    #[serde(default = "String::default")]
+    actor_repo_rev: String,
     #[serde(default = "PathBuf::default")]
     actor_path: PathBuf,
     #[serde(default = "PathBuf::default")]
@@ -373,6 +375,12 @@ impl Runner {
         let mut repo_url = String::default();
         scanf!("{}", repo_url)?;
 
+        print!("> {}", "Actor git revision: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut repo_rev = String::from("master");
+        scanf!("{}", repo_rev)?;
+
         print!("> {}", "Clone to: ".green());
         io::stdout().flush().unwrap();
 
@@ -380,10 +388,11 @@ impl Runner {
         scanf!("{}", target_path)?;
 
         self.actor_repo_url = repo_url.clone();
+        self.actor_repo_rev = repo_rev.clone();
         self.actor_path = target_path.clone().resolve().to_path_buf();
 
         info!("{}{}{}{}", "> Cloning ...".blue(), repo_url.clone(), " -> ".yellow(), target_path.clone().display());
-        clone_actor(&repo_url, target_path.clone())?;
+        clone_actor(&repo_url, &repo_rev, target_path.clone())?;
 
         Ok(())
     }
@@ -717,6 +726,7 @@ impl Runner {
         println!("  > {}{}", "Rpc Bearer Token:".green(), format!(" {}", self.rpc_bearer_token));
 
         println!("  > {}{}", "Actor Repo Url:".green(), format!(" {}", self.actor_repo_url));
+        println!("  > {}{}", "Actor Repo Revision:".green(), format!(" {}", self.actor_repo_rev));
         println!("  > {}{}", "Actor Path:".green(), format!(" {}", self.actor_path.display()));
         println!("  > {}{}", "Actor WASM Path:".green(), format!(" {}", self.actor_wasm_path.display()));
 

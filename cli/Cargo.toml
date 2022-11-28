@@ -87,9 +87,6 @@ workspace = true
 [dependencies.serde_with]
 workspace = true
 
-[dependencies.git2]
-workspace = true
-
 [dependencies.actor]
 workspace = true
 

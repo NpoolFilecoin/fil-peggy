@@ -12,9 +12,6 @@ workspace = true
 [dependencies.forest_key_management]
 workspace = true
 
-[dependencies.git2]
-workspace = true
-
 [dependencies.serde_json]
 workspace = true
 

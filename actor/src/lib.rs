@@ -1,4 +1,3 @@
-use git2::{self, Repository};
 use thiserror::Error;
 use std::path::PathBuf;
 use anyhow::{anyhow, Error as AnyhowError};
@@ -34,8 +33,6 @@ use state::{wait_msg, StateError};
 
 #[derive(Debug, Error)]
 pub enum ActorError {
-    #[error("git call error: {0}")]
-    GitCallError(#[from] git2::Error),
     #[error("io call error: {0}")]
     IOCallError(#[from] std::io::Error),
     #[error("common error: {0}")]
@@ -56,8 +53,21 @@ pub enum ActorError {
     ParseAddressError(#[from] fvm_shared::address::Error),
 }
 
-pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorError> {
-    let _ = Repository::clone(repo_url, target_path)?;
+pub fn clone_actor(repo_url: &str, repo_rev: &str, target_path: PathBuf) -> Result<(), ActorError> {
+    Command::new("git")
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .arg("clone")
+        .arg(format!("{}", repo_url))
+        .arg(format!("{}", target_path))
+        .output()?;
+    Command::new("git")
+        .current_dir(target_path.clone())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .arg("checkout")
+        .arg(format!("{}", repo_rev))
+        .output()?;
     Ok(())
 }
 

@@ -46,7 +46,6 @@ url                      = { version = "2.3.1" }
 serde                    = { version = "1.0.147" }
 chrono                   = { version = "0.4.23" }
 serde_with               = { version = "2.1.0" }
-git2                     = { version = "0.15.0" }
 serde_json               = { version = "1.0.88" }
 hex                      = { version = "0.4.3" }
 fil_actor_power          = { version = "9.0.1" }
