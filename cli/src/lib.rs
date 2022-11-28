@@ -417,7 +417,7 @@ impl Runner {
 
         info!("{}{}", "> Installing ... ".blue(), self.actor_wasm_path.clone().display());
         let (code_cid, installed) = install_actor(
-            rpc_cli.debug(),
+            rpc_cli,
             self.actor_wasm_path.clone(),
             self.owner,
             owner_key_info.clone(),

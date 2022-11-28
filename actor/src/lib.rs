@@ -65,10 +65,9 @@ pub fn compile_actor(target_path: PathBuf) -> Result<PathBuf, ActorError> {
     let name = name.as_str().ok_or(ActorError::CommonError(anyhow!("invalid name")))?;
 
     let wasm_path = target_path.join("target/release/wbuild");
-    let wasm_path = wasm_path.join(name.clone());
-    let wasm_path = wasm_path.join("target/wasm32-unknown-unknown/release");
+    let wasm_path = wasm_path.join(name);
     let mut wasm_path = wasm_path.join(name);
-    wasm_path.set_extension("wasm");
+    wasm_path.set_extension("compact.wasm");
 
     Ok(wasm_path)
 }

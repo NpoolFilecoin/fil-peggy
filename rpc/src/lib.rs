@@ -50,8 +50,8 @@ pub enum RpcError {
     LowLevelError(#[from] reqwest::Error),
     #[error("fail request")]
     RequestError,
-    #[error("rpc application error")]
-    RpcApplicationError,
+    #[error("rpc application error {0}")]
+    RpcApplicationError(serde_json::Value),
     #[error("rpc response parse error")]
     RpcResponseParseError,
     #[error("rpc application result parse error: {0}")]
@@ -132,7 +132,7 @@ impl RpcEndpoint {
             };
         }
         if res.get("error").is_some() {
-            return Err(RpcError::RpcApplicationError);
+            return Err(RpcError::RpcApplicationError(res.get("error").unwrap().clone()));
         }
         Err(RpcError::Unknown)
     }
