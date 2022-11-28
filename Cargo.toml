@@ -64,6 +64,7 @@ forest_message           = { version = "0.8.0", git = "https://github.com/NpoolF
 forest_rpc-api           = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
 forest_ipld              = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
 fil_actors_runtime       = { version = "10.0.0-alpha.1", git = "https://github.com/filecoin-project/builtin-actors.git" }
+fvm_shared_3             = { version = "3.0.0-alpha.12", features = ["arb"], package = "fvm_shared" }
 fvm_shared               = { version = "2.0.0", features = ["arb"] }
 reqwest                  = { version = "0.11.13", features = ["blocking", "json"] }
 jsonrpc-v2               = { version = "0.11", features = ["easy-errors", "macros", "bytes-v05"], default-features = false }
