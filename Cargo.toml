@@ -71,6 +71,7 @@ num-bigint               = { version = "0.4.3" }
 fil_actor_init           = { git = "https://github.com/filecoin-project/builtin-actors.git", branch = "next", features = ["m2-native"] }
 resolve-path             = { version = "0.1.0" }
 cid                      = { version = "0.8.6" }
+base64                   = { version = "0.13.1" }
 
 [dependencies.app]
 workspace = true

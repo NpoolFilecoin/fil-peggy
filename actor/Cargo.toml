@@ -48,3 +48,8 @@ workspace = true
 [dependencies.cid]
 workspace = true
 
+[dependencies.base64]
+workspace = true
+
+[dependencies.log]
+workspace = true

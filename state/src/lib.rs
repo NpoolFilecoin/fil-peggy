@@ -17,7 +17,7 @@ use fvm_shared::{
 };
 use thiserror::Error;
 use std::{str::FromStr, fmt::Debug};
-use hex::FromHexError;
+use log::warn;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -59,8 +59,8 @@ pub enum StateError {
     ParseReturnDecError(#[from] serde_json::Error),
     #[error("convert return_dec to target error: {0}")]
     ConvertReturnDecError(String),
-    #[error("parse hex error: {0}")]
-    ParseHexError(#[from] FromHexError),
+    #[error("parse by yourself {0}")]
+    ParseByYourSelf(String),
 }
 
 pub async fn wait_msg<T: FromStr + Default>(rpc: RpcEndpoint, cid: CidJson) -> Result<T, StateError>
@@ -76,13 +76,8 @@ pub async fn wait_msg<T: FromStr + Default>(rpc: RpcEndpoint, cid: CidJson) -> R
         IpldJson(Ipld::Null) => {
             match msg_lookup.receipt.return_data {
                 Some(s) => {
-                    let ret = hex::decode(s)?;
-                    let ret = serde_json::from_slice::<serde_json::Value>(&ret)?;
-                    let ret = serde_json::to_string(&ret)?;
-                    return match T::from_str(&ret) {
-                        Ok(ret) => Ok(ret),
-                        Err(err) => Err(StateError::ConvertReturnDecError(format!("{:?}", err))),
-                    };
+                    warn!("> Cannot parse {}, pass to upper", &s);
+                    return Err(StateError::ParseByYourSelf(s));
                 },
                 None => {
                     return Ok(T::default());

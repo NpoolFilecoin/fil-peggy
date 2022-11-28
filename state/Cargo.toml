@@ -36,5 +36,3 @@ workspace = true
 [dependencies.forest_ipld]
 workspace = true
 
-[dependencies.hex]
-workspace = true

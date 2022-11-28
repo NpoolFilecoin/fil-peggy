@@ -7,6 +7,7 @@ name = "actor"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64",
  "cid 0.8.6",
  "fil_actor_init 10.0.0-alpha.1",
  "fil_actors_runtime 10.0.0-alpha.1 (git+https://github.com/filecoin-project/builtin-actors.git)",
@@ -15,6 +16,7 @@ dependencies = [
  "fvm_ipld_encoding 0.3.0",
  "fvm_shared 2.0.0",
  "git2",
+ "log",
  "mpool",
  "rpc",
  "serde",
@@ -6892,7 +6894,6 @@ dependencies = [
  "forest_json",
  "forest_rpc-api",
  "fvm_shared 2.0.0",
- "hex",
  "libipld-core 0.15.0",
  "log",
  "rpc",

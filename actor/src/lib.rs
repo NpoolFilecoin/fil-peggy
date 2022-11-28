@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error as AnyhowError};
 use std::process::{Command, Stdio};
 use std::string::FromUtf8Error;
-use fil_actor_init::InstallParams;
+use fil_actor_init::{InstallParams, InstallReturn as InstallReturn1};
 use fil_actors_runtime::INIT_ACTOR_ADDR;
 use forest_key_management::KeyInfo;
 use fvm_shared::{
@@ -20,6 +20,8 @@ use forest_json::{
 use serde::{Serialize, Deserialize};
 use std::str::FromStr;
 use cid::Cid;
+use base64;
+use log::warn;
 
 use mpool::{mpool_push, MpoolError};
 use rpc::RpcEndpoint;
@@ -41,6 +43,10 @@ pub enum ActorError {
     MpoolCallError(#[from] MpoolError),
     #[error("state call error: {0}")]
     StateCallError(#[from] StateError),
+    #[error("decode base64 error: {0}")]
+    DecodeBase64Error(#[from] base64::DecodeError),
+    #[error("decode ipld error: {0}")]
+    DecodeIpldError(#[from] fvm_ipld_encoding_3::Error),
 }
 
 pub fn clone_actor(repo_url: &str, target_path: PathBuf) -> Result<(), ActorError> {
@@ -127,8 +133,17 @@ pub async fn install_actor(
         params,
     ).await {
         Ok(res) => {
-            let ret = wait_msg::<InstallReturn>(rpc.debug(), res.clone()).await?;
-            Ok((ret.code_cid, ret.installed))
+            match wait_msg::<InstallReturn>(rpc.debug(), res.clone()).await {
+                Ok(ret) => Ok((ret.code_cid, ret.installed)),
+                Err(StateError::ParseByYourSelf(s)) => {
+                    warn!("> State cannot parse {}, parse by youself!", &s);
+                    let s = base64::decode_config(&s, base64::STANDARD)?;
+                    let b = RawBytes::new(s);
+                    let ret: InstallReturn1 = RawBytes::deserialize(&b)?;
+                    Ok((CidJson(ret.code_cid), ret.installed))
+                },
+                Err(err) => Err(ActorError::StateCallError(err)),
+            }
         },
         Err(err) => Err(ActorError::MpoolCallError(err)),
     }
