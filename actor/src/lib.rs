@@ -124,7 +124,7 @@ pub async fn install_actor(
     };
 
     match mpool_push::<_, CidJson>(
-        rpc.clone().debug(),
+        rpc.clone(),
         from,
         from_key_info,
         INIT_ACTOR_ADDR,
@@ -133,7 +133,7 @@ pub async fn install_actor(
         params,
     ).await {
         Ok(res) => {
-            match wait_msg::<InstallReturn>(rpc.debug(), res.clone()).await {
+            match wait_msg::<InstallReturn>(rpc, res.clone()).await {
                 Ok(ret) => Ok((ret.code_cid, ret.installed)),
                 Err(StateError::ParseByYourSelf(s)) => {
                     warn!("> State cannot parse {}, parse by youself!", &s);
