@@ -27,7 +27,7 @@ pub enum AppError {
     ParseCommandError,
     #[error("run app error")]
     RunAppError,
-    #[error("cli execution error")]
+    #[error("cli execution error {0}")]
     CliExecError(#[from] CliError),
 }
 

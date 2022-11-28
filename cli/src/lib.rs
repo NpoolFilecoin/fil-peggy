@@ -125,23 +125,23 @@ impl FromStr for ActorAction {
 
 #[derive(Error, Debug)]
 pub enum CliError {
-    #[error("io call error")]
+    #[error("io call error {0}")]
     IOCallError(#[from] std::io::Error),
-    #[error("parse json error")]
+    #[error("parse json error {0}")]
     ParseJsonError(#[from] serde_json::Error),
-    #[error("parse hex error")]
+    #[error("parse hex error {0}")]
     ParseHexError(#[from] FromHexError),
-    #[error("common error")]
+    #[error("common error {0}")]
     CommonError(#[from] AnyhowError),
-    #[error("parse url error")]
+    #[error("parse url error {0}")]
     ParseUrlError(#[from] url::ParseError),
-    #[error("send call error")]
+    #[error("send call error {0}")]
     SendCallError(#[from] send::SendError),
-    #[error("miner call error")]
+    #[error("miner call error {0}")]
     MinerCallError(#[from] miner::MinerError),
-    #[error("state call error")]
+    #[error("state call error {0}")]
     StateCallError(#[from] state::StateError),
-    #[error("actor call error `{0}`")]
+    #[error("actor call error {0}")]
     ActorCallError(#[from] actor::ActorError),
 }
 
@@ -189,7 +189,7 @@ impl Cli {
 }
 
 #[serde_as]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 struct Runner {
     #[serde_as(as = "DisplayFromStr")]
     owner: Address,
@@ -324,7 +324,7 @@ impl Runner {
 
         let runner_str = std::fs::read_to_string(runner_file)?;
 
-        let runner: Self;
+        let mut runner: Self;
         match serde_json::from_str(&runner_str) {
             Ok(r) => {
                 runner = r;
@@ -336,6 +336,16 @@ impl Runner {
         }
 
         runner.print_myself()?;
+
+        runner.rpc = Some(RpcEndpoint::new(runner.clone().rpc_host, runner.clone().rpc_bearer_token)?);
+
+        let key_info = hex::decode(&runner.clone().encoded_owner_key)?;
+        let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
+        runner.owner_key_info = Some(KeyInfo::from(key_info));
+
+        let key_info = hex::decode(&runner.clone().encoded_worker_key)?;
+        let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
+        runner.worker_key_info = Some(KeyInfo::from(key_info));
 
         Ok(Some(runner))
     }
@@ -372,12 +382,14 @@ impl Runner {
         self.actor_repo_url = repo_url.clone();
         self.actor_path = target_path.clone().resolve().to_path_buf();
 
+        info!("{}{}{}{:?}", "> Cloning ...".blue(), repo_url.clone(), " -> ".yellow(), target_path.clone());
         clone_actor(&repo_url, target_path.clone())?;
 
         Ok(())
     }
 
     fn compile_actor(&mut self) -> Result<(), CliError> {
+        info!("{}{:?}", "> Compiling ...".blue(), self.actor_path.clone());
         self.actor_wasm_path = compile_actor(self.actor_path.clone())?;
         Ok(())
     }
@@ -403,9 +415,10 @@ impl Runner {
             }
         }
 
+        info!("{}{:?}", "> Installing ... ".blue(), self.actor_wasm_path.clone());
         let (code_cid, installed) = install_actor(
             rpc_cli,
-            self.actor_path.clone(),
+            self.actor_wasm_path.clone(),
             self.owner,
             owner_key_info.clone(),
         ).await?;

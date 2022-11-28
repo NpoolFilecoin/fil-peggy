@@ -22,17 +22,17 @@ use forest_json::{
 
 #[derive(Debug, Error)]
 pub enum ActorError {
-    #[error("git call error")]
+    #[error("git call error: {0}")]
     GitCallError(#[from] git2::Error),
-    #[error("io call error")]
+    #[error("io call error: {0}")]
     IOCallError(#[from] std::io::Error),
-    #[error("common error")]
+    #[error("common error: {0}")]
     CommonError(#[from] AnyhowError),
-    #[error("parse json error")]
+    #[error("parse json error: {0}")]
     ParseJsonError(#[from] serde_json::Error),
-    #[error("parse utf8 error")]
+    #[error("parse utf8 error: {0}")]
     ParseUtf8Error(#[from] FromUtf8Error),
-    #[error("mpool call error `{0}`")]
+    #[error("mpool call error: {0}")]
     MpoolCallError(#[from] MpoolError),
 }
 
@@ -62,9 +62,12 @@ pub fn compile_actor(target_path: PathBuf) -> Result<PathBuf, ActorError> {
     let manifest = String::from_utf8(output.stdout)?;
     let value = serde_json::from_str::<serde_json::Value>(&manifest)?;
     let name = value.get("name").ok_or(ActorError::CommonError(anyhow!("invalid name")))?;
+    let name = name.as_str().ok_or(ActorError::CommonError(anyhow!("invalid name")))?;
 
-    let wasm_path = target_path.join("target/wasm32-unknown-unknown/release");
-    let mut wasm_path = wasm_path.join(name.as_str().ok_or(ActorError::CommonError(anyhow!("invalid name")))?);
+    let wasm_path = target_path.join("target/release/wbuild");
+    let wasm_path = wasm_path.join(name.clone());
+    let wasm_path = wasm_path.join("target/wasm32-unknown-unknown/release");
+    let mut wasm_path = wasm_path.join(name);
     wasm_path.set_extension("wasm");
 
     Ok(wasm_path)
