@@ -76,6 +76,7 @@ Smart contract address cannot be used as miner's worker.
 * All funtionalities to manage miner
 * Detect deposit to smart contract address inside smart contract
 * Mining reward distribution according to amount ratio
+* NFT minting and transferring of deposited amount
 * Upgrade governance process
 
 ## ${\color{blue}{6 \ Product}}$
