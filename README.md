@@ -121,3 +121,24 @@ Smart contract address cannot be used as miner's worker.
 - [ ] Add CI/CD workflow
 - [ ] Executable file size optimization
 
+## ${\color{blue}{9 \ Try \ it}}$
+We still do not have a full version (and it may be available after a long time, :(). But we really have some preview feature could be try.
+# Compile
+```cargo build```
+# Run
+* ```./target/debug/peggy cli create-miner```: create a new miner with generated or exist owner account
+* ```./target/debug/peggy cli create-actor```: create an actor with provided actor code, it'll compile/install/create actor
+* ```./target/debug/peggy cli change-owner```: change the miner's owner to actor
+* ```./target/debug/peggy cli costody-miner```: call actor to let it take the owner of miner
+
+## ${\color{blue}{10 \ About}}$
+We don't accept pull request currently. If you have any suggestion, or any issue when you try peggy, please kindly create an issue. Believe me, we'll response to you.
+
+## ${\color{blue}{11 \ Reference \ and \ Design \ of \ FIL-Peggy}}$
+* [FIL-Peggy ETHGlobal Submit Page - Hack FEVM Finalist and Filecoin Pool Prize](https://ethglobal.com/showcase/fil-peggy-f77i2)
+* [FVM — About FIL-Peggy being ETHGlobal Hack FEVM finalist and using Actor as Owner](https://medium.com/@web3.0.eye/fvm-about-fil-peggy-being-ethglobal-hack-fevm-finalist-and-using-actor-as-owner-ff0a2a133d4c)
+* [FVM — Guidance of Jim Pick’s FVM Playground](https://medium.com/@web3.0.eye/fvm-guidance-of-jim-picks-fvm-playground-b5b3c0ffb06b)
+* [ FVM — Create Miner with Smart Contract (Native Actor) and (Part 1)](https://medium.com/@web3.0.eye/fvm-fvm-create-miner-with-smart-contract-native-actor-and-part-1-9a5d03b41c31)
+* [FVM - 关于FIL-Peggy入围ETHGlobal Hack HEVM finalist，以及用Actor作为Owner](https://mp.weixin.qq.com/s?__biz=MzIyMjY4NzU2Ng==&mid=2247483767&idx=1&sn=f7f49b178530ae7a3996db274e93f82f&chksm=e828f956df5f704041b45fb040fa8b2ce6d554e9f3ea8d6b45e96645db43645147704a491832&token=1769770941&lang=zh_CN#rd)
+* [FVM - 将合约作为Owner创建Miner(一)](https://mp.weixin.qq.com/s?__biz=MzIyMjY4NzU2Ng==&mid=2247483757&idx=1&sn=3bec40882f06bbac9add0aceff6b59ee&chksm=e828f94cdf5f705aeb8ac81b67ee228edd9d57e280ef3ae9b8c9ed0c473e93455c548e20a5c8&token=1769770941&lang=zh_CN#rd)
+* [FVM - 入坑指南](https://mp.weixin.qq.com/s?__biz=MzIyMjY4NzU2Ng==&mid=2247483740&idx=1&sn=b74142ca30186fb5df09dd594e18e03a&chksm=e828f97ddf5f706b5c3449422e953e052ac090bec20deddff354d84190755da7d2348f03c436&token=1769770941&lang=zh_CN#rd)
