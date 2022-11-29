@@ -123,9 +123,9 @@ Smart contract address cannot be used as miner's worker.
 
 ## ${\color{blue}{9 \ Try \ it}}$
 We still do not have a full version (and it may be available after a long time, :(). But we really have some preview feature could be try.
-# Compile
+### Compile
 ```cargo build```
-# Run
+### Run
 * ```./target/debug/peggy cli create-miner```: create a new miner with generated or exist owner account
 * ```./target/debug/peggy cli create-actor```: create an actor with provided actor code, it'll compile/install/create actor
 * ```./target/debug/peggy cli change-owner```: change the miner's owner to actor
