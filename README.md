@@ -100,7 +100,7 @@ Smart contract address cannot be used as miner's worker.
 - [X] Support to estimate message gas
 - [X] Add a fund account for new account create miner gas
 - [X] Restructure command parameter and persistent method
-- [ ] Native actor code support take owner of miner
+- [X] Native actor code support take owner of miner
 - [X] Compile native actor code
 - [X] Install actor
 - [X] Create actor
