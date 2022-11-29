@@ -104,11 +104,12 @@ Smart contract address cannot be used as miner's worker.
 - [X] Compile native actor code
 - [X] Install actor
 - [X] Create actor
-- [ ] Host code support invoke take owner
+- [X] Host code support invoke take owner
 - [ ] Native actor code support other miner action
 - [ ] Native actor code support deposit process (depend on FVM implementation)
 - [ ] Native actor code support reward distribution
 - [ ] Native actor code support deploy parameter setting
+- [ ] NFT prototype with FVM
 - [ ] Native actor code support mint NFT for deposit account
 - [ ] Native actor code support NFT transfer process
 - [ ] Native actor code support upgrade governance
