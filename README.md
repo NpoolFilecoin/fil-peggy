@@ -127,7 +127,7 @@ We still do not have a full version (and it may be available after a long time, 
 ```cargo build```
 ### Run
 * ```./target/debug/peggy cli create-miner```: create a new miner with generated or exist owner account
-* ```./target/debug/peggy cli create-actor```: create an actor with provided actor code, it'll compile/install/create actor
+* ```./target/debug/peggy cli create-actor```: create actor with provided rust code, it'll compile/install/create actor
 * ```./target/debug/peggy cli change-owner```: change the miner's owner to actor
 * ```./target/debug/peggy cli costody-miner```: call actor to let it take the owner of miner
 
