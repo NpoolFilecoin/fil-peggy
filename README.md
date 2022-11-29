@@ -132,7 +132,7 @@ We still do not have a full version (and it may be available after a long time, 
 * ```./target/debug/peggy cli costody-miner```: call actor to let it take the owner of miner
 
 ## ${\color{blue}{10 \ About}}$
-We don't accept pull request currently. If you have any suggestion, or any issue when you try peggy, please kindly create an issue. Believe me, we'll response to you.
+We don't accept pull request currently. If you have any suggestion, or any issue when you try peggy, please kindly create an issue. Believe me, we'll reply to you.
 
 ## ${\color{blue}{11 \ Reference \ and \ Design \ of \ FIL-Peggy}}$
 * [FIL-Peggy ETHGlobal Submit Page - Hack FEVM Finalist and Filecoin Pool Prize](https://ethglobal.com/showcase/fil-peggy-f77i2)
