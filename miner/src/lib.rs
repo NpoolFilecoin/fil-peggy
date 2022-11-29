@@ -87,7 +87,7 @@ pub async fn create_miner(
         worker: worker,
         window_post_proof_type: window_post_proof_type,
         peer: peer_id.to_bytes(),
-        multiaddrs: vec![BytesDe("peggy.miner".as_bytes().to_vec())],
+        multiaddrs: vec![BytesDe("".as_bytes().to_vec())],
     };
 
     match mpool_push::<_, CidJson>(

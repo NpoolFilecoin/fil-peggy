@@ -185,8 +185,7 @@ impl Cli {
                 Runner::new().change_owner_main().await
             },
             Cmd::CostodyMiner {} => {
-                info!("CostidyMiner");
-                Ok(())
+                Runner::new().take_owner_main().await
             },
         }
     }
@@ -299,7 +298,7 @@ impl Runner {
     }
 
     fn load() -> Result<Option<Self>, CliError> {
-        let yes_no = Runner::yes_no("Would you use exist runner?", true)?;
+        let yes_no = Runner::yes_no("Would you like to use exist runner?", true)?;
         if yes_no == YesNo::No {
             return Ok(None);
         }
@@ -363,7 +362,6 @@ impl Runner {
         self.compile_actor()?;
         self.install_actor().await?;
         self.create_actor().await?;
-        self.actor_take_owner()?;
         self.print_myself()?;
         self.save_myself()?;
         Ok(())
@@ -419,8 +417,58 @@ impl Runner {
         self.change_owner().await
     }
 
+    async fn take_owner(&self) -> Result<(), CliError> {
+        let yes_no = Runner::yes_no(&format!(
+            "{}:\n  {}{}{}{}{}",
+            "Would you like to take".bright_green().bold(),
+            self.miner_id_address.to_string().bold(),
+            "'s owner from ".bright_green(),
+            self.owner.to_string().bold(),
+            " to ".bright_green(),
+            self.actor_id_address.to_string().bold(),
+        ), false)?;
+        if yes_no == YesNo::No {
+            return Ok(());
+        }
+
+        let rpc_cli: RpcEndpoint;
+        match &self.rpc {
+            Some(rpc) => {
+                rpc_cli = rpc.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid rpc")));
+            },
+        }
+
+        let owner_key_info: KeyInfo;
+        match &self.owner_key_info {
+            Some(key_info) => {
+                owner_key_info = key_info.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid owner key info")));
+            }
+        }
+
+        match actor::take_owner(
+            rpc_cli,
+            self.owner,
+            owner_key_info,
+            self.actor_id_address,
+            self.miner_id_address,
+        ).await {
+            Ok(_) => Ok(()),
+            Err(err) => Err(CliError::ActorCallError(err)),
+        }
+    }
+
+    async fn take_owner_main(&self) -> Result<(), CliError> {
+        self.take_owner().await
+    }
+
     async fn actor_repo_handler(&mut self) -> Result<(), CliError> {
-        let yes_no = Runner::yes_no("Would you use exist repository?", true)?;
+        let yes_no = Runner::yes_no("Would you like to use exist repository?", true)?;
         if yes_no == YesNo::Yes {
             return Ok(());
         }
@@ -483,9 +531,9 @@ impl Runner {
         info!("{}{}", "> Installing ... ".blue().bold(), self.actor_wasm_path.clone().display());
         let (code_cid, installed) = install_actor(
             rpc_cli,
-            self.actor_wasm_path.clone(),
             self.owner,
             owner_key_info.clone(),
+            self.actor_wasm_path.clone(),
         ).await?;
 
         self.actor_code_id = Some(code_cid.clone());
@@ -530,18 +578,14 @@ impl Runner {
         info!("{}{:?}", "> Creating ... ".blue().bold(), actor_code_id.clone());
         let (id_address, robust_address) = create_actor(
             rpc_cli,
-            actor_code_id.clone(),
             self.owner,
             owner_key_info.clone(),
+            actor_code_id.clone(),
         ).await?;
 
         self.actor_id_address = id_address;
         self.actor_robust_address = robust_address;
 
-        Ok(())
-    }
-
-    fn actor_take_owner(&mut self) -> Result<(), CliError> {
         Ok(())
     }
 
@@ -606,6 +650,11 @@ impl Runner {
     }
 
     fn prepare_fund_account(&mut self) -> Result<(), CliError> {
+        let yes_no = Runner::yes_no("Would you like to use exist fund account?", true)?;
+        if yes_no == YesNo::Yes {
+            return Ok(());
+        }
+
         print!("> {}", "Fund address: ".green());
         io::stdout().flush().unwrap();
 

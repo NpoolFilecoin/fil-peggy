@@ -25,7 +25,7 @@ use serde::{Serialize, Deserialize};
 use std::str::FromStr;
 use cid::Cid;
 use base64;
-use log::warn;
+use log::{warn, info};
 
 use mpool::{mpool_push, MpoolError};
 use rpc::RpcEndpoint;
@@ -130,9 +130,9 @@ impl Default for InstallReturn {
 
 pub async fn install_actor(
     rpc: RpcEndpoint,
-    target_path: PathBuf,
     from: Address,
     from_key_info: KeyInfo,
+    target_path: PathBuf,
 ) -> Result<(CidJson, bool), ActorError> {
     let code = std::fs::read(target_path)?;
     let code = RawBytes::from(code);
@@ -200,9 +200,9 @@ impl FromStr for ExecReturn {
 
 pub async fn create_actor(
     rpc: RpcEndpoint,
-    actor_code_id: CidJson,
     from: Address,
     from_key_info: KeyInfo,
+    actor_code_id: CidJson,
 ) -> Result<(Address, Address), ActorError> {
     let CidJson(_cid) = actor_code_id;
     let params = ExecParams {
@@ -242,6 +242,37 @@ pub async fn create_actor(
     }
 }
 
-pub fn take_owner() {
-    println!("{}", " Try take owner");
+pub async fn take_owner(
+    rpc: RpcEndpoint,
+    from: Address,
+    from_key_info: KeyInfo,
+    actor_id: Address,
+    miner_id: Address,
+) -> Result<(), ActorError> {
+    match mpool_push::<_, CidJson>(
+        rpc.clone(),
+        from,
+        from_key_info,
+        actor_id,
+        16,
+        TokenAmount::from_atto(0),
+        miner_id,
+    ).await {
+        Ok(res) => {
+            match wait_msg::<serde_json::Value>(
+                rpc,
+                res,
+            ).await {
+                Ok(_) => Ok(()),
+                Err(StateError::ParseByYourSelf(s)) => {
+                    warn!("> State cannot parse {}, parse by youself!", &s);
+                    let s = base64::decode_config(&s, base64::STANDARD)?;
+                    info!("> {}", String::from_utf8(s)?);
+                    Ok(())
+                },
+                Err(err) => Err(ActorError::StateCallError(err)),
+            }
+        },
+        Err(err) => Err(ActorError::MpoolCallError(err)),
+    }
 }
