@@ -44,3 +44,6 @@ workspace = true
 
 [dependencies.serde_json]
 workspace = true
+
+[dependencies.multiaddr]
+workspace = true

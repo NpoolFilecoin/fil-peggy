@@ -24,6 +24,7 @@ use serde::Deserialize;
 use thiserror::Error;
 use std::str::FromStr;
 use serde_json;
+use multiaddr::Multiaddr;
 
 use mpool::{mpool_push, MpoolError};
 use state::{wait_msg, StateError};
@@ -42,6 +43,8 @@ pub enum MinerError {
     MpoolCallError(#[from] MpoolError),
     #[error("state call error: {0}")]
     StateCallError(#[from] StateError),
+    #[error("parse multiaddr error: {0}")]
+    ParseMultiaddrError(#[from] multiaddr::Error),
 }
 
 #[derive(Default)]
@@ -82,12 +85,13 @@ pub async fn create_miner(
     window_post_proof_type: RegisteredPoStProof,
     peer_id: PeerId,
 ) -> Result<(Address, Address), MinerError> {
+    let addr: Multiaddr = "/ip4/127.0.0.1/tcp/2345/http".parse()?;
     let params = CreateMinerParams {
         owner: owner,
         worker: worker,
         window_post_proof_type: window_post_proof_type,
         peer: peer_id.to_bytes(),
-        multiaddrs: vec![BytesDe("peggy.miner".as_bytes().to_vec())],
+        multiaddrs: vec![BytesDe(addr.to_vec())],
     };
 
     match mpool_push::<_, CidJson>(

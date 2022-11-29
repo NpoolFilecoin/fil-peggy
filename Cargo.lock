@@ -4318,7 +4318,7 @@ dependencies = [
  "libp2p-tcp",
  "libp2p-websocket",
  "libp2p-yamux",
- "multiaddr",
+ "multiaddr 0.14.0",
  "parking_lot 0.12.1",
  "pin-project",
  "smallvec",
@@ -4359,7 +4359,7 @@ dependencies = [
  "instant",
  "lazy_static",
  "log",
- "multiaddr",
+ "multiaddr 0.14.0",
  "multihash 0.16.3",
  "multistream-select",
  "parking_lot 0.12.1",
@@ -4897,6 +4897,7 @@ dependencies = [
  "hex",
  "libp2p",
  "mpool",
+ "multiaddr 0.16.0",
  "rpc",
  "serde",
  "serde_json",
@@ -4961,6 +4962,24 @@ dependencies = [
  "bs58",
  "byteorder",
  "data-encoding",
+ "multihash 0.16.3",
+ "percent-encoding",
+ "serde",
+ "static_assertions",
+ "unsigned-varint",
+ "url",
+]
+
+[[package]]
+name = "multiaddr"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4aebdb21e90f81d13ed01dc84123320838e53963c2ca94b60b305d3fa64f31e"
+dependencies = [
+ "arrayref",
+ "byteorder",
+ "data-encoding",
+ "multibase",
  "multihash 0.16.3",
  "percent-encoding",
  "serde",
