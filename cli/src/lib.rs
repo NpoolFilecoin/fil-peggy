@@ -371,13 +371,13 @@ impl Runner {
 
     async fn change_owner(&self) -> Result<(), CliError> {
         let yes_no = Runner::yes_no(&format!(
-            "{}{}{}{}{}{}",
-            "Would you like to change ".bright_green(),
-            self.miner_id_address,
+            "{}:\n  {}{}{}{}{}",
+            "Would you like to change".bright_green().bold(),
+            self.miner_id_address.to_string().bold(),
             "'s owner from ".bright_green(),
-            self.owner,
+            self.owner.to_string().bold(),
             " to ".bright_green(),
-            self.actor_id_address,
+            self.actor_id_address.to_string().bold(),
         ), false)?;
         if yes_no == YesNo::No {
             return Ok(());
