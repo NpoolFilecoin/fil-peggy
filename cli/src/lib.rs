@@ -353,6 +353,10 @@ impl Runner {
         let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
         runner.worker_key_info = Some(KeyInfo::from(key_info));
 
+        let key_info = hex::decode(&runner.clone().encoded_fund_key)?;
+        let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
+        runner.fund_key_info = Some(KeyInfo::from(key_info));
+
         Ok(Some(runner))
     }
 
@@ -614,6 +618,11 @@ impl Runner {
     }
 
     fn prepare_rpc_endpoint(&mut self) -> Result<(), CliError> {
+        let yes_no = Runner::yes_no("Would you like to use exist rpc endpoint?", true)?;
+        if yes_no == YesNo::Yes {
+            return Ok(());
+        }
+
         print!("> {}{}", "Rpc host to lotus".green(), " (e.g. http://localhost:1234/rpc/v0): ".yellow());
         io::stdout().flush().unwrap();
 
