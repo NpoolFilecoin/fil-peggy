@@ -143,7 +143,7 @@ We don't accept pull request currently. If you have any suggestion, or any issue
 * Q2: we know we cannot use a native actor as miner's worker currently, is it possible to use a native actor as miner's worker in future ?
 * Q3: how about the issue #835 ? will we be able to detect method 0 invocation in native actor code ? will we be able to get who send to the native actor ?
 * Q4: do you have any suggestion about the security if we implement all miner's owner functionalities with a native actor ?
-* Q5: Is self_destruct the only way to destroy an actor ? Is it means that if the actor do not implement self_destruct, then it won't be deleted forever ?
+* Q5: Is self_destruct the only way to destroy an actor ? Does it mean that if the actor do not implement self_destruct, then it won't be deleted forever ?
 
 ## ${\color{blue}{12 \ Reference \ and \ Design \ of \ FIL-Peggy}}$
 * [FIL-Peggy ETHGlobal Submit Page - Hack FEVM Finalist and Filecoin Pool Prize](https://ethglobal.com/showcase/fil-peggy-f77i2)
