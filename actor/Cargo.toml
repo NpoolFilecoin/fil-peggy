@@ -50,3 +50,6 @@ workspace = true
 
 [dependencies.log]
 workspace = true
+
+[dependencies.serde_tuple]
+workspace = true

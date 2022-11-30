@@ -20,6 +20,7 @@ dependencies = [
  "rpc",
  "serde",
  "serde_json",
+ "serde_tuple",
  "state",
  "thiserror",
 ]

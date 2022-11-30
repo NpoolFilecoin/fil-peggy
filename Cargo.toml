@@ -72,6 +72,7 @@ resolve-path             = { version = "0.1.0" }
 cid                      = { version = "0.8.6" }
 base64                   = { version = "0.13.1" }
 multiaddr                = { version = "0.16.0" }
+serde_tuple              = { version = "0.5" }
 
 [dependencies.app]
 workspace = true

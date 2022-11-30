@@ -17,6 +17,8 @@ use fvm_shared::{
 };
 use fvm_ipld_encoding_3::{
     RawBytes,
+    Cbor,
+    tuple::{Deserialize_tuple, Serialize_tuple},
 };
 use forest_json::{
     cid::CidJson,
@@ -277,11 +279,12 @@ pub async fn take_owner(
     }
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize_tuple, Deserialize_tuple, Default)]
 struct ChangeWorkerParams {
     miner_id: Address,
     new_worker_id: Address,
 }
+impl Cbor for ChangeWorkerParams {}
 
 pub async fn change_worker(
     rpc: RpcEndpoint,
@@ -311,6 +314,12 @@ pub async fn change_worker(
                 res,
             ).await {
                 Ok(_) => Ok(()),
+                Err(StateError::ParseByYourSelf(s)) => {
+                    warn!("> State cannot parse {}, parse by youself!", &s);
+                    let s = base64::decode_config(&s, base64::STANDARD)?;
+                    info!("> {}", String::from_utf8(s)?);
+                    Ok(())
+                },
                 Err(err) => Err(ActorError::StateCallError(err)),
             }
         },
