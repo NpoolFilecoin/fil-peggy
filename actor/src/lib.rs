@@ -300,7 +300,7 @@ pub async fn change_worker(
     };
 
     match mpool_push::<_, CidJson>(
-        rpc.clone().debug(),
+        rpc.clone(),
         from,
         from_key_info,
         actor_id,
@@ -310,7 +310,7 @@ pub async fn change_worker(
     ).await {
         Ok(res) => {
             match wait_msg::<serde_json::Value>(
-                rpc.debug(),
+                rpc,
                 res,
             ).await {
                 Ok(_) => Ok(()),
@@ -348,7 +348,7 @@ pub async fn withdraw_miner(
     };
 
     match mpool_push::<_, CidJson>(
-        rpc.clone().debug(),
+        rpc.clone(),
         from,
         from_key_info,
         actor_id,
@@ -358,7 +358,7 @@ pub async fn withdraw_miner(
     ).await {
         Ok(res) => {
             match wait_msg::<serde_json::Value>(
-                rpc.debug(),
+                rpc,
                 res,
             ).await {
                 Ok(_) => Ok(()),

@@ -69,7 +69,7 @@ pub enum StateError {
 pub async fn wait_msg<T: FromStr + Default>(rpc: RpcEndpoint, cid: CidJson) -> Result<T, StateError>
     where <T as FromStr>::Err: Debug
 {
-    let msg_lookup = rpc.post::<_, MessageLookup>(state_api::STATE_WAIT_MSG, json!([cid, 3])).await?;
+    let msg_lookup = rpc.post::<_, MessageLookup>(state_api::STATE_WAIT_MSG, json!([cid, 1])).await?;
 
     if msg_lookup.receipt.exit_code != ExitCode::OK {
         return Err(StateError::MsgCodeError(msg_lookup.receipt.exit_code));
