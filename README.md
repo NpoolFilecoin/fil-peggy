@@ -107,6 +107,8 @@ Smart contract address cannot be used as miner's worker.
 - [X] Create actor
 - [X] Host code support invoke take owner
 - [ ] Native actor code support other miner action
+  - [X] Native actor code support change worker
+  - [X] Native actor code support withdraw miner balance
 - [ ] Native actor code support deposit process (depend on FVM implementation)
 - [ ] Native actor code support reward distribution
 - [ ] Native actor code support deploy parameter setting
