@@ -140,6 +140,7 @@ We don't accept pull request currently. If you have any suggestion, or any issue
 * Q1: we know we cannot create miner through a native actor, but we can change miner's owner to a native actor. Is it a design or only a implementation flaw ?
 * Q2: we know we cannot use a native actor as miner's worker currently, is it possible to use a native actor as miner's worker in future ?
 * Q3: how about the issue #835 ? will we be able to detect method 0 invocation in native actor code ? will we be able to get who send to the native actor ?
+* Q4: do you have any suggestion about the security if we implement all miner's owner functionalities with a native actor ?
 
 ## ${\color{blue}{12 \ Reference \ and \ Design \ of \ FIL-Peggy}}$
 * [FIL-Peggy ETHGlobal Submit Page - Hack FEVM Finalist and Filecoin Pool Prize](https://ethglobal.com/showcase/fil-peggy-f77i2)
