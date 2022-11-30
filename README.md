@@ -141,7 +141,7 @@ We don't accept pull request currently. If you have any suggestion, or any issue
 ## ${\color{blue}{11 \ Question \ About \ FVM}}$
 * Q1: we know we cannot create miner through a native actor, but we can change miner's owner to a native actor. Is it a design or only a implementation flaw ?
 * Q2: we know we cannot use a native actor as miner's worker currently, is it possible to use a native actor as miner's worker in future ?
-* Q3: how about the issue #835 ? will we be able to detect method 0 invocation in native actor code ? will we be able to get who send to the native actor ?
+* Q3: how about the issue #835 ? will we be able to detect method 0 invocation in native actor code ? will we be able to get who sent to the native actor ?
 * Q4: do you have any suggestion about the security if we implement all miner's owner functionalities with a native actor ?
 * Q5: Is self_destruct the only way to destroy an actor ? Does it mean that if the actor do not implement self_destruct, then it won't be deleted forever ?
 
