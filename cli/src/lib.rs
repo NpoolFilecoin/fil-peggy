@@ -167,9 +167,15 @@ impl Cli {
 
     fn print_banner() {
         let standard_font = FIGfont::standard().unwrap();
-        let figure = standard_font.convert("* FIL Peggy");
+        let figure = standard_font.convert("      * FIL Peggy");
         assert!(figure.is_some());
+
+        println!("\n\n\n");
         println!("{}", format!("{}", figure.unwrap()).blue().bold());
+        println!("   {}", "Manage your miner with FVM".bright_blue().bold());
+        println!("   {}", "Let your frient invest you miner through smart contract directly".blue());
+        println!("   {}", "@web3_eye".bright_yellow());
+        println!("\n\n\n");
     }
 
     pub async fn run(&mut self) -> Result<(), CliError> {
