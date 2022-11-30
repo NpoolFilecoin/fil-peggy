@@ -172,8 +172,13 @@ impl Cli {
 
         println!("\n\n\n");
         println!("{}", format!("{}", figure.unwrap()).blue().bold());
-        println!("   {}", "Manage your miner with FVM".bright_blue().bold());
-        println!("   {}", "Let your frient invest you miner through smart contract directly".blue());
+        println!("   {}{}",
+                 "Manage your miner with ".bright_blue().bold(),
+                 "FVM".bright_yellow().bold());
+        println!("   {}{}{}",
+                 "Let your friends invest you miner through ".blue(),
+                 "smart contract".bright_yellow().bold(),
+                 " directly".blue());
         println!("   {}", "@web3_eye".bright_yellow());
         println!("\n\n\n");
     }
