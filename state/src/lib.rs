@@ -14,6 +14,7 @@ use serde_json::json;
 use std::fmt;
 use fvm_shared::{
     error::ExitCode,
+    address::Address,
 };
 use thiserror::Error;
 use std::{str::FromStr, fmt::Debug};
@@ -61,6 +62,8 @@ pub enum StateError {
     ConvertReturnDecError(String),
     #[error("parse by yourself {0}")]
     ParseByYourSelf(String),
+    #[error("parse address error {0}")]
+    ParseAddressError(#[from] fvm_shared::address::Error),
 }
 
 pub async fn wait_msg<T: FromStr + Default>(rpc: RpcEndpoint, cid: CidJson) -> Result<T, StateError>
@@ -91,5 +94,16 @@ pub async fn wait_msg<T: FromStr + Default>(rpc: RpcEndpoint, cid: CidJson) -> R
                 Err(err) => Err(StateError::ConvertReturnDecError(format!("{:?}", err))),
             }
         },
+    }
+}
+
+pub async fn lookup_id(rpc: RpcEndpoint, addr: Address) -> Result<Address, StateError> {
+    // state_api::STATE_LOOKUP_ID definition is wrong
+    match rpc.post::<_, String>(
+        /* state_api::STATE_LOOKUP_ID */ "Filecoin.StateLookupID",
+        json!([addr.to_string(), []]),
+    ).await {
+        Ok(addr) => Ok(Address::from_str(&addr)?),
+        Err(err) => Err(StateError::StateRpcError(err)),
     }
 }

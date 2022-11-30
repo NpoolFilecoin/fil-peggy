@@ -276,3 +276,44 @@ pub async fn take_owner(
         Err(err) => Err(ActorError::MpoolCallError(err)),
     }
 }
+
+#[derive(Serialize, Deserialize, Default)]
+struct ChangeWorkerParams {
+    miner_id: Address,
+    new_worker_id: Address,
+}
+
+pub async fn change_worker(
+    rpc: RpcEndpoint,
+    from: Address,
+    from_key_info: KeyInfo,
+    actor_id: Address,
+    miner_id: Address,
+    new_worker_id: Address,
+) -> Result<(), ActorError> {
+    let params = ChangeWorkerParams {
+        miner_id: miner_id,
+        new_worker_id: new_worker_id,
+    };
+
+    match mpool_push::<_, CidJson>(
+        rpc.clone().debug(),
+        from,
+        from_key_info,
+        actor_id,
+        18,
+        TokenAmount::from_atto(0),
+        params,
+    ).await {
+        Ok(res) => {
+            match wait_msg::<serde_json::Value>(
+                rpc.debug(),
+                res,
+            ).await {
+                Ok(_) => Ok(()),
+                Err(err) => Err(ActorError::StateCallError(err)),
+            }
+        },
+        Err(err) => Err(ActorError::MpoolCallError(err)),
+    }
+}

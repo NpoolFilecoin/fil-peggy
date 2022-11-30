@@ -47,7 +47,9 @@ use actor::{
     compile_actor,
     install_actor,
     create_actor,
+    change_worker,
 };
+use state::lookup_id;
 
 #[derive(PartialEq)]
 enum YesNo {
@@ -151,6 +153,7 @@ pub enum Cmd {
     CreateActor {},
     ChangeOwner {},
     CostodyMiner {},
+    ChangeWorker {},
 }
 
 #[derive(Debug, Parser, Clone)]
@@ -197,6 +200,9 @@ impl Cli {
             },
             Cmd::CostodyMiner {} => {
                 Runner::new().take_owner_main().await
+            },
+            Cmd::ChangeWorker {} => {
+                Runner::new().change_worker_main().await
             },
         }
     }
@@ -480,6 +486,51 @@ impl Runner {
 
     async fn take_owner_main(&self) -> Result<(), CliError> {
         self.take_owner().await
+    }
+
+    async fn change_worker(&self) -> Result<(), CliError> {
+        let rpc_cli: RpcEndpoint;
+        match &self.rpc {
+            Some(rpc) => {
+                rpc_cli = rpc.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid rpc")));
+            },
+        }
+
+        print!("> {}", "New worker BLS address: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut worker = Address::default();
+        scanf!("{}", worker)?;
+
+        let owner_key_info: KeyInfo;
+        match &self.owner_key_info {
+            Some(key_info) => {
+                owner_key_info = key_info.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid owner key info")));
+            }
+        }
+
+        let worker = lookup_id(rpc_cli.clone(), worker).await?;
+        match change_worker(
+            rpc_cli,
+            self.owner,
+            owner_key_info,
+            self.actor_id_address,
+            self.miner_id_address,
+            worker,
+        ).await {
+            Ok(_) => Ok(()),
+            Err(err) => Err(CliError::ActorCallError(err)),
+        }
+    }
+
+    async fn change_worker_main(&self) -> Result<(), CliError> {
+        self.change_worker().await
     }
 
     async fn actor_repo_handler(&mut self) -> Result<(), CliError> {
