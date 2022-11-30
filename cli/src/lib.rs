@@ -167,7 +167,7 @@ impl Cli {
 
     fn print_banner() {
         let standard_font = FIGfont::standard().unwrap();
-        let figure = standard_font.convert("FIL Peggy");
+        let figure = standard_font.convert("* FIL Peggy");
         assert!(figure.is_some());
         println!("{}", format!("{}", figure.unwrap()).blue().bold());
     }
