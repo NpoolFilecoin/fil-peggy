@@ -136,7 +136,12 @@ We still do not have a full version (and it may be available after a long time, 
 ## ${\color{blue}{10 \ About}}$
 We don't accept pull request currently. If you have any suggestion, or any issue when you try peggy, please kindly create an issue. Believe me, we'll reply to you.
 
-## ${\color{blue}{11 \ Reference \ and \ Design \ of \ FIL-Peggy}}$
+## ${\color{blue}{11 \ Question \ About \ FVM}}$
+* Q1: we know we cannot create miner through a native actor, but we can change miner's owner to a native actor. Is it a design or only a implementation flaw ?
+* Q2: we know we cannot use a native actor as miner's worker currently, is it possible to use a native actor as miner's worker in future ?
+* Q3: how about the issue #835 ? will we be able to detect method 0 invocation in native actor code ? will we be able to get who send to the native actor ?
+
+## ${\color{blue}{12 \ Reference \ and \ Design \ of \ FIL-Peggy}}$
 * [FIL-Peggy ETHGlobal Submit Page - Hack FEVM Finalist and Filecoin Pool Prize](https://ethglobal.com/showcase/fil-peggy-f77i2)
 * [ETHGlobal Hack FEVM](https://ethglobal.medium.com/hack-fevm-2022-4d31781408b5)
 * [FVM — About FIL-Peggy being ETHGlobal Hack FEVM finalist and using Actor as Owner](https://medium.com/@web3.0.eye/fvm-about-fil-peggy-being-ethglobal-hack-fevm-finalist-and-using-actor-as-owner-ff0a2a133d4c)
