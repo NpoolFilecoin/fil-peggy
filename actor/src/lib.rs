@@ -1,33 +1,25 @@
-use thiserror::Error;
-use std::path::PathBuf;
 use anyhow::{anyhow, Error as AnyhowError};
-use std::process::{Command, Stdio};
-use std::string::FromUtf8Error;
-use fil_actor_init::{
-    InstallParams,
-    InstallReturn as InstallReturn1,
-    ExecParams,
-    ExecReturn as ExecReturn1,
-};
-use fil_actors_runtime::INIT_ACTOR_ADDR;
-use forest_key_management::KeyInfo;
-use fvm_shared::{
-    econ::TokenAmount,
-    address::Address,
-};
-use fvm_ipld_encoding_3::{
-    RawBytes,
-    Cbor,
-    tuple::{Deserialize_tuple, Serialize_tuple},
-};
-use forest_json::{
-    cid::CidJson,
-};
-use serde::{Serialize, Deserialize};
-use std::str::FromStr;
-use cid::Cid;
 use base64;
-use log::{warn, info};
+use cid::Cid;
+use fil_actor_init::{ExecParams, ExecReturn as ExecReturn1, InstallParams, InstallReturn as InstallReturn1};
+use fil_actors_runtime::INIT_ACTOR_ADDR;
+use forest_json::cid::CidJson;
+use forest_key_management::KeyInfo;
+use fvm_ipld_encoding_3::{
+    tuple::{Deserialize_tuple, Serialize_tuple},
+    Cbor,
+    RawBytes,
+};
+use fvm_shared::{address::Address, econ::TokenAmount};
+use log::{info, warn};
+use serde::{Deserialize, Serialize};
+use std::{
+    path::PathBuf,
+    process::{Command, Stdio},
+    str::FromStr,
+    string::FromUtf8Error,
+};
+use thiserror::Error;
 
 use mpool::{mpool_push, MpoolError};
 use rpc::RpcEndpoint;
@@ -64,7 +56,7 @@ pub fn clone_actor(repo_url: &str, repo_rev: &str, target_path: PathBuf) -> Resu
         .arg(format!("{}", target_path.display()))
         .output()?;
     Command::new("git")
-        .current_dir(target_path.clone())
+        .current_dir(target_path)
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("checkout")
@@ -82,10 +74,7 @@ pub fn compile_actor(target_path: PathBuf) -> Result<PathBuf, ActorError> {
         .arg("--release")
         .output()?;
 
-    let output = Command::new("cargo")
-        .current_dir(target_path.clone())
-        .arg("read-manifest")
-        .output()?;
+    let output = Command::new("cargo").current_dir(target_path.clone()).arg("read-manifest").output()?;
 
     if !output.status.success() {
         return Err(ActorError::CommonError(anyhow!("fail read manifest")));
@@ -124,7 +113,9 @@ impl FromStr for InstallReturn {
 impl Default for InstallReturn {
     fn default() -> Self {
         Self {
-            code_cid: CidJson(Cid::from_str("bafyreibjo4xmgaevkgud7mbifn3dzp4v4lyaui4yvqp3f2bqwtxcjrdqg4").unwrap() as Cid),
+            code_cid: CidJson(
+                Cid::from_str("bafyreibjo4xmgaevkgud7mbifn3dzp4v4lyaui4yvqp3f2bqwtxcjrdqg4").unwrap() as Cid
+            ),
             installed: false,
         }
     }
@@ -138,9 +129,7 @@ pub async fn install_actor(
 ) -> Result<(CidJson, bool), ActorError> {
     let code = std::fs::read(target_path)?;
     let code = RawBytes::from(code);
-    let params = InstallParams {
-        code: code,
-    };
+    let params = InstallParams { code };
 
     match mpool_push::<_, CidJson>(
         rpc.clone(),
@@ -150,19 +139,19 @@ pub async fn install_actor(
         4,
         TokenAmount::from_atto(0),
         params,
-    ).await {
-        Ok(res) => {
-            match wait_msg::<InstallReturn>(rpc, res.clone()).await {
-                Ok(ret) => Ok((ret.code_cid, ret.installed)),
-                Err(StateError::ParseByYourSelf(s)) => {
-                    warn!("> State cannot parse {}, parse by youself!", &s);
-                    let s = base64::decode_config(&s, base64::STANDARD)?;
-                    let b = RawBytes::new(s);
-                    let ret: InstallReturn1 = RawBytes::deserialize(&b)?;
-                    Ok((CidJson(ret.code_cid), ret.installed))
-                },
-                Err(err) => Err(ActorError::StateCallError(err)),
+    )
+    .await
+    {
+        Ok(res) => match wait_msg::<InstallReturn>(rpc, res.clone()).await {
+            Ok(ret) => Ok((ret.code_cid, ret.installed)),
+            Err(StateError::ParseByYourSelf(s)) => {
+                warn!("> State cannot parse {}, parse by youself!", &s);
+                let s = base64::decode_config(&s, base64::STANDARD)?;
+                let b = RawBytes::new(s);
+                let ret: InstallReturn1 = RawBytes::deserialize(&b)?;
+                Ok((CidJson(ret.code_cid), ret.installed))
             }
+            Err(err) => Err(ActorError::StateCallError(err)),
         },
         Err(err) => Err(ActorError::MpoolCallError(err)),
     }
@@ -193,10 +182,7 @@ impl FromStr for ExecReturn {
         let id_address = Address::from_str(&v.id_address)?;
         let robust_address = Address::from_str(&v.robust_address)?;
 
-        Ok(Self {
-            id_address,
-            robust_address,
-        })
+        Ok(Self { id_address, robust_address })
     }
 }
 
@@ -207,10 +193,7 @@ pub async fn create_actor(
     actor_code_id: CidJson,
 ) -> Result<(Address, Address), ActorError> {
     let CidJson(_cid) = actor_code_id;
-    let params = ExecParams {
-        code_cid: _cid,
-        constructor_params: RawBytes::new(Vec::new()),
-    };
+    let params = ExecParams { code_cid: _cid, constructor_params: RawBytes::new(Vec::new()) };
 
     match mpool_push::<_, CidJson>(
         rpc.clone(),
@@ -220,25 +203,25 @@ pub async fn create_actor(
         2,
         TokenAmount::from_atto(0),
         params,
-    ).await {
-        Ok(res) => {
-            match wait_msg::<ExecReturn>(rpc, res.clone()).await {
-                Ok(ret) => Ok((
+    )
+    .await
+    {
+        Ok(res) => match wait_msg::<ExecReturn>(rpc, res.clone()).await {
+            Ok(ret) => Ok((
+                Address::from_str(&ret.id_address.to_string())?,
+                Address::from_str(&ret.robust_address.to_string())?,
+            )),
+            Err(StateError::ParseByYourSelf(s)) => {
+                warn!("> State cannot parse {}, parse by youself!", &s);
+                let s = base64::decode_config(&s, base64::STANDARD)?;
+                let b = RawBytes::new(s);
+                let ret: ExecReturn1 = RawBytes::deserialize(&b)?;
+                Ok((
                     Address::from_str(&ret.id_address.to_string())?,
                     Address::from_str(&ret.robust_address.to_string())?,
-                )),
-                Err(StateError::ParseByYourSelf(s)) => {
-                    warn!("> State cannot parse {}, parse by youself!", &s);
-                    let s = base64::decode_config(&s, base64::STANDARD)?;
-                    let b = RawBytes::new(s);
-                    let ret: ExecReturn1 = RawBytes::deserialize(&b)?;
-                    Ok((
-                        Address::from_str(&ret.id_address.to_string())?,
-                        Address::from_str(&ret.robust_address.to_string())?,
-                    ))
-                },
-                Err(err) => Err(ActorError::StateCallError(err)),
+                ))
             }
+            Err(err) => Err(ActorError::StateCallError(err)),
         },
         Err(err) => Err(ActorError::MpoolCallError(err)),
     }
@@ -251,29 +234,18 @@ pub async fn take_owner(
     actor_id: Address,
     miner_id: Address,
 ) -> Result<(), ActorError> {
-    match mpool_push::<_, CidJson>(
-        rpc.clone(),
-        from,
-        from_key_info,
-        actor_id,
-        16,
-        TokenAmount::from_atto(0),
-        miner_id,
-    ).await {
-        Ok(res) => {
-            match wait_msg::<serde_json::Value>(
-                rpc,
-                res,
-            ).await {
-                Ok(_) => Ok(()),
-                Err(StateError::ParseByYourSelf(s)) => {
-                    warn!("> State cannot parse {}, parse by youself!", &s);
-                    let s = base64::decode_config(&s, base64::STANDARD)?;
-                    info!("> {}", String::from_utf8(s)?);
-                    Ok(())
-                },
-                Err(err) => Err(ActorError::StateCallError(err)),
+    match mpool_push::<_, CidJson>(rpc.clone(), from, from_key_info, actor_id, 16, TokenAmount::from_atto(0), miner_id)
+        .await
+    {
+        Ok(res) => match wait_msg::<serde_json::Value>(rpc, res).await {
+            Ok(_) => Ok(()),
+            Err(StateError::ParseByYourSelf(s)) => {
+                warn!("> State cannot parse {}, parse by youself!", &s);
+                let s = base64::decode_config(&s, base64::STANDARD)?;
+                info!("> {}", String::from_utf8(s)?);
+                Ok(())
             }
+            Err(err) => Err(ActorError::StateCallError(err)),
         },
         Err(err) => Err(ActorError::MpoolCallError(err)),
     }
@@ -294,34 +266,20 @@ pub async fn change_worker(
     miner_id: Address,
     new_worker_id: Address,
 ) -> Result<(), ActorError> {
-    let params = ChangeWorkerParams {
-        miner_id: miner_id,
-        new_worker_id: new_worker_id,
-    };
+    let params = ChangeWorkerParams { miner_id, new_worker_id };
 
-    match mpool_push::<_, CidJson>(
-        rpc.clone(),
-        from,
-        from_key_info,
-        actor_id,
-        18,
-        TokenAmount::from_atto(0),
-        params,
-    ).await {
-        Ok(res) => {
-            match wait_msg::<serde_json::Value>(
-                rpc,
-                res,
-            ).await {
-                Ok(_) => Ok(()),
-                Err(StateError::ParseByYourSelf(s)) => {
-                    warn!("> State cannot parse {}, parse by youself!", &s);
-                    let s = base64::decode_config(&s, base64::STANDARD)?;
-                    info!("> {}", String::from_utf8(s)?);
-                    Ok(())
-                },
-                Err(err) => Err(ActorError::StateCallError(err)),
+    match mpool_push::<_, CidJson>(rpc.clone(), from, from_key_info, actor_id, 18, TokenAmount::from_atto(0), params)
+        .await
+    {
+        Ok(res) => match wait_msg::<serde_json::Value>(rpc, res).await {
+            Ok(_) => Ok(()),
+            Err(StateError::ParseByYourSelf(s)) => {
+                warn!("> State cannot parse {}, parse by youself!", &s);
+                let s = base64::decode_config(&s, base64::STANDARD)?;
+                info!("> {}", String::from_utf8(s)?);
+                Ok(())
             }
+            Err(err) => Err(ActorError::StateCallError(err)),
         },
         Err(err) => Err(ActorError::MpoolCallError(err)),
     }
@@ -342,34 +300,20 @@ pub async fn withdraw_miner(
     miner_id: Address,
     amount: TokenAmount,
 ) -> Result<(), ActorError> {
-    let params = WithdrawMinerParams {
-        miner_id: miner_id,
-        amount: amount,
-    };
+    let params = WithdrawMinerParams { miner_id, amount };
 
-    match mpool_push::<_, CidJson>(
-        rpc.clone(),
-        from,
-        from_key_info,
-        actor_id,
-        19,
-        TokenAmount::from_atto(0),
-        params,
-    ).await {
-        Ok(res) => {
-            match wait_msg::<serde_json::Value>(
-                rpc,
-                res,
-            ).await {
-                Ok(_) => Ok(()),
-                Err(StateError::ParseByYourSelf(s)) => {
-                    warn!("> State cannot parse {}, parse by youself!", &s);
-                    let s = base64::decode_config(&s, base64::STANDARD)?;
-                    info!("> {}", String::from_utf8(s)?);
-                    Ok(())
-                },
-                Err(err) => Err(ActorError::StateCallError(err)),
+    match mpool_push::<_, CidJson>(rpc.clone(), from, from_key_info, actor_id, 19, TokenAmount::from_atto(0), params)
+        .await
+    {
+        Ok(res) => match wait_msg::<serde_json::Value>(rpc, res).await {
+            Ok(_) => Ok(()),
+            Err(StateError::ParseByYourSelf(s)) => {
+                warn!("> State cannot parse {}, parse by youself!", &s);
+                let s = base64::decode_config(&s, base64::STANDARD)?;
+                info!("> {}", String::from_utf8(s)?);
+                Ok(())
             }
+            Err(err) => Err(ActorError::StateCallError(err)),
         },
         Err(err) => Err(ActorError::MpoolCallError(err)),
     }

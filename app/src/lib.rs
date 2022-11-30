@@ -1,7 +1,6 @@
-use cli::{Cli, CliError};
 use clap::{Parser, Subcommand};
+use cli::{Cli, CliError};
 use thiserror::Error;
-use anyhow;
 
 #[derive(Debug, Subcommand, Clone)]
 pub enum Cmd {
@@ -36,7 +35,7 @@ impl Cmd {
         match self.clone() {
             Self::Cli(cmd) => {
                 let _ = cmd.parse()?;
-            },
+            }
         }
         Ok(self)
     }
@@ -44,8 +43,8 @@ impl Cmd {
     pub async fn run(self) -> anyhow::Result<(), AppError> {
         match self {
             Self::Cli(mut cmd) => {
-                let _ = cmd.run().await?;
-            },
+                cmd.run().await?;
+            }
         }
         Ok(())
     }

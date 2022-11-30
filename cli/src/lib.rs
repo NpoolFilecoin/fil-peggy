@@ -1,57 +1,44 @@
+use anyhow::{anyhow, Error as AnyhowError};
+use chrono::{offset::Utc, DateTime};
 use clap::{Parser, Subcommand};
-use core::str::FromStr;
-use scanf::scanf;
 use colored::Colorize;
-use forest_key_management::{
-    json::KeyInfoJson,
-    KeyInfo,
-    Key,
-};
+use core::str::FromStr;
+use crossterm::style::Color;
+use figlet_rs::FIGfont;
+use forest_json::cid::CidJson;
+use forest_key_management::{json::KeyInfoJson, Key, KeyInfo};
 use fvm_shared::{
-    crypto::signature::SignatureType,
     address::Address,
-    sector::{RegisteredSealProof, SectorSize, RegisteredPoStProof},
-    version::NetworkVersion,
-    econ::TokenAmount,
     bigint::{BigInt, ParseBigIntError},
+    crypto::signature::SignatureType,
+    econ::TokenAmount,
+    sector::{RegisteredPoStProof, RegisteredSealProof, SectorSize},
+    version::NetworkVersion,
 };
+use hex::FromHexError;
 use libp2p::{
     identity::{ed25519, Keypair},
     PeerId,
 };
-use thiserror::Error;
-use figlet_rs::FIGfont;
-use anyhow::{anyhow, Error as AnyhowError};
+use log::{error, info, warn};
+use resolve_path::PathResolveExt;
+use scanf::scanf;
+use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 use std::{
     io::{self, Write},
+    path::PathBuf,
     time::SystemTime,
 };
-use chrono::{offset::Utc, DateTime};
-use terminal_menu::{menu, label, button, run, mut_menu};
-use crossterm::style::Color;
-use log::{info, error, warn};
-use hex::FromHexError;
-use serde::{Serialize, Deserialize};
-use serde_with::{serde_as, DisplayFromStr};
-use std::path::PathBuf;
-use forest_json::{
-    cid::CidJson,
-};
-use resolve_path::PathResolveExt;
+use terminal_menu::{button, label, menu, mut_menu, run};
+use thiserror::Error;
 
-use wallet;
+use actor::{change_worker, clone_actor, compile_actor, create_actor, install_actor, withdraw_miner};
 use miner;
 use rpc::RpcEndpoint;
 use send::send;
-use actor::{
-    clone_actor,
-    compile_actor,
-    install_actor,
-    create_actor,
-    change_worker,
-    withdraw_miner,
-};
 use state::lookup_id;
+use wallet;
 
 #[derive(PartialEq)]
 enum YesNo {
@@ -180,13 +167,13 @@ impl Cli {
 
         println!("\n\n\n");
         println!("{}", format!("{}", figure.unwrap()).blue().bold());
-        println!("   {}{}",
-                 "Manage your miner with ".bright_blue().bold(),
-                 "FVM".bright_yellow().bold());
-        println!("   {}{}{}",
-                 "Let your friends invest you miner through ".blue(),
-                 "smart contract".bright_yellow().bold(),
-                 " directly".blue());
+        println!("   {}{}", "Manage your miner with ".bright_blue().bold(), "FVM".bright_yellow().bold());
+        println!(
+            "   {}{}{}",
+            "Let your friends invest you miner through ".blue(),
+            "smart contract".bright_yellow().bold(),
+            " directly".blue()
+        );
         println!("   {}", "@web3_eye".bright_yellow());
         println!("\n\n\n");
     }
@@ -194,24 +181,12 @@ impl Cli {
     pub async fn run(&mut self) -> Result<(), CliError> {
         Self::print_banner();
         match self.cmd {
-            Cmd::CreateMiner {} => {
-                Runner::new().create_miner_main().await
-            },
-            Cmd::CreateActor {} => {
-                Runner::new().create_actor_main().await
-            },
-            Cmd::ChangeOwner {} => {
-                Runner::new().change_owner_main().await
-            },
-            Cmd::CostodyMiner {} => {
-                Runner::new().take_owner_main().await
-            },
-            Cmd::ChangeWorker {} => {
-                Runner::new().change_worker_main().await
-            },
-            Cmd::WithdrawMiner {} => {
-                Runner::new().withdraw_miner_main().await
-            },
+            Cmd::CreateMiner {} => Runner::new().create_miner_main().await,
+            Cmd::CreateActor {} => Runner::new().create_actor_main().await,
+            Cmd::ChangeOwner {} => Runner::new().change_owner_main().await,
+            Cmd::CostodyMiner {} => Runner::new().take_owner_main().await,
+            Cmd::ChangeWorker {} => Runner::new().change_worker_main().await,
+            Cmd::WithdrawMiner {} => Runner::new().withdraw_miner_main().await,
         }
     }
 }
@@ -279,11 +254,11 @@ impl Runner {
         match Self::load() {
             Ok(Some(runner)) => {
                 return runner;
-            },
-            Ok(None) => {},
+            }
+            Ok(None) => {}
             Err(err) => {
                 error!("{}: {}", "> Fail to load exist runner".red(), err);
-            },
+            }
         }
 
         Self {
@@ -332,12 +307,12 @@ impl Runner {
         for dir in std::fs::read_dir("output")? {
             let path = dir?.path();
             if path.is_dir() {
-                continue
+                continue;
             }
             paths.push(format!("{}", path.display()));
         }
 
-        if paths.len() == 0 {
+        if paths.is_empty() {
             return Ok(None);
         }
 
@@ -355,30 +330,27 @@ impl Runner {
 
         let runner_str = std::fs::read_to_string(runner_file)?;
 
-        let mut runner: Self;
-        match serde_json::from_str(&runner_str) {
-            Ok(r) => {
-                runner = r;
-            },
+        let mut runner: Runner = match serde_json::from_str(&runner_str) {
+            Ok(r) => r,
             Err(err) => {
                 error!("{}", format!("> Fail parse json: {}", err).red());
                 return Err(CliError::ParseJsonError(err));
-            },
-        }
+            }
+        };
 
         runner.print_myself()?;
 
-        runner.rpc = Some(RpcEndpoint::new(runner.clone().rpc_host, runner.clone().rpc_bearer_token)?);
+        runner.rpc = Some(RpcEndpoint::new(&runner.rpc_host, &runner.rpc_bearer_token)?);
 
-        let key_info = hex::decode(&runner.clone().encoded_owner_key)?;
+        let key_info = hex::decode(&runner.encoded_owner_key)?;
         let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
         runner.owner_key_info = Some(KeyInfo::from(key_info));
 
-        let key_info = hex::decode(&runner.clone().encoded_worker_key)?;
+        let key_info = hex::decode(&runner.encoded_worker_key)?;
         let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
         runner.worker_key_info = Some(KeyInfo::from(key_info));
 
-        let key_info = hex::decode(&runner.clone().encoded_fund_key)?;
+        let key_info = hex::decode(&runner.encoded_fund_key)?;
         let key_info: KeyInfoJson = serde_json::from_slice(&key_info)?;
         runner.fund_key_info = Some(KeyInfo::from(key_info));
 
@@ -397,46 +369,39 @@ impl Runner {
     }
 
     async fn change_owner(&self) -> Result<(), CliError> {
-        let yes_no = Runner::yes_no(&format!(
-            "{}:\n  {}{}{}{}{}",
-            "Would you like to change".bright_green().bold(),
-            self.miner_id_address.to_string().bold(),
-            "'s owner from ".bright_green(),
-            self.owner.to_string().bold(),
-            " to ".bright_green(),
-            self.actor_id_address.to_string().bold(),
-        ), false)?;
+        let yes_no = Runner::yes_no(
+            &format!(
+                "{}:\n  {}{}{}{}{}",
+                "Would you like to change".bright_green().bold(),
+                self.miner_id_address.to_string().bold(),
+                "'s owner from ".bright_green(),
+                self.owner.to_string().bold(),
+                " to ".bright_green(),
+                self.actor_id_address.to_string().bold(),
+            ),
+            false,
+        )?;
         if yes_no == YesNo::No {
             return Ok(());
         }
 
-        let rpc_cli: RpcEndpoint;
-        match &self.rpc {
-            Some(rpc) => {
-                rpc_cli = rpc.clone();
-            },
+        let rpc_cli = match &self.rpc {
+            Some(rpc) => rpc.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid rpc")));
-            },
-        }
+            }
+        };
 
-        let owner_key_info: KeyInfo;
-        match &self.owner_key_info {
-            Some(key_info) => {
-                owner_key_info = key_info.clone();
-            },
+        let owner_key_info = match &self.owner_key_info {
+            Some(key_info) => key_info.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid owner key info")));
             }
-        }
+        };
 
-        match miner::change_owner(
-            rpc_cli,
-            self.owner,
-            owner_key_info,
-            self.miner_id_address,
-            self.actor_id_address,
-        ).await {
+        match miner::change_owner(rpc_cli, self.owner, owner_key_info, self.miner_id_address, self.actor_id_address)
+            .await
+        {
             Ok(_) => Ok(()),
             Err(err) => Err(CliError::MinerCallError(err)),
         }
@@ -447,46 +412,38 @@ impl Runner {
     }
 
     async fn take_owner(&self) -> Result<(), CliError> {
-        let yes_no = Runner::yes_no(&format!(
-            "{}:\n  {}{}{}{}{}",
-            "Would you like to take".bright_green().bold(),
-            self.miner_id_address.to_string().bold(),
-            "'s owner from ".bright_green(),
-            self.owner.to_string().bold(),
-            " to ".bright_green(),
-            self.actor_id_address.to_string().bold(),
-        ), false)?;
+        let yes_no = Runner::yes_no(
+            &format!(
+                "{}:\n  {}{}{}{}{}",
+                "Would you like to take".bright_green().bold(),
+                self.miner_id_address.to_string().bold(),
+                "'s owner from ".bright_green(),
+                self.owner.to_string().bold(),
+                " to ".bright_green(),
+                self.actor_id_address.to_string().bold(),
+            ),
+            false,
+        )?;
         if yes_no == YesNo::No {
             return Ok(());
         }
 
-        let rpc_cli: RpcEndpoint;
-        match &self.rpc {
-            Some(rpc) => {
-                rpc_cli = rpc.clone();
-            },
+        let rpc_cli = match &self.rpc {
+            Some(rpc) => rpc.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid rpc")));
-            },
-        }
+            }
+        };
 
-        let owner_key_info: KeyInfo;
-        match &self.owner_key_info {
-            Some(key_info) => {
-                owner_key_info = key_info.clone();
-            },
+        let owner_key_info = match &self.owner_key_info {
+            Some(key_info) => key_info.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid owner key info")));
             }
-        }
+        };
 
-        match actor::take_owner(
-            rpc_cli,
-            self.owner,
-            owner_key_info,
-            self.actor_id_address,
-            self.miner_id_address,
-        ).await {
+        match actor::take_owner(rpc_cli, self.owner, owner_key_info, self.actor_id_address, self.miner_id_address).await
+        {
             Ok(_) => Ok(()),
             Err(err) => Err(CliError::ActorCallError(err)),
         }
@@ -497,15 +454,12 @@ impl Runner {
     }
 
     async fn change_worker(&self) -> Result<(), CliError> {
-        let rpc_cli: RpcEndpoint;
-        match &self.rpc {
-            Some(rpc) => {
-                rpc_cli = rpc.clone();
-            },
+        let rpc_cli = match &self.rpc {
+            Some(rpc) => rpc.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid rpc")));
-            },
-        }
+            }
+        };
 
         print!("> {}", "New worker BLS address: ".green());
         io::stdout().flush().unwrap();
@@ -513,25 +467,17 @@ impl Runner {
         let mut worker = Address::default();
         scanf!("{}", worker)?;
 
-        let owner_key_info: KeyInfo;
-        match &self.owner_key_info {
-            Some(key_info) => {
-                owner_key_info = key_info.clone();
-            },
+        let owner_key_info = match &self.owner_key_info {
+            Some(key_info) => key_info.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid owner key info")));
             }
-        }
+        };
 
         let worker = lookup_id(rpc_cli.clone(), worker).await?;
-        match change_worker(
-            rpc_cli,
-            self.owner,
-            owner_key_info,
-            self.actor_id_address,
-            self.miner_id_address,
-            worker,
-        ).await {
+        match change_worker(rpc_cli, self.owner, owner_key_info, self.actor_id_address, self.miner_id_address, worker)
+            .await
+        {
             Ok(_) => Ok(()),
             Err(err) => Err(CliError::ActorCallError(err)),
         }
@@ -542,15 +488,12 @@ impl Runner {
     }
 
     async fn withdraw_miner(&self) -> Result<(), CliError> {
-        let rpc_cli: RpcEndpoint;
-        match &self.rpc {
-            Some(rpc) => {
-                rpc_cli = rpc.clone();
-            },
+        let rpc_cli = match &self.rpc {
+            Some(rpc) => rpc.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid rpc")));
-            },
-        }
+            }
+        };
 
         print!("> {}", "FIL amount to be withdrawn: ".green());
         io::stdout().flush().unwrap();
@@ -560,24 +503,16 @@ impl Runner {
 
         let amount = TokenAmount::from_whole(BigInt::from_str(&amount_str)?);
 
-        let owner_key_info: KeyInfo;
-        match &self.owner_key_info {
-            Some(key_info) => {
-                owner_key_info = key_info.clone();
-            },
+        let owner_key_info = match &self.owner_key_info {
+            Some(key_info) => key_info.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid owner key info")));
             }
-        }
+        };
 
-        match withdraw_miner(
-            rpc_cli,
-            self.owner,
-            owner_key_info,
-            self.actor_id_address,
-            self.miner_id_address,
-            amount,
-        ).await {
+        match withdraw_miner(rpc_cli, self.owner, owner_key_info, self.actor_id_address, self.miner_id_address, amount)
+            .await
+        {
             Ok(_) => Ok(()),
             Err(err) => Err(CliError::ActorCallError(err)),
         }
@@ -613,10 +548,11 @@ impl Runner {
 
         self.actor_repo_url = repo_url.clone();
         self.actor_repo_rev = repo_rev.clone();
-        self.actor_path = target_path.clone().resolve().to_path_buf();
+        self.actor_path = target_path.resolve().to_path_buf();
 
-        info!("{}{}{}{}", "> Cloning ...".blue().bold(), repo_url.clone(), " -> ".yellow(), target_path.clone().display());
-        clone_actor(&repo_url, &repo_rev, target_path.clone())?;
+        info!("{}{}{}{}", "> Cloning ...".blue().bold(), repo_url, " -> ".yellow(), target_path.display());
+
+        clone_actor(&repo_url, &repo_rev, target_path)?;
 
         Ok(())
     }
@@ -628,33 +564,23 @@ impl Runner {
     }
 
     async fn install_actor(&mut self) -> Result<(), CliError> {
-        let rpc_cli: RpcEndpoint;
-        match &self.rpc {
-            Some(rpc) => {
-                rpc_cli = rpc.clone();
-            },
+        let rpc_cli = match &self.rpc {
+            Some(rpc) => rpc.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid rpc")));
-            },
-        }
+            }
+        };
 
-        let owner_key_info: KeyInfo;
-        match &self.owner_key_info {
-            Some(key_info) => {
-                owner_key_info = key_info.clone();
-            },
+        let owner_key_info = match &self.owner_key_info {
+            Some(key_info) => key_info,
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid owner key info")));
             }
-        }
+        };
 
         info!("{}{}", "> Installing ... ".blue().bold(), self.actor_wasm_path.clone().display());
-        let (code_cid, installed) = install_actor(
-            rpc_cli,
-            self.owner,
-            owner_key_info.clone(),
-            self.actor_wasm_path.clone(),
-        ).await?;
+        let (code_cid, installed) =
+            install_actor(rpc_cli, self.owner, owner_key_info.clone(), self.actor_wasm_path.clone()).await?;
 
         self.actor_code_id = Some(code_cid.clone());
         if !installed {
@@ -665,43 +591,30 @@ impl Runner {
     }
 
     async fn create_actor(&mut self) -> Result<(), CliError> {
-        let rpc_cli: RpcEndpoint;
-        match &self.rpc {
-            Some(rpc) => {
-                rpc_cli = rpc.clone();
-            },
+        let rpc_cli = match &self.rpc {
+            Some(rpc) => rpc.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid rpc")));
-            },
-        }
+            }
+        };
 
-        let owner_key_info: KeyInfo;
-        match &self.owner_key_info {
-            Some(key_info) => {
-                owner_key_info = key_info.clone();
-            },
+        let owner_key_info = match &self.owner_key_info {
+            Some(key_info) => key_info,
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid owner key info")));
             }
-        }
+        };
 
-        let actor_code_id: &CidJson;
-        match &self.actor_code_id {
-            Some(code_id) => {
-                actor_code_id = code_id;
-            },
+        let actor_code_id = match &self.actor_code_id {
+            Some(code_id) => code_id,
             None => {
                 return Err(CliError::CommonError(anyhow!("invalid actor code id")));
-            },
-        }
+            }
+        };
 
         info!("{}{:?}", "> Creating ... ".blue().bold(), actor_code_id.clone());
-        let (id_address, robust_address) = create_actor(
-            rpc_cli,
-            self.owner,
-            owner_key_info.clone(),
-            actor_code_id.clone(),
-        ).await?;
+        let (id_address, robust_address) =
+            create_actor(rpc_cli, self.owner, owner_key_info.clone(), actor_code_id.clone()).await?;
 
         self.actor_id_address = id_address;
         self.actor_robust_address = robust_address;
@@ -724,10 +637,10 @@ impl Runner {
         match yes_no {
             YesNo::No => {
                 self.generate_account()?;
-            },
+            }
             YesNo::Yes => {
                 self.fill_old_account()?;
-            },
+            }
         }
 
         Ok(())
@@ -746,10 +659,10 @@ impl Runner {
         match scanf!("{}", rpc_host) {
             Ok(_) => {
                 self.rpc_host = rpc_host.clone();
-            },
+            }
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
 
         println!("> {}{}", "Lotus bearer token".green(),
@@ -763,13 +676,13 @@ impl Runner {
         match scanf!("{}", bearer_token) {
             Ok(_) => {
                 self.rpc_bearer_token = bearer_token.clone();
-            },
+            }
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
 
-        self.rpc = Some(RpcEndpoint::new(rpc_host, bearer_token)?);
+        self.rpc = Some(RpcEndpoint::new(&rpc_host, &bearer_token)?);
 
         Ok(())
     }
@@ -787,10 +700,10 @@ impl Runner {
         match scanf!("{}", fund) {
             Ok(_) => {
                 self.fund = fund;
-            },
+            }
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
 
         print!("> {}", "Fund private key: ".green());
@@ -800,10 +713,10 @@ impl Runner {
         match scanf!("{}", key) {
             Ok(_) => {
                 self.encoded_fund_key = key;
-            },
+            }
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
 
         let key_info = hex::decode(&self.encoded_fund_key)?;
@@ -821,10 +734,10 @@ impl Runner {
         match scanf!("{}", owner) {
             Ok(_) => {
                 self.owner = owner;
-            },
+            }
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
 
         print!("> {}", "Owner private key: ".green());
@@ -834,10 +747,10 @@ impl Runner {
         match scanf!("{}", key) {
             Ok(_) => {
                 self.encoded_owner_key = key;
-            },
+            }
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
 
         let key_info = hex::decode(&self.encoded_owner_key)?;
@@ -851,10 +764,10 @@ impl Runner {
         match scanf!("{}", worker) {
             Ok(_) => {
                 self.worker = worker;
-            },
+            }
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
 
         print!("> {}", "Worker private key: ".green());
@@ -864,10 +777,10 @@ impl Runner {
         match scanf!("{}", key) {
             Ok(_) => {
                 self.encoded_worker_key = key;
-            },
+            }
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
 
         let key_info = hex::decode(&self.encoded_worker_key)?;
@@ -881,7 +794,7 @@ impl Runner {
         let menu = menu(vec![
             label("> Select owner account signature type:").colorize(Color::Green),
             button("Secp256k1"),
-            button("BLS")
+            button("BLS"),
         ]);
         run(&menu);
 
@@ -921,7 +834,7 @@ impl Runner {
         match label_color {
             true => print!("> {}{}", s.bright_green().bold(), " (yes | no): ".yellow()),
             _ => print!("> {}{}", s, " (yes | no): ".yellow()),
-        } 
+        }
         io::stdout().flush().unwrap();
 
         let mut yes_no = YesNo::Yes;
@@ -929,7 +842,7 @@ impl Runner {
             Ok(_) => Ok(yes_no),
             Err(err) => {
                 return Err(CliError::IOCallError(err));
-            },
+            }
         }
     }
 
@@ -972,12 +885,12 @@ impl Runner {
 
     fn save_myself(&self) -> Result<(), CliError> {
         match std::fs::create_dir("output") {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(err) => {
                 if err.kind() != std::io::ErrorKind::AlreadyExists {
                     return Err(CliError::IOCallError(err));
                 }
-            },
+            }
         }
 
         let my_json = serde_json::to_string_pretty(self)?;
@@ -993,11 +906,8 @@ impl Runner {
     }
 
     async fn miner_handler(&mut self) -> Result<(), CliError> {
-        let menu = menu(vec![
-            label("> Select miner action:").colorize(Color::Green),
-            button("Create"),
-            button("ChangeOwner")
-        ]);
+        let menu =
+            menu(vec![label("> Select miner action:").colorize(Color::Green), button("Create"), button("ChangeOwner")]);
         run(&menu);
 
         let menu = mut_menu(&menu);
@@ -1021,14 +931,14 @@ impl Runner {
             label("> Select miner's sector size:").colorize(Color::Green),
             button("32GiB"),
             button("64GiB"),
-            button("2KiB")
+            button("2KiB"),
         ]);
         run(&menu);
 
         let menu = mut_menu(&menu);
         let sector_size = menu.selected_item_name();
 
-        let sector_size =  match sector_size {
+        let sector_size = match sector_size {
             "32GiB" => SectorSize::_32GiB,
             "64GiB" => SectorSize::_64GiB,
             "2KiB" => SectorSize::_2KiB,
@@ -1039,10 +949,10 @@ impl Runner {
         match seal_proof.registered_window_post_proof() {
             Ok(proof_type) => {
                 self.window_post_proof_type = Some(proof_type);
-            },
+            }
             Err(err) => {
                 return Err(CliError::CommonError(anyhow!("{}", err)));
-            },
+            }
         }
 
         let gen_keypair = ed25519::Keypair::generate();
@@ -1050,53 +960,36 @@ impl Runner {
         self.miner_keypair = Some(net_keypair.clone());
         self.miner_peer_id = Some(PeerId::from(net_keypair.public()));
 
-        let rpc_cli: RpcEndpoint;
-        match &self.rpc {
-            Some(rpc) => {
-                rpc_cli = rpc.clone();
-            },
+        let rpc_cli = match &self.rpc {
+            Some(rpc) => rpc.clone(),
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid rpc")));
-            },
-        }
+            }
+        };
 
-        let fund_key_info: KeyInfo;
-        match &self.fund_key_info {
-            Some(key_info) => {
-                fund_key_info = key_info.clone();
-            },
+        let fund_key_info = match &self.fund_key_info {
+            Some(key_info) => key_info,
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid fund key info")));
             }
-        }
+        };
 
         info!("{}", "> Fund owner address".yellow());
-        let _ = send(
-            rpc_cli.clone(),
-            self.fund,
-            fund_key_info.clone(),
-            self.owner,
-            TokenAmount::from_nano(100_000_000),
-        ).await?;
+        let _ =
+            send(rpc_cli.clone(), self.fund, fund_key_info.clone(), self.owner, TokenAmount::from_nano(100_000_000))
+                .await?;
 
         info!("{}", "> Fund worker address".yellow());
-        let _ = send(
-            rpc_cli.clone(),
-            self.fund,
-            fund_key_info.clone(),
-            self.worker,
-            TokenAmount::from_nano(100_000_000),
-        ).await?;
+        let _ =
+            send(rpc_cli.clone(), self.fund, fund_key_info.clone(), self.worker, TokenAmount::from_nano(100_000_000))
+                .await?;
 
-        let owner_key_info: KeyInfo;
-        match &self.owner_key_info {
-            Some(key_info) => {
-                owner_key_info = key_info.clone();
-            },
+        let owner_key_info = match &self.owner_key_info {
+            Some(key_info) => key_info,
             _ => {
                 return Err(CliError::CommonError(anyhow!("invalid owner key info")));
             }
-        }
+        };
 
         self.print_myself()?;
 
@@ -1106,16 +999,16 @@ impl Runner {
             self.owner,
             owner_key_info.clone(),
             self.worker,
-            self.window_post_proof_type.ok_or(anyhow!("invalid proof type"))?,
-            self.miner_peer_id.ok_or(anyhow!("invalid peer id"))?,
-        ).await {
-            Ok(res) => {
-                res
-            },
+            self.window_post_proof_type.ok_or_else(|| anyhow!("invalid proof type"))?,
+            self.miner_peer_id.ok_or_else(|| anyhow!("invalid peer id"))?,
+        )
+        .await
+        {
+            Ok(res) => res,
             Err(err) => {
                 error!("{}", format!(">   Create miner fail: {}", err).red());
                 return Err(CliError::MinerCallError(err));
-            },
+            }
         };
 
         self.miner_id_address = id_address;
@@ -1124,4 +1017,3 @@ impl Runner {
         Ok(())
     }
 }
-

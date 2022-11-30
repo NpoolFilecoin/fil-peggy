@@ -23,56 +23,64 @@ name = "peggy"
 path = "peggy/main.rs"
 
 [workspace.dependencies]
-app                      = { path = "./app" }
-cli                      = { path = "./cli" }
-wallet                   = { path = "./wallet" }
-miner                    = { path = "./miner" }
-rpc                      = { path = "./rpc" }
-state                    = { path = "./state" }
-logger                   = { path = "./logger" }
-mpool                    = { path = "./mpool" }
-gasestimator             = { path = "./gasestimator" }
-send                     = { path = "./send" }
-actor                    = { path = "./actor" }
-clap                     = { version = "4.0.27", features = ["derive"] }
-thiserror                = { version = "1.0.37" }
-anyhow                   = { version = "1.0.66" }
-figlet-rs                = { version =  "0.1.4" }
-terminal-menu            = { version =  "2.0.4" }
-tokio                    = { version = "1.22.0", features = ["macros"] }
-crossterm                = { version = "0.23.2" }
-log                      = { version = "0.4.17" }
-url                      = { version = "2.3.1" }
-serde                    = { version = "1.0.147" }
-chrono                   = { version = "0.4.23" }
-serde_with               = { version = "2.1.0" }
-serde_json               = { version = "1.0.88" }
-hex                      = { version = "0.4.3" }
-fil_actor_power          = { version = "9.0.1" }
-libp2p                   = { version = "0.49.0" }
-fvm_ipld_encoding        = { version = "0.2.2" }
-fvm_ipld_encoding_3      = { version = "0.3.0", package = "fvm_ipld_encoding" }
-scanf                    = { version = "1.2.1" }
-colored                  = { version = "2.0.0" }
-forest_key_management    = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
-forest_json              = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
-forest_blocks            = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
-forest_message           = { version = "0.8.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
-forest_rpc-api           = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
-forest_ipld              = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
-fil_actors_runtime       = { version = "10.0.0-alpha.1", git = "https://github.com/filecoin-project/builtin-actors.git" }
-fvm_shared_3             = { version = "3.0.0-alpha.12", features = ["arb"], package = "fvm_shared" }
-fvm_shared               = { version = "2.0.0", features = ["arb"] }
-reqwest                  = { version = "0.11.13", features = ["blocking", "json"] }
-jsonrpc-v2               = { version = "0.11", features = ["easy-errors", "macros", "bytes-v05"], default-features = false }
-libipld-core             = { version = "0.15", features = ["serde-codec"] }
-num-bigint               = { version = "0.4.3" }
-fil_actor_init           = { git = "https://github.com/filecoin-project/builtin-actors.git", branch = "next", features = ["m2-native"] }
-resolve-path             = { version = "0.1.0" }
-cid                      = { version = "0.8.6" }
-base64                   = { version = "0.13.1" }
-multiaddr                = { version = "0.16.0" }
-serde_tuple              = { version = "0.5" }
+app = { path = "./app" }
+cli = { path = "./cli" }
+wallet = { path = "./wallet" }
+miner = { path = "./miner" }
+rpc = { path = "./rpc" }
+state = { path = "./state" }
+logger = { path = "./logger" }
+mpool = { path = "./mpool" }
+gasestimator = { path = "./gasestimator" }
+send = { path = "./send" }
+actor = { path = "./actor" }
+clap = { version = "4.0.27", features = ["derive"] }
+thiserror = { version = "1.0.37" }
+anyhow = { version = "1.0.66" }
+figlet-rs = { version = "0.1.4" }
+terminal-menu = { version = "2.0.4" }
+tokio = { version = "1.22.0", features = ["macros"] }
+crossterm = { version = "0.23.2" }
+log = { version = "0.4.17" }
+url = { version = "2.3.1" }
+serde = { version = "1.0.147" }
+chrono = { version = "0.4.23" }
+serde_with = { version = "2.1.0" }
+serde_json = { version = "1.0.88" }
+hex = { version = "0.4.3" }
+fil_actor_power = { version = "9.0.1" }
+libp2p = { version = "0.49.0" }
+fvm_ipld_encoding = { version = "0.2.2" }
+fvm_ipld_encoding_3 = { version = "0.3.0", package = "fvm_ipld_encoding" }
+scanf = { version = "1.2.1" }
+colored = { version = "2.0.0" }
+forest_key_management = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
+forest_json = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
+forest_blocks = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
+forest_message = { version = "0.8.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
+forest_rpc-api = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
+forest_ipld = { version = "0.2.0", git = "https://github.com/NpoolFilecoin/forest.git", branch = "experimental/fvm-m2" }
+fil_actors_runtime = { version = "10.0.0-alpha.1", git = "https://github.com/filecoin-project/builtin-actors.git" }
+fvm_shared_3 = { version = "3.0.0-alpha.12", features = [
+  "arb",
+], package = "fvm_shared" }
+fvm_shared = { version = "2.0.0", features = ["arb"] }
+reqwest = { version = "0.11.13", features = ["blocking", "json"] }
+jsonrpc-v2 = { version = "0.11", features = [
+  "easy-errors",
+  "macros",
+  "bytes-v05",
+], default-features = false }
+libipld-core = { version = "0.15", features = ["serde-codec"] }
+num-bigint = { version = "0.4.3" }
+fil_actor_init = { git = "https://github.com/filecoin-project/builtin-actors.git", branch = "next", features = [
+  "m2-native",
+] }
+resolve-path = { version = "0.1.0" }
+cid = { version = "0.8.6" }
+base64 = { version = "0.13.1" }
+multiaddr = { version = "0.16.0" }
+serde_tuple = { version = "0.5" }
 
 [dependencies.app]
 workspace = true
@@ -88,6 +96,9 @@ workspace = true
 
 [dependencies.logger]
 workspace = true
+
+[dev-dependencies.rusty-hook]
+version = "0.11.2"
 
 [profile.release]
 opt-level = 'z'

@@ -1,4 +1,4 @@
-use log::{LevelFilter, Record, Level, Metadata};
+use log::{Level, LevelFilter, Metadata, Record};
 
 struct SimpleLogger;
 
@@ -17,6 +17,5 @@ impl log::Log for SimpleLogger {
 }
 
 pub fn initialize() {
-    let _ = log::set_boxed_logger(Box::new(SimpleLogger)).
-        map(|()| log::set_max_level(LevelFilter::Trace));
+    let _ = log::set_boxed_logger(Box::new(SimpleLogger)).map(|()| log::set_max_level(LevelFilter::Trace));
 }

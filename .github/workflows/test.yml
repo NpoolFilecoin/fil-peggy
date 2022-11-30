@@ -9,7 +9,7 @@ env:
 
 jobs:
   build_and_test:
-    name: chain transaction - latest
+    name: fil-peggy - latest
     runs-on: ubuntu-latest
     strategy:
       matrix:

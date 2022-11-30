@@ -1,32 +1,19 @@
-use rpc::{RpcEndpoint, RpcError};
-use thiserror::Error;
-use forest_key_management::{
-    KeyInfo,
-};
-use fvm_shared::{
-    address::Address,
-    message::Message,
-    econ::TokenAmount,
-};
-use fvm_ipld_encoding::{
-    RawBytes,
-    Cbor,
-};
+use forest_json::signed_message::json::SignedMessageJson;
+use forest_key_management::KeyInfo;
 use forest_message::signed_message::SignedMessage;
-use forest_json::{
-    signed_message::json::SignedMessageJson,
-};
-use forest_rpc_api::{
-    mpool_api,
-};
+use forest_rpc_api::mpool_api;
+use fvm_ipld_encoding::{Cbor, RawBytes};
+use fvm_shared::{address::Address, econ::TokenAmount, message::Message};
 use gasestimator::{estimate_msg_gas, GasEstimatorError};
-use wallet::{get_balance, WalletError};
-use std::{
-    ops::{Add, Mul},
-    cmp::Ordering,
-};
-use num_bigint::BigInt;
 use log::error;
+use num_bigint::BigInt;
+use rpc::{RpcEndpoint, RpcError};
+use std::{
+    cmp::Ordering,
+    ops::{Add, Mul},
+};
+use thiserror::Error;
+use wallet::{get_balance, WalletError};
 
 #[derive(Error, Debug)]
 pub enum MpoolError {
@@ -53,29 +40,27 @@ async fn mpool_get_nonce(rpc: RpcEndpoint, address: Address) -> Result<u64, Mpoo
     }
 }
 
-pub async fn mpool_push<
-    T1: serde::Serialize,
-    T2: for<'de>serde::Deserialize<'de>>(
+pub async fn mpool_push<T1: serde::Serialize, T2: for<'de> serde::Deserialize<'de>>(
     rpc: RpcEndpoint,
     from: Address,
     from_key_info: KeyInfo,
     to: Address,
     method_num: u64,
     value: TokenAmount,
-    params: T1) -> Result<T2, MpoolError>
-{
+    params: T1,
+) -> Result<T2, MpoolError> {
     let nonce = mpool_get_nonce(rpc.clone(), from).await?;
     let balance = get_balance(rpc.clone(), from).await?;
 
     let params = RawBytes::serialize(params)?;
     let msg = Message {
         version: 0,
-        to: to,
-        from: from,
-        method_num: method_num,
+        to,
+        from,
+        method_num,
         value: value.clone(),
         sequence: nonce,
-        params: params,
+        params,
         gas_fee_cap: TokenAmount::from_atto(0),
         gas_limit: 0,
         gas_premium: TokenAmount::from_atto(0),
@@ -93,13 +78,11 @@ pub async fn mpool_push<
     let sig = forest_key_management::sign(
         *from_key_info.key_type(),
         from_key_info.private_key(),
-        msg_cid.to_bytes().as_slice())?;
+        msg_cid.to_bytes().as_slice(),
+    )?;
     let smsg = SignedMessage::new_from_parts(msg, sig)?;
 
-    match rpc.post::<_, T2>(
-        mpool_api::MPOOL_PUSH,
-        vec![SignedMessageJson(smsg.clone())],
-    ).await {
+    match rpc.post::<_, T2>(mpool_api::MPOOL_PUSH, vec![SignedMessageJson(smsg.clone())]).await {
         Ok(res) => Ok(res),
         Err(err) => Err(MpoolError::RpcRequestError(err)),
     }
