@@ -13,6 +13,7 @@ use fvm_shared::{
     sector::{RegisteredSealProof, SectorSize, RegisteredPoStProof},
     version::NetworkVersion,
     econ::TokenAmount,
+    bigint::{BigInt, ParseBigIntError},
 };
 use libp2p::{
     identity::{ed25519, Keypair},
@@ -48,6 +49,7 @@ use actor::{
     install_actor,
     create_actor,
     change_worker,
+    withdraw_miner,
 };
 use state::lookup_id;
 
@@ -145,6 +147,8 @@ pub enum CliError {
     StateCallError(#[from] state::StateError),
     #[error("actor call error {0}")]
     ActorCallError(#[from] actor::ActorError),
+    #[error("parse bigint error {0}")]
+    ParseBigIntError(#[from] ParseBigIntError),
 }
 
 #[derive(Debug, Subcommand, Clone)]
@@ -154,6 +158,7 @@ pub enum Cmd {
     ChangeOwner {},
     CostodyMiner {},
     ChangeWorker {},
+    WithdrawMiner {},
 }
 
 #[derive(Debug, Parser, Clone)]
@@ -203,6 +208,9 @@ impl Cli {
             },
             Cmd::ChangeWorker {} => {
                 Runner::new().change_worker_main().await
+            },
+            Cmd::WithdrawMiner {} => {
+                Runner::new().withdraw_miner_main().await
             },
         }
     }
@@ -531,6 +539,52 @@ impl Runner {
 
     async fn change_worker_main(&self) -> Result<(), CliError> {
         self.change_worker().await
+    }
+
+    async fn withdraw_miner(&self) -> Result<(), CliError> {
+        let rpc_cli: RpcEndpoint;
+        match &self.rpc {
+            Some(rpc) => {
+                rpc_cli = rpc.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid rpc")));
+            },
+        }
+
+        print!("> {}", "FIL amount to be withdrawn: ".green());
+        io::stdout().flush().unwrap();
+
+        let mut amount_str = String::default();
+        scanf!("{}", amount_str)?;
+
+        let amount = TokenAmount::from_whole(BigInt::from_str(&amount_str)?);
+
+        let owner_key_info: KeyInfo;
+        match &self.owner_key_info {
+            Some(key_info) => {
+                owner_key_info = key_info.clone();
+            },
+            _ => {
+                return Err(CliError::CommonError(anyhow!("invalid owner key info")));
+            }
+        }
+
+        match withdraw_miner(
+            rpc_cli,
+            self.owner,
+            owner_key_info,
+            self.actor_id_address,
+            self.miner_id_address,
+            amount,
+        ).await {
+            Ok(_) => Ok(()),
+            Err(err) => Err(CliError::ActorCallError(err)),
+        }
+    }
+
+    async fn withdraw_miner_main(&self) -> Result<(), CliError> {
+        self.withdraw_miner().await
     }
 
     async fn actor_repo_handler(&mut self) -> Result<(), CliError> {

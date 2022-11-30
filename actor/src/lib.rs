@@ -326,3 +326,51 @@ pub async fn change_worker(
         Err(err) => Err(ActorError::MpoolCallError(err)),
     }
 }
+
+#[derive(Serialize_tuple, Deserialize_tuple, Default)]
+struct WithdrawMinerParams {
+    miner_id: Address,
+    amount: TokenAmount,
+}
+impl Cbor for WithdrawMinerParams {}
+
+pub async fn withdraw_miner(
+    rpc: RpcEndpoint,
+    from: Address,
+    from_key_info: KeyInfo,
+    actor_id: Address,
+    miner_id: Address,
+    amount: TokenAmount,
+) -> Result<(), ActorError> {
+    let params = WithdrawMinerParams {
+        miner_id: miner_id,
+        amount: amount,
+    };
+
+    match mpool_push::<_, CidJson>(
+        rpc.clone().debug(),
+        from,
+        from_key_info,
+        actor_id,
+        19,
+        TokenAmount::from_atto(0),
+        params,
+    ).await {
+        Ok(res) => {
+            match wait_msg::<serde_json::Value>(
+                rpc.debug(),
+                res,
+            ).await {
+                Ok(_) => Ok(()),
+                Err(StateError::ParseByYourSelf(s)) => {
+                    warn!("> State cannot parse {}, parse by youself!", &s);
+                    let s = base64::decode_config(&s, base64::STANDARD)?;
+                    info!("> {}", String::from_utf8(s)?);
+                    Ok(())
+                },
+                Err(err) => Err(ActorError::StateCallError(err)),
+            }
+        },
+        Err(err) => Err(ActorError::MpoolCallError(err)),
+    }
+}
