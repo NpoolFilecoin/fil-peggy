@@ -170,7 +170,7 @@ impl Cli {
         println!("   {}{}", "Manage your miner with ".bright_blue().bold(), "FVM".bright_yellow().bold());
         println!(
             "   {}{}{}",
-            "Let your friends invest you miner through ".blue(),
+            "Let your friends invest your miner through ".blue(),
             "smart contract".bright_yellow().bold(),
             " directly".blue()
         );
