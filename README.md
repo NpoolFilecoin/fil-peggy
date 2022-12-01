@@ -122,8 +122,8 @@ Smart contract address cannot be used as miner's worker.
 - [ ] Peggy website - support miner create offer
 - [ ] Peggy website - support display contract history data
 - [ ] Peggy website - support miner reputation from on-chain data
-- [ ] Add CI/CD workflow
-- [ ] Executable file size optimization
+- [X] Add CI/CD workflow
+- [X] Executable file size optimization
 
 ## ${\color{blue}{9 \ Try \ it}}$
 We still do not have a full version (and it may be available after a long time, :(). But we really have some preview feature could be tried.
