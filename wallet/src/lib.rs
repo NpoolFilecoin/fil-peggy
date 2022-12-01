@@ -1,18 +1,9 @@
-use forest_key_management::{
-    json::KeyInfoJson,
-    Key,
-};
-use fvm_shared::{
-    crypto::signature::SignatureType,
-    address::Address,
-    econ::TokenAmount,
-};
+use forest_key_management::{json::KeyInfoJson, Key};
+use forest_rpc_api::wallet_api;
+use fvm_shared::{address::Address, crypto::signature::SignatureType, econ::TokenAmount};
+use num_bigint::{BigInt, ParseBigIntError};
 use rpc::{RpcEndpoint, RpcError};
 use thiserror::Error;
-use forest_rpc_api::{
-    wallet_api,
-};
-use num_bigint::{BigInt, ParseBigIntError};
 
 #[derive(Error, Debug)]
 pub enum WalletError {
@@ -36,8 +27,7 @@ pub async fn get_balance(rpc: RpcEndpoint, address: Address) -> Result<TokenAmou
             let res = res.parse::<BigInt>()?;
             let res = TokenAmount::from_atto(res);
             Ok(res)
-        },
+        }
         Err(err) => Err(WalletError::RpcRequestError(err)),
     }
 }
-

@@ -1,30 +1,16 @@
-use forest_key_management::{
-    KeyInfo,
-};
-use fvm_shared::{
-    address::Address,
-    econ::TokenAmount,
-    sector::RegisteredPoStProof,
-};
-use fil_actor_power::{
-    CreateMinerParams,
-};
-use libp2p::{
-    PeerId,
-};
-use fvm_ipld_encoding::{
-    BytesDe,
-};
+use fil_actor_power::CreateMinerParams;
 use fil_actors_runtime::STORAGE_POWER_ACTOR_ADDR;
-use forest_json::{
-    cid::CidJson,
-};
+use forest_json::cid::CidJson;
+use forest_key_management::KeyInfo;
+use fvm_ipld_encoding::BytesDe;
+use fvm_shared::{address::Address, econ::TokenAmount, sector::RegisteredPoStProof};
+use libp2p::PeerId;
+use multiaddr::Multiaddr;
 use rpc::RpcEndpoint;
 use serde::Deserialize;
-use thiserror::Error;
-use std::str::FromStr;
 use serde_json;
-use multiaddr::Multiaddr;
+use std::str::FromStr;
+use thiserror::Error;
 
 use mpool::{mpool_push, MpoolError};
 use state::{wait_msg, StateError};
@@ -70,10 +56,7 @@ impl FromStr for CreateMinerReturn {
         let id_address = Address::from_str(&v.id_address)?;
         let robust_address = Address::from_str(&v.robust_address)?;
 
-        Ok(Self {
-            id_address,
-            robust_address,
-        })
+        Ok(Self { id_address, robust_address })
     }
 }
 
@@ -87,9 +70,9 @@ pub async fn create_miner(
 ) -> Result<(Address, Address), MinerError> {
     let addr: Multiaddr = "/ip4/127.0.0.1/tcp/2345/http".parse()?;
     let params = CreateMinerParams {
-        owner: owner,
-        worker: worker,
-        window_post_proof_type: window_post_proof_type,
+        owner,
+        worker,
+        window_post_proof_type,
         peer: peer_id.to_bytes(),
         multiaddrs: vec![BytesDe(addr.to_vec())],
     };
@@ -102,15 +85,12 @@ pub async fn create_miner(
         2,
         TokenAmount::from_atto(0),
         params,
-    ).await {
-        Ok(res) => {
-            match wait_msg::<CreateMinerReturn>(
-                rpc.clone(),
-                res.clone(),
-            ).await {
-                Ok(ret) => Ok((ret.id_address, ret.robust_address)),
-                Err(err) => Err(MinerError::StateCallError(err)),
-            }
+    )
+    .await
+    {
+        Ok(res) => match wait_msg::<CreateMinerReturn>(rpc.clone(), res.clone()).await {
+            Ok(ret) => Ok((ret.id_address, ret.robust_address)),
+            Err(err) => Err(MinerError::StateCallError(err)),
         },
         Err(err) => Err(MinerError::MpoolCallError(err)),
     }
@@ -131,17 +111,13 @@ pub async fn change_owner(
         23,
         TokenAmount::from_atto(0),
         new_owner_id,
-    ).await {
-        Ok(res) => {
-            match wait_msg::<serde_json::Value>(
-                rpc,
-                res,
-            ).await {
-                Ok(_) => Ok(()),
-                Err(err) => Err(MinerError::StateCallError(err)),
-            }
+    )
+    .await
+    {
+        Ok(res) => match wait_msg::<serde_json::Value>(rpc, res).await {
+            Ok(_) => Ok(()),
+            Err(err) => Err(MinerError::StateCallError(err)),
         },
         Err(err) => Err(MinerError::MpoolCallError(err)),
     }
 }
-

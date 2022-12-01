@@ -1,23 +1,23 @@
-use url::{Url, ParseError};
 use jsonrpc_v2::RequestObject;
+use log::{error, info};
 use reqwest::{
+    header::{AUTHORIZATION, CONTENT_TYPE},
     Client,
-    header::{CONTENT_TYPE, AUTHORIZATION},
 };
+use serde_json::json;
 use std::{
     str::FromStr,
     sync::{
-        Arc,
         atomic::{
             AtomicUsize,
-            Ordering::{SeqCst, Relaxed},
+            Ordering::{Relaxed, SeqCst},
         },
+        Arc,
     },
     time::Duration,
 };
-use log::{error, info};
-use serde_json::json;
 use thiserror::Error;
+use url::{ParseError, Url};
 
 const RPC_START_ID: usize = 1000;
 
@@ -36,7 +36,7 @@ impl FromStr for RpcEndpoint {
         let url = Url::parse(s)?;
 
         Ok(Self {
-            url: url,
+            url,
             request_id: Arc::new(AtomicUsize::new(RPC_START_ID)),
             bearer_token: String::default(),
             debug: false,
@@ -61,11 +61,11 @@ pub enum RpcError {
 }
 
 impl RpcEndpoint {
-    pub fn new(url: String, bearer_token: String) -> Result<Self, ParseError> {
-        let url = Url::parse(url.as_str())?;
+    pub fn new(url: &str, bearer_token: &str) -> Result<Self, ParseError> {
+        let url = Url::parse(url)?;
 
         Ok(Self {
-            url: url,
+            url,
             request_id: Arc::new(AtomicUsize::new(RPC_START_ID)),
             bearer_token: bearer_token.to_string(),
             debug: false,
@@ -77,10 +77,11 @@ impl RpcEndpoint {
         self
     }
 
-    pub async fn post<
-        T1: serde::Serialize,
-        T2: for<'de>serde::Deserialize<'de>,
-    >(&self, method: &str, params: T1) -> Result<T2, RpcError> {
+    pub async fn post<T1: serde::Serialize, T2: for<'de> serde::Deserialize<'de>>(
+        &self,
+        method: &str,
+        params: T1,
+    ) -> Result<T2, RpcError> {
         let req = RequestObject::request()
             .with_params(json!(params))
             .with_method(method)
@@ -93,9 +94,7 @@ impl RpcEndpoint {
 
         self.request_id.fetch_add(1, SeqCst);
 
-        let cli = Client::builder()
-            .timeout(Duration::from_secs(600))
-            .build()?;
+        let cli = Client::builder().timeout(Duration::from_secs(600)).build()?;
 
         let res = cli
             .post(self.url.clone())
@@ -105,20 +104,16 @@ impl RpcEndpoint {
             .send()
             .await?;
 
-        let resp;
-
-        match res.error_for_status() {
+        let res = match res.error_for_status() {
             Ok(res) => {
                 info!("POST -> {} SUCCESS", method);
-                resp = res;
-            },
+                res
+            }
             Err(err) => {
                 error!("POST -> {} - {} FAIL", method, err);
                 return Err(RpcError::LowLevelError(err));
-            },
-        }
-
-        let res = resp;
+            }
+        };
 
         let res = res.json::<serde_json::Value>().await?;
         if self.debug {
@@ -131,9 +126,11 @@ impl RpcEndpoint {
                 Err(err) => return Err(RpcError::RpcApplicationResultParseError(err)),
             };
         }
+
         if res.get("error").is_some() {
             return Err(RpcError::RpcApplicationError(res.get("error").unwrap().clone()));
         }
+
         Err(RpcError::Unknown)
     }
 }

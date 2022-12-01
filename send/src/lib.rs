@@ -1,17 +1,10 @@
-use forest_key_management::{
-    KeyInfo,
-};
-use fvm_shared::{
-    address::Address,
-    econ::TokenAmount,
-};
-use rpc::RpcEndpoint;
-use thiserror::Error;
-use forest_json::{
-    cid::CidJson,
-};
+use forest_json::cid::CidJson;
+use forest_key_management::KeyInfo;
+use fvm_shared::{address::Address, econ::TokenAmount};
 use mpool::{mpool_push, MpoolError};
+use rpc::RpcEndpoint;
 use state::{wait_msg, StateError};
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum SendError {
@@ -32,7 +25,7 @@ pub async fn send(
         Ok(res) => {
             let _ = wait_msg::<serde_json::Value>(rpc, res.clone()).await?;
             Ok(res)
-        },
+        }
         Err(err) => Err(SendError::MpoolCallError(err)),
     }
 }
