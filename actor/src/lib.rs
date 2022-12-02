@@ -45,23 +45,25 @@ pub enum ActorError {
     DecodeIpldError(#[from] fvm_ipld_encoding_3::Error),
     #[error("parse address error")]
     ParseAddressError(#[from] fvm_shared::address::Error),
+    #[error("clone fvm repo error code {0}")]
+    CloneFVMRepoError(std::process::ExitStatus),
 }
 
 pub fn clone_actor(repo_url: &str, repo_rev: &str, target_path: PathBuf) -> Result<(), ActorError> {
-    Command::new("git")
+    let out = Command::new("git")
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("clone")
-        .arg(format!("{}", repo_url))
-        .arg(format!("{}", target_path.display()))
+        .arg("--single-branch")
+        .arg("--branch")
+        .arg(repo_rev)
+        .arg(repo_url)
+        .arg(target_path.display().to_string())
         .output()?;
-    Command::new("git")
-        .current_dir(target_path)
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .arg("checkout")
-        .arg(format!("{}", repo_rev))
-        .output()?;
+    if !out.status.success() {
+        return Err(ActorError::CloneFVMRepoError(out.status));
+    }
+
     Ok(())
 }
 
