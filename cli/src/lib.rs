@@ -143,7 +143,7 @@ pub enum Cmd {
     CreateMiner {},
     CreateActor {},
     ChangeOwner {},
-    CostodyMiner {},
+    CustodyMiner {},
     ChangeWorker {},
     WithdrawMiner {},
 }
@@ -184,7 +184,7 @@ impl Cli {
             Cmd::CreateMiner {} => Runner::new().create_miner_main().await,
             Cmd::CreateActor {} => Runner::new().create_actor_main().await,
             Cmd::ChangeOwner {} => Runner::new().change_owner_main().await,
-            Cmd::CostodyMiner {} => Runner::new().take_owner_main().await,
+            Cmd::CustodyMiner {} => Runner::new().take_owner_main().await,
             Cmd::ChangeWorker {} => Runner::new().change_worker_main().await,
             Cmd::WithdrawMiner {} => Runner::new().withdraw_miner_main().await,
         }

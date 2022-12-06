@@ -133,7 +133,7 @@ We still do not have a full version (and it may be available after a long time, 
 * ```./target/debug/peggy cli create-miner```: create a new miner with generated or exist owner account
 * ```./target/debug/peggy cli create-actor```: create actor with provided rust code, it'll compile/install/create actor
 * ```./target/debug/peggy cli change-owner```: change the miner's owner to actor
-* ```./target/debug/peggy cli costody-miner```: call actor to let it take the owner of miner
+* ```./target/debug/peggy cli custody-miner```: call actor to let it take the owner of miner
 
 ## ${\color{blue}{10 \ About}}$
 We don't accept pull request currently. If you have any suggestion, or any issue when you try peggy, please kindly create an issue. Believe me, we'll reply to you.
