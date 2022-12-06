@@ -150,6 +150,7 @@ We don't accept pull request currently. If you have any suggestion, or any issue
 ## ${\color{blue}{12 \ Reference \ and \ Design \ of \ FIL-Peggy}}$
 * [FIL-Peggy ETHGlobal Submit Page - Hack FEVM Finalist and Filecoin Pool Prize](https://ethglobal.com/showcase/fil-peggy-f77i2)
 * [ETHGlobal Hack FEVM](https://ethglobal.medium.com/hack-fevm-2022-4d31781408b5)
+* [FVM - Custody Your Miner’s Owner to Native Actor through peggy](https://medium.com/coinsbench/fvm-custody-your-miners-owner-to-native-actor-through-peggy-b8d2a4432748)
 * [FVM — About FIL-Peggy being ETHGlobal Hack FEVM finalist and using Actor as Owner](https://medium.com/@web3.0.eye/fvm-about-fil-peggy-being-ethglobal-hack-fevm-finalist-and-using-actor-as-owner-ff0a2a133d4c)
 * [FVM — Guidance of Jim Pick’s FVM Playground](https://medium.com/@web3.0.eye/fvm-guidance-of-jim-picks-fvm-playground-b5b3c0ffb06b)
 * [FVM — Create Miner with Smart Contract (Native Actor) and (Part 1)](https://medium.com/@web3.0.eye/fvm-fvm-create-miner-with-smart-contract-native-actor-and-part-1-9a5d03b41c31)
