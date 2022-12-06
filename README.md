@@ -2,7 +2,7 @@
 # FIL Peggy: $\mathbb{\color{#1e46a2}{Manage \ your \ \ miner \ with \ FVM}}$
 ### ${\color{blue}Let \space your \space friends \space invest \space your \space miner \space through \space smart \space contract \space directly}$
 
-[![Test](https://github.com/NpoolFilecoin/fil-peggy/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/NpoolFilecoin/fil-peggy/actions/workflows/test.yml)
+[![Test](https://github.com/NpoolFilecoin/fil-peggy/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/NpoolFilecoin/fil-peggy/actions/workflows/test.yml)
 
 ## ${\color{blue}{1 \ Overview}}$
 
