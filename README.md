@@ -2,6 +2,8 @@
 # FIL Peggy: $\mathbb{\color{#1e46a2}{Manage \ your \ \ miner \ with \ FVM}}$
 ### ${\color{blue}Let \space your \space friends \space invest \space your \space miner \space through \space smart \space contract \space directly}$
 
+[![Test](https://github.com/NpoolFilecoin/fil-peggy/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/NpoolFilecoin/fil-peggy/actions/workflows/test.yml)
+
 ## ${\color{blue}{1 \ Overview}}$
 
 When user want to run a Filecoin miner node, they need to have an account or multisig account, then they can create miner. Account which is used to create the miner is the owner of the miner. The owner can send a request to network to change miner's owner to a new account. All management of miner can only be executed by owner. Mining reward will be withdrawed to owner, or some beneficiary account set by owner.
@@ -157,4 +159,4 @@ We don't accept pull request currently. If you have any suggestion, or any issue
 * [FVM - 入坑指南](https://mp.weixin.qq.com/s?__biz=MzIyMjY4NzU2Ng==&mid=2247483740&idx=1&sn=b74142ca30186fb5df09dd594e18e03a&chksm=e828f97ddf5f706b5c3449422e953e052ac090bec20deddff354d84190755da7d2348f03c436&token=1769770941&lang=zh_CN#rd)
 
 ## ${\color{blue}{13 \ Actors}}$
-* [Owner Actor Repo](https://github.com/NpoolFilecoin/fil-owner-actor.git)
+* [Owner Actor Repo: https://github.com/NpoolFilecoin/fil-owner-actor.git](https://github.com/NpoolFilecoin/fil-owner-actor.git)
