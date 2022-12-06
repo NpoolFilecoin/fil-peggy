@@ -157,4 +157,4 @@ We don't accept pull request currently. If you have any suggestion, or any issue
 * [FVM - 入坑指南](https://mp.weixin.qq.com/s?__biz=MzIyMjY4NzU2Ng==&mid=2247483740&idx=1&sn=b74142ca30186fb5df09dd594e18e03a&chksm=e828f97ddf5f706b5c3449422e953e052ac090bec20deddff354d84190755da7d2348f03c436&token=1769770941&lang=zh_CN#rd)
 
 ## ${\color{blue}{13 \ Actors}}$
-* [Owner Actor](https://github.com/NpoolFilecoin/fil-owner-actor.git)
+* [Owner Actor Repo](https://github.com/NpoolFilecoin/fil-owner-actor.git)
