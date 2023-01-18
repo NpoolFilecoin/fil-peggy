@@ -166,7 +166,7 @@ We don't accept pull request currently. If you have any suggestion, or any issue
 * FEVM solidity Owner Actor Repo: [https://github.com/NpoolFilecoin/fevm-owner-actor.git](https://github.com/NpoolFilecoin/fevm-owner-actor.git)
 
 ## ${\color{blue}{11 \ Functionalities}}$
-### Miner Management dApp
+### Miner Management Browser Extension App
 - Set Owner - MVP
   - Set Miner's Owner to Smart Contract - MVP
   - Set Miner's Investment Terms, Preset Benefit Account and Preset Benefit Ratio
