@@ -164,3 +164,35 @@ We don't accept pull request currently. If you have any suggestion, or any issue
 ## ${\color{blue}{13 \ Actors}}$
 * FVM native Owner Actor Repo: [https://github.com/NpoolFilecoin/fvm-owner-actor.git](https://github.com/NpoolFilecoin/fvm-owner-actor.git)
 * FEVM solidity Owner Actor Repo: [https://github.com/NpoolFilecoin/fevm-owner-actor.git](https://github.com/NpoolFilecoin/fevm-owner-actor.git)
+
+## ${\color{blue}{11 \ Functionalities}}$
+### Miner Management dApp
+- Set Owner - MVP
+  - Set Miner's Owner to Smart Contract - MVP
+  - Set Miner's Investment Terms, Preset Benefit Account and Preset Benefit Ratio
+- Change Worker
+- Set Control
+- Withdraw Balance - MVP
+- Redeem Amount - MVP
+- Governance
+  - Upgrade Request
+  - Sealing Enable / Disable Request
+### Reputation System
+- Parse On-Chain Offer and their Preset Investment Terms - MVP
+- Parse Storage Provider Node's History Performance Data
+- Connect to dApp to Deposit / Withdraw / Redeem / Governance - MVP
+### Owner Contract
+- Miner Management
+  - Custody Miners with Investment Terms, Preset Benefit Account and Preset Benefit Ratio - MVP
+  - Withdraw Miner Balance - MVP
+  - Set Worker
+  - Set Control
+- Deposit Management
+  - Detect Deposit - MVP
+  - Store Account / Amount - MVP
+  - Redeem Amount
+- Benefit Management
+  - Withdraw Miner Balance - MVP
+  - Store Accounting Result - MVP
+  - Withdraw Balance - MVP
+  - Benefit Investment
