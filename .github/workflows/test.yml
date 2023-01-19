@@ -24,3 +24,6 @@ jobs:
       - run: cd peggy; rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
       - run: cd peggy; cargo build --verbose
       - run: cd peggy; cargo test --verbose
+      - run: cd extension; yarn
+      - run: cd extension; yarn build
+      - run: cd extension; yarn lint
