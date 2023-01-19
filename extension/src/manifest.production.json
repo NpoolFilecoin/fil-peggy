@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "fil-peggy",
+    "name": "FIL Peggy",
     "description": "FIL Peggy dApp to interact with peggy smart contract",
     "version": "0.0.1",
     "background": {
@@ -22,6 +22,7 @@
     "options_page": "options.html",
     "devtools_page": "devtools.html",
     "icons": {
+        "48": "assets/logos/48x48.png",
         "64": "assets/logos/64x64.png",
         "128": "assets/logos/128x128.png",
         "256": "assets/logos/256x256.png"
