@@ -1,0 +1,55 @@
+[package]
+name = "actor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies.fil_actor_init]
+workspace = true
+
+[dependencies.fil_actors_runtime]
+workspace = true
+
+[dependencies.forest_key_management]
+workspace = true
+
+[dependencies.serde_json]
+workspace = true
+
+[dependencies.thiserror]
+workspace = true
+
+[dependencies.anyhow]
+workspace = true
+
+[dependencies.mpool]
+workspace = true
+
+[dependencies.rpc]
+workspace = true
+
+[dependencies.fvm_shared]
+workspace = true
+
+[dependencies.fvm_ipld_encoding_3]
+workspace = true
+
+[dependencies.forest_json]
+workspace = true
+
+[dependencies.serde]
+workspace = true
+
+[dependencies.state]
+workspace = true
+
+[dependencies.cid]
+workspace = true
+
+[dependencies.base64]
+workspace = true
+
+[dependencies.log]
+workspace = true
+
+[dependencies.serde_tuple]
+workspace = true

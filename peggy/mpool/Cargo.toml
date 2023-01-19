@@ -1,0 +1,46 @@
+[package]
+name = "mpool"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies.anyhow]
+workspace = true
+
+[dependencies.num-bigint]
+workspace = true
+
+[dependencies.serde]
+workspace = true
+
+[dependencies.fvm_shared]
+workspace = true
+
+[dependencies.thiserror]
+workspace = true
+
+[dependencies.fvm_ipld_encoding]
+workspace = true
+
+[dependencies.forest_key_management]
+workspace = true
+
+[dependencies.forest_json]
+workspace = true
+
+[dependencies.forest_message]
+workspace = true
+
+[dependencies.forest_rpc-api]
+workspace = true
+
+[dependencies.rpc]
+workspace = true
+
+[dependencies.gasestimator]
+workspace = true
+
+[dependencies.wallet]
+workspace = true
+
+[dependencies.log]
+workspace = true
