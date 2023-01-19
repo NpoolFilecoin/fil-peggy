@@ -20,5 +20,10 @@
         }
     ],
     "options_page": "options.html",
-    "devtools_page": "devtools.html"
+    "devtools_page": "devtools.html",
+    "icons": {
+        "64": "assets/logos/64x64.png",
+        "128": "assets/logos/128x128.png",
+        "256": "assets/logos/256x256.png"
+    }
 }

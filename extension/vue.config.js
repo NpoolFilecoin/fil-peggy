@@ -40,6 +40,10 @@ module.exports = {
           {
             from: path.resolve(`public/`),
             to: `${path.resolve('dist')}/`
+          },
+          {
+            from: path.resolve(`src/assets`),
+            to: `${path.resolve('dist')}/assets`
           }
         ]
       }
