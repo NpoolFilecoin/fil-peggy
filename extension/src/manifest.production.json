@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "FIL Peggy",
-    "description": "FIL Peggy dApp to interact with peggy smart contract",
+    "description": "FIL Peggy dApp to interact with Peggy smart contract",
     "version": "0.0.1",
     "background": {
         "service_worker": "/background.js"
