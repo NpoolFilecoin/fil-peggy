@@ -1,28 +1,31 @@
 <template>
   <div class="main_app">
-    <h1>Hello {{msg}}</h1>
+    <headerComponent />
   </div>
 </template>
 
 <script>
+import headerComponent from '../components/header.vue'
+
 export default {
   name: 'popupView',
+  components: {
+    headerComponent
+  },
   data () {
     return {
-      msg: 'popup'
     }
   }
 }
 
 </script>
 
-<style>
+<style scoped>
 .main_app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  width: 360px;
+  height: 572px;
 }
 </style>
