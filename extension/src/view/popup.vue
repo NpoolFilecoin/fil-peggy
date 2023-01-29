@@ -2,6 +2,7 @@
   <div class="main_app">
     <headerComponent />
     <toolbarComponent />
+    <RouterView />
   </div>
 </template>
 

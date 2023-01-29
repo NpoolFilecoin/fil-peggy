@@ -1,8 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import popupView from '../view/popup.vue'
+import homePage from '../pages/home.vue'
 
 const routes = [
-  { path: '/', component: popupView }
+  { path: '/', component: homePage }
 ]
 
 export const router = createRouter({
