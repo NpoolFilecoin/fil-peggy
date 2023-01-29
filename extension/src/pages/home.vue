@@ -73,7 +73,7 @@ export default {
   width: 100%;
   background-color: #F2F4F6;
   font-size: 12px;
-  color: #535A61;
+  color: #0D99FF;
   text-align: center;
 }
 
