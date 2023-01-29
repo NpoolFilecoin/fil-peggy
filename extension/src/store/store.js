@@ -9,5 +9,21 @@ export const store = createStore({
       NetworkRpcEndpoint: 'https://localhost:1234/v1',
       NetworkRpcConnected: true
     }
+  },
+  mutations: {
+    setToolbarShowAddBtn (state, show) {
+      state.ToolbarShowAddBtn = show
+    },
+    setToolbarTitle (state, title) {
+      state.ToolbarTitle = title
+    }
+  },
+  getters: {
+    toolbarShowAddBtn (state) {
+      return state.ToolbarShowAddBtn
+    },
+    toolbarTitle (state) {
+      return state.ToolbarTitle
+    } 
   }
 })

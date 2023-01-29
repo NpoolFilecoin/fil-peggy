@@ -4,22 +4,64 @@
       <img class='icon' :src='allOffersIcon' />
       <div class='text'>{{ allOffersText }}</div>
     </div>
-    <div class='help'>
-      {{ needHelp }}
-      <span class='contact'>{{ peggySupport }}</span>
-    </div>
+  </div>
+  <div class='menus'>
+    <mainItem
+      v-for='menu in menus'
+      :key='menu.title'
+      class='menu-item'
+      :title='menu.title'
+      :icon='menu.icon'
+      :content='menu.content'
+      v-on:click='menu.click'
+    />
+  </div>
+  <div class='help'>
+    {{ needHelp }}
+    <span class='contact'>{{ peggySupport }}</span>
   </div>
 </template>
 
 <script>
+import mainItem from '../components/mainitem.vue'
+
 export default {
   name: 'homePage',
+  components: {
+    mainItem
+  },
   data () {
     return {
       allOffersIcon: '../assets/icons/all-offers-24x24.png',
       allOffersText: 'All Offers',
       needHelp: 'Need help ? ',
-      peggySupport: 'Peggy support'
+      peggySupport: 'Peggy support',
+      menus: [
+        {
+          title: 'Storage Providers',
+          icon: '../assets/icons/filecoin-64x64.png',
+          content: 'Check Your On-Chain Storage Providers',
+          click: this.clickStorageProviders
+        }, {
+          title: 'Investment Shares',
+          icon: '../assets/icons/investment-shares-64x64.png',
+          content: 'Deposit / Redeem / Withdraw Your Investment'
+        }, {
+          title: 'Custody Contracts',
+          icon: '../assets/icons/custody-contracts-64x64.png',
+          content: 'Custody Storage Provider to Smart Contract'
+        }, {
+          title: 'Filecoin Accounts',
+          icon: '../assets/icons/accounts-64x64.png',
+          content: 'Add / Remove / Set Your Filecoin Accounts'
+        }
+      ]
+    }
+  },
+  methods: {
+    clickStorageProviders: function () {
+      this.$store.commit('setToolbarShowAddBtn', true)
+      this.$store.commit('setToolbarTitle', 'Storage Providers')
     }
   }
 }
@@ -69,5 +111,15 @@ export default {
 
 .help .contact {
   color: #0D99FF;
+}
+
+.menus {
+  margin: 0 16px 0 16px;
+  height: 396px;
+}
+
+.menu-item {
+  height: 80px;
+  border-bottom: 1px solid #D6D9DC;
 }
 </style>

@@ -14,11 +14,17 @@ export default {
   name: 'toolbarComponent',
   data () {
     return {
-      title: this.$store.state.ToolbarTitle,
-      showAddBtn: this.$store.state.ToolbarShowAddBtn,
       leftArrow: '../assets/icons/left-arrow-24x24.png',
       add: '../assets/icons/add-24x24.png',
       setting: '../assets/icons/setting-24x24.png'
+    }
+  },
+  computed: {
+    showAddBtn () {
+      return this.$store.getters.toolbarShowAddBtn
+    },
+    title () {
+      return this.$store.getters.toolbarTitle
     }
   }
 }
