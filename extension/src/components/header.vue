@@ -45,6 +45,7 @@ export default {
   width: 176px;
   margin: 12px 16px 12px 0px;
   line-height: 40px;
+  cursor: pointer;
 }
 
 .network {

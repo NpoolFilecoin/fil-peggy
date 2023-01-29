@@ -1,10 +1,10 @@
 <template>
   <div class='toolbar1'>
     <div class='toolbar-inner'>
-      <img :src='leftArrow'/>
+      <img class='clickable' :src='leftArrow'/>
       <div :class='[ "title", showAddBtn ? "title-with-add" : ""]'>{{ title }}</div>
-      <img v-show='showAddBtn' :src='add' />
-      <img :src='setting' />
+      <img class='clickable' v-show='showAddBtn' :src='add' />
+      <img class='clickable' :src='setting' />
     </div>
   </div>
 </template>
@@ -51,7 +51,7 @@ export default {
 }
 
 
-.align-right {
-  float: right;
+.clickable {
+  cursor: pointer;
 }
 </style>
