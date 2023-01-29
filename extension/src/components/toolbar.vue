@@ -2,7 +2,7 @@
   <div class='toolbar1'>
     <div class='toolbar-inner'>
       <img :src='leftArrow'/>
-      <div :class='[ showAddBtn ? "title-with-add" : "title"]'>{{ title }}</div>
+      <div :class='[ "title", showAddBtn ? "title-with-add" : ""]'>{{ title }}</div>
       <img v-show='showAddBtn' :src='add' />
       <img :src='setting' />
     </div>
@@ -47,10 +47,7 @@ export default {
 }
 
 .title-with-add {
-  font-size: 14px;
   width: 260px;
-  height: 24px;
-  line-height: 24px;
 }
 
 

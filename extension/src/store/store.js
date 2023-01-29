@@ -4,7 +4,10 @@ export const store = createStore({
   state () {
     return {
       ToolbarTitle: 'Home',
-      ToolbarShowAddBtn: false
+      ToolbarShowAddBtn: false,
+      NetworkName: 'Hyperspace',
+      NetworkRpcEndpoint: 'https://localhost:1234/v1',
+      NetworkRpcConnected: true
     }
   }
 })

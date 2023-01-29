@@ -2,7 +2,7 @@
   <div class='header'>
     <img :src='logoPath'/>
     <div class='selector'>
-      <div class='indicator' />
+      <div :class='[ "indicator", connected ? "" : "indicator-not-connected"]' />
       <div class='network'>
         {{ network }}
       </div>
@@ -12,7 +12,6 @@
 </template>
 
 <script>
-// TODO: add selector right down arrow
 // TODO: if network endpoint is not reachable, indicator color should be red
 // TODO: when enter here, we should get all networks to store
 // TODO: when switch, we should set current network to store
@@ -21,7 +20,8 @@ export default {
   name: 'headerComponent',
   data () {
     return {
-      network: 'Hyperspace',
+      network: this.$store.state.NetworkName,
+      connected: this.$store.state.NetworkRpcConnected,
       logoPath: '../assets/logos/64x64.png',
       downArrow: '../assets/icons/down-arrow-16x16.png'
     }
@@ -60,6 +60,10 @@ export default {
   border-radius: 10px;
   background-color: #29B6AF;
   margin: 10px;
+}
+
+.indicator-not-connected {
+  background-color: red;
 }
 
 .down-arrow {
