@@ -1,0 +1,5 @@
+[hooks]
+# pre-commit = "cargo clippy --workspace --all-targets --all-features --manifest-path peggy/Cargo.toml && cargo +nightly fmt --manifest-path peggy/Cargo.toml --all -- --check"
+
+[logging]
+verbose = true
