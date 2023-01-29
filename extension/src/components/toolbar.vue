@@ -1,7 +1,7 @@
 <template>
   <div class='toolbar1'>
     <div class='toolbar-inner'>
-      <img class='clickable' :src='leftArrow'/>
+      <img class='clickable' :src='leftArrow' v-on:click='onBackClick'/>
       <div :class='[ "title", showAddBtn ? "title-with-add" : ""]'>{{ title }}</div>
       <img class='clickable' v-show='showAddBtn' :src='add' />
       <img class='clickable' :src='setting' />
@@ -25,6 +25,12 @@ export default {
     },
     title () {
       return this.$store.getters.toolbarTitle
+    }
+  },
+  methods: {
+    onBackClick: function () {
+      console.log('Back')
+      this.$router.back()
     }
   }
 }

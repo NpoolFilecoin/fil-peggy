@@ -58,10 +58,13 @@ export default {
       ]
     }
   },
+  mounted () {
+    this.$store.commit('setToolbarShowAddBtn', false)
+    this.$store.commit('setToolbarTitle', 'Home')
+  },
   methods: {
     clickStorageProviders: function () {
-      this.$store.commit('setToolbarShowAddBtn', true)
-      this.$store.commit('setToolbarTitle', 'Storage Providers')
+      this.$router.push('/storageproviders')
     }
   }
 }
