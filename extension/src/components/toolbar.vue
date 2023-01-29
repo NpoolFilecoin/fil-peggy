@@ -26,7 +26,7 @@ export default {
 
 <style scoped>
 .toolbar1 {
-  height: 64px;
+  height: 48px;
   width: 100%;
   border-bottom: 1px solid #D6D9DC;
 }
@@ -35,7 +35,7 @@ export default {
   display: flex;
   color: #535A61;
   height: 24px;
-  padding: 20px 16px 20px 12px;
+  padding: 12px 16px 12px 12px;
   width: 100%;
 }
 

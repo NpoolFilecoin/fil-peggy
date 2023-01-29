@@ -12,10 +12,6 @@
 </template>
 
 <script>
-// TODO: if network endpoint is not reachable, indicator color should be red
-// TODO: when enter here, we should get all networks to store
-// TODO: when switch, we should set current network to store
-
 export default {
   name: 'headerComponent',
   data () {
