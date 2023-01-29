@@ -1,0 +1,60 @@
+<template>
+  <div class='toolbar1'>
+    <div class='toolbar-inner'>
+      <img :src='leftArrow'/>
+      <div :class='[ showAddBtn ? "title-with-add" : "title"]'>{{ title }}</div>
+      <img v-show='showAddBtn' :src='add' />
+      <img :src='setting' />
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'toolbarComponent',
+  data () {
+    return {
+      title: 'Home',
+      showAddBtn: false,
+      leftArrow: '../assets/icons/left-arrow-24x24.png',
+      add: '../assets/icons/add-24x24.png',
+      setting: '../assets/icons/setting-24x24.png'
+    }
+  }
+}
+</script>
+
+<style scoped>
+.toolbar1 {
+  height: 64px;
+  width: 100%;
+  border-bottom: 1px solid #D6D9DC;
+}
+
+.toolbar-inner {
+  display: flex;
+  color: #535A61;
+  height: 24px;
+  padding: 20px 16px 20px 12px;
+  width: 100%;
+}
+
+.title {
+  font-size: 14px;
+  width: 284px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.title-with-add {
+  font-size: 14px;
+  width: 260px;
+  height: 24px;
+  line-height: 24px;
+}
+
+
+.align-right {
+  float: right;
+}
+</style>

@@ -1,16 +1,19 @@
 <template>
   <div class="main_app">
     <headerComponent />
+    <toolbarComponent />
   </div>
 </template>
 
 <script>
 import headerComponent from '../components/header.vue'
+import toolbarComponent from '../components/toolbar.vue'
 
 export default {
   name: 'popupView',
   components: {
-    headerComponent
+    headerComponent,
+    toolbarComponent
   },
   data () {
     return {
