@@ -1,5 +1,5 @@
 <template>
-  <div class='page'>
+  <div :class='["page", adding ? "blur" : ""]'>
     <div
       class='contract-item'
       v-for='contract in contracts'
@@ -29,6 +29,25 @@
       <div class='text'>{{ minersText }}</div>
     </div>
   </div>
+  <div v-if='adding' class='popup'>
+    <div class='title'>Add My Contract</div>
+    <div class='area'>
+      <div>Code ID</div>
+      <div>
+        <input type='text' placeholder='Input code id of contract'>
+      </div>
+    </div>
+    <div class='area'>
+      <div>Actor ID</div>
+      <div>
+        <input type='text' placeholder='Input actor id of contract'>
+      </div>
+    </div>
+    <div class='btns'>
+      <button class='btn' v-on:click='onAddContractClick'>Add</button>
+      <button class='btn' v-on:click='onCancelClick'>Cancel</button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -47,7 +66,8 @@ export default {
       contractsText: 'My Contracts',
       minersIcon: '../assets/icons/miners-40x40.png',
       minersText: 'My Miners',
-      curTab: 'contracts'
+      curTab: 'contracts',
+      adding: false
     }
   },
   mounted () {
@@ -67,6 +87,9 @@ export default {
       this.curTab = 'miners'
     },
     onContractClick: function (contract) {
+      if (this.adding) {
+        return
+      }
       this.$router.push({
         path: '/mycontract',
         query: {
@@ -75,7 +98,13 @@ export default {
       })
     },
     onAddClick: function () {
-      // TODO: we call contract method through web3 library here
+      this.adding = true
+    },
+    onAddContractClick: function () {
+      this.adding = false
+    },
+    onCancelClick: function () {
+      this.adding = false
     }
   },
   computed: {
@@ -130,5 +159,53 @@ export default {
   max-width: 50%;
   line-height: 40px;
   margin-left: 10px;
+}
+
+.popup {
+  position: absolute;
+  margin: 16px;
+  padding: 16px;
+  background-color: white;
+  border-radius: 8px;
+  top: 110px;
+  min-height: 120px;
+  width: 296px;
+  color: #535A61;
+}
+
+.blur {
+  filter: blur(8px);
+  background-color: rgba(83, 90, 97, 0.2);
+}
+
+.popup .title {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.popup .area {
+  margin: 10px 0 0 0;
+  width: 100%;
+}
+
+.popup input {
+  border: none;
+  border-bottom: 1px solid #D6D9DC;
+  width: 100%;
+}
+
+.popup .btns {
+  display: flex;
+  margin-top: 24px;
+}
+
+.popup .btns .btn {
+  width: 60px;
+  height: 24px;
+  border-radius: 8px;
+  margin-right: 8px;
+  border: 1px solid #0D99FF;
+  color: #535A61;
 }
 </style>

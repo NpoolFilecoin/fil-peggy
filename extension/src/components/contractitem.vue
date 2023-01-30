@@ -100,7 +100,7 @@ export default {
   display: flex;
   height: 100%;
   width: 100%;
-  margin: 16px 0 16px 0;
+  padding: 16px 0 16px 0;
   cursor: pointer;
 }
 
