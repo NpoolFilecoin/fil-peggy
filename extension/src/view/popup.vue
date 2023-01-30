@@ -2,7 +2,9 @@
   <div class="main_app">
     <headerComponent />
     <toolbarComponent />
-    <RouterView class='main_body' />
+    <div class='main_body'>
+      <RouterView />
+    </div>
     <div v-if='showFooterHelp' class='help'>
       {{ needHelp }}
       <span class='contact'>{{ peggySupport }}</span>
@@ -53,8 +55,7 @@ export default {
 }
 
 .main_body {
-  position: absolute;
-  top: 112px;
+  margin-top: 112px;
   height: 428px;
 }
 

@@ -2,11 +2,11 @@
   <div :class='["page", adding ? "blur" : ""]'>
     <div
       class='contract-item'
-      v-for='contract in contracts'
-      :key='contract.Title'
+      v-for='(contract, index) in contracts'
+      :key='index'
     >
       <contractItem
-        :title='contract.Title'
+        :title='index'
         :icon='contract.Icon'
         :subtitle='contract.Subtitle'
         :custody-type='contract.CustodyType'
