@@ -29,9 +29,20 @@ export const store = createStore({
           EstimateDailyReward: 245.9,
           TotalAttoFilAmount: 832571312649679456n,
           BalanceAttoFilAmount: 356823546458798n,
-          Icon: '../assets/icons/custody-contracts-64x64.png'
+          TotalRewardAttoFilAmount: 123465789789765465132n,
+          AvgPowerLostIntervalSeconds: 1234567896544,
+          AvgPowerLostRecoverSeconds: 1245,
+          LastMonthRawPowerBytesIncrement: 454132432132n,
+          LastMonthAdjPowerBytesIncrement: 454132432132n,
+          LastHalfYearRawPowerBytesIncrement: 12465789453413n,
+          LastHalfYearAdjPowerBytesIncrement: 12465789453413n,
+          LastYearPowerRawBytesIncrement: 1234657987n,
+          LastYearPowerAdjBytesIncrement: 1234657987n,
+          TotalSlashPenaltyAttoFilAmount: 12456746789465432n
         }
-      ]
+      ],
+      NetworkRawPowerBytes: 124597984564321321323131232n,
+      NetworkAdjPowerBytes: 1204597984564321321323131232n
     }
   },
   mutations: {
@@ -54,6 +65,12 @@ export const store = createStore({
     },
     contractById: (state) => (id) => {
       return state.Contracts.find(contract => contract.Title === id)
+    },
+    networkRawPowerBytes (state) {
+      return state.NetworkRawPowerBytes
+    },
+    networkAdjPowerBytes (state) {
+      return state.NetworkAdjPowerBytes
     }
   }
 })
