@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
 
-import { CustodyTypes } from '../const/contract_types'
+import { CustodyTypes, ActivityTypes } from '../const/contract_types'
 
 export const store = createStore({
   state () {
@@ -38,7 +38,30 @@ export const store = createStore({
           LastHalfYearAdjPowerBytesIncrement: 12465789453413n,
           LastYearPowerRawBytesIncrement: 1234657987n,
           LastYearPowerAdjBytesIncrement: 1234657987n,
-          TotalSlashPenaltyAttoFilAmount: 12456746789465432n
+          TotalSlashPenaltyAttoFilAmount: 12456746789465432n,
+          Activities: [
+            {
+              Activity: ActivityTypes.Withdraw,
+              Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+              Timestamp: 1236456465,
+              AttoFilAmount: 123456456n
+            }, {
+              Activity: ActivityTypes.Deposit,
+              Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+              Timestamp: 1236456465,
+              AttoFilAmount: 123456456n
+            }, {
+              Activity: ActivityTypes.WithdrawMinerBalance,
+              Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+              Timestamp: 1236456465,
+              AttoFilAmount: 123456456n
+            }, {
+              Activity: ActivityTypes.Redeem,
+              Target: 'f0178352',
+              Timestamp: 1236456465,
+              AttoFilAmount: 123456456n
+            }
+          ]
         }
       ],
       NetworkRawPowerBytes: 124597984564321321323131232n,

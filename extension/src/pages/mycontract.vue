@@ -90,6 +90,19 @@
         </div>
       </div>
     </div>
+    <div class='activities'>
+      <div
+        v-for='(act, index) in contract.Activities'
+        :key='index'
+        class='activity'
+      >
+        <img class='icon' :src='activityIcon(act)' />
+        <div>{{ act.Activity }}</div>
+        <div>{{ act.Target }}</div>
+        <div>{{ act.Timestamp }}</div>
+        <div>{{ act.AttoFilAmount }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -98,6 +111,8 @@ import { amountDisplay } from '../utils/amount_display'
 import { powerDisplay } from '../utils/power_display'
 import { CustodyTypes } from '../const/contract_types'
 import { durationDisplay } from '../utils/time_display'
+import { activityDir } from '../utils/activity_dir'
+import { ActivityDirs } from '../const/contract_types'
 
 export default {
   name: 'myContract',
@@ -110,6 +125,17 @@ export default {
     this.contract = this.$store.getters.contractById(this.$route.query.contractId)
     this.$store.commit('setToolbarShowAddBtn', false)
     this.$store.commit('setToolbarTitle', this.contract.Title)
+  },
+  methods: {
+    activityIcon: function (act) {
+      console.log(act)
+      switch (activityDir(act.Activity)) {
+      case ActivityDirs.Incoming:
+        return '../assets/icons/incoming-32x32.png'
+      case ActivityDirs.Outcoming:
+        return '../assets/icons/outcoming-32x32.png'
+      }
+    }
   },
   computed: {
     totalFilAmount () {
@@ -162,6 +188,9 @@ export default {
       return amountDisplay(this.contract.BalanceAttoFilAmount)
     },
     miners () {
+      if (!this.contract.Miners) {
+        return 'None'
+      }
       return this.contract.Miners.join(' ')
     }
   }
@@ -253,5 +282,14 @@ export default {
 .detail .inner .miners {
   color: #0D99FF;
   word-wrap: break-word;
+}
+
+.activities .activity {
+  height: 72px;
+}
+
+.activities .activity .icon {
+  height: 32px;
+  width: 32px;
 }
 </style>

@@ -31,5 +31,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   width: 360px;
   height: 572px;
+  scrollbar-width: none; /* firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.main_app::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
 }
 </style>
