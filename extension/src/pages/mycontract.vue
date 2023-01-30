@@ -97,10 +97,14 @@
         class='activity'
       >
         <img class='icon' :src='activityIcon(act)' />
-        <div>{{ act.Activity }}</div>
-        <div>{{ act.Target }}</div>
-        <div>{{ act.Timestamp }}</div>
-        <div>{{ act.AttoFilAmount }}</div>
+        <div class='content'>
+          <div class='top'>
+            <span class='activity1'>{{ act.Activity }}</span>
+            <span class='amount'>{{ activityAmount(act) }}</span>
+          </div>
+          <div class='timestamp'>{{ activityDate(act) }}</div>
+          <div class='target'>{{ activityTarget(act) }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -128,12 +132,31 @@ export default {
   },
   methods: {
     activityIcon: function (act) {
-      console.log(act)
       switch (activityDir(act.Activity)) {
       case ActivityDirs.Incoming:
         return '../assets/icons/incoming-32x32.png'
       case ActivityDirs.Outcoming:
         return '../assets/icons/outcoming-32x32.png'
+      }
+    },
+    activityAmount: function (act) {
+      switch (activityDir(act.Activity)) {
+      case ActivityDirs.Incoming:
+        return '+ ' + amountDisplay(act.AttoFilAmount)
+      case ActivityDirs.Outcoming:
+        return '- ' + amountDisplay(act.AttoFilAmount)
+      }
+    },
+    activityDate: function (act) {
+      let date = new Date(act.Timestamp * 1000)
+      return date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate()
+    },
+    activityTarget: function (act) {
+      switch (activityDir(act.Activity)) {
+      case ActivityDirs.Incoming:
+        return act.Target
+      case ActivityDirs.Outcoming:
+        return act.Target
       }
     }
   },
@@ -284,12 +307,50 @@ export default {
   word-wrap: break-word;
 }
 
+.activities {
+  padding: 0 16px 0 16px;
+}
+
 .activities .activity {
-  height: 72px;
+  display: flex;
+  height: 48px;
+  padding: 16px 0 16px 0;
+  border-bottom: 1px solid #D6D9DC;
 }
 
 .activities .activity .icon {
   height: 32px;
   width: 32px;
+}
+
+.activities .activity .content {
+  height: 32px;
+  width: calc(100% - 42px);
+  margin-left: 10px;
+  display: block;
+}
+
+.activities .activity .content .top {
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.activities .activity .content .activity1 {
+  float: left;
+  color: #535A61;
+  font-weight: bold;
+}
+
+.activities .activity .content .amount {
+  float: right;
+  color: #535A61;
+}
+
+.activities .activity .content .timestamp {
+  color: #28D90C;
+}
+
+.activities .activity .content .target {
+  color: #8A8A8A;
 }
 </style>

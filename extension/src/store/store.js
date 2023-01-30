@@ -43,23 +43,23 @@ export const store = createStore({
             {
               Activity: ActivityTypes.Withdraw,
               Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
-              Timestamp: 1236456465,
-              AttoFilAmount: 123456456n
+              Timestamp: 1256456465,
+              AttoFilAmount: 123456456452265613221n
             }, {
               Activity: ActivityTypes.Deposit,
               Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
               Timestamp: 1236456465,
-              AttoFilAmount: 123456456n
-            }, {
-              Activity: ActivityTypes.WithdrawMinerBalance,
-              Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
-              Timestamp: 1236456465,
-              AttoFilAmount: 123456456n
+              AttoFilAmount: 1234564564523454879n
             }, {
               Activity: ActivityTypes.Redeem,
+              Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+              Timestamp: 1216456465,
+              AttoFilAmount: 123456456798423465132n
+            }, {
+              Activity: ActivityTypes.WithdrawMinerBalance,
               Target: 'f0178352',
-              Timestamp: 1236456465,
-              AttoFilAmount: 123456456n
+              Timestamp: 1206456465,
+              AttoFilAmount: 12345645640265132456n
             }
           ]
         }
