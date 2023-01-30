@@ -195,6 +195,10 @@ export default {
   width: 100%;
 }
 
+.popup input:focus {
+  outline: 1px solid #0D99FF;
+}
+
 .popup .btns {
   display: flex;
   margin-top: 24px;
@@ -207,5 +211,6 @@ export default {
   margin-right: 8px;
   border: 1px solid #0D99FF;
   color: #535A61;
+  cursor: pointer;
 }
 </style>
