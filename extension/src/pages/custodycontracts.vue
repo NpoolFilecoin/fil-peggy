@@ -54,6 +54,10 @@
       <button class='btn' v-on:click='onCancelClick'>Cancel</button>
       <button class='btn' v-on:click='onVerifyClick'>Verify</button>
     </div>
+    <div class='tips'>
+      <span>Don't have a Peggy Actor ? </span>
+      <span class='deploy'>Deploy</span>
+    </div>
   </div>
 </template>
 
@@ -222,5 +226,15 @@ export default {
   border: 1px solid #0D99FF;
   color: #535A61;
   cursor: pointer;
+}
+
+.tips {
+  color: #535A61;
+  cursor: pointer;
+  margin: 8px 0 16px 0;
+}
+
+.tips .deploy {
+  color: #0D99FF;
 }
 </style>
