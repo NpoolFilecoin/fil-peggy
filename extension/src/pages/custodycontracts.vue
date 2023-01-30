@@ -9,7 +9,7 @@
         :title='contract.title'
         :icon='contract.icon'
         :subtitle='contract.subtitle'
-        :contract-type='contract.contractType'
+        :custody-type='contract.custodyType'
         :value='contract.value'
         :miners='contract.miners'
         :raw-power-bytes='contract.rawPowerBytes'
@@ -51,7 +51,7 @@ export default {
         {
           title: 'f078235',
           subtitle: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
-          contractType: CustodyTypes.FixedIncome,
+          custodyType: CustodyTypes.FixedIncome,
           value: 30,
           miners: [
             "f0182365",

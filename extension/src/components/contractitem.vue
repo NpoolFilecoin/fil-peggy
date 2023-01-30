@@ -8,17 +8,17 @@
       <div class='content'>
         <div class='left'>
           <div class='line'>Type:</div>
-          <div class='line'>APY:</div>
+          <div class='line'>{{ valueLabel }}:</div>
           <div class='line'>Miners:</div>
           <div class='line'>Power:</div>
           <div class='line'>Daily Reward:</div>
         </div>
         <div class='right'>
-          <div class='line'>Type:</div>
-          <div class='line'>APY:</div>
-          <div class='line'>Miners:</div>
-          <div class='line'>Power:</div>
-          <div class='line'>Daily Reward:</div>
+          <div class='line'>{{ custodyType }}</div>
+          <div class='line'>{{ value }}%</div>
+          <div class='line miner'>{{ miners.join(' ') }}</div>
+          <div class='line'>{{ rawPower }}/{{ adjPower }}</div>
+          <div class='line'>{{ estimateDailyReward }} FIL</div>
         </div>
       </div>
     </div>
@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import { CustodyTypes } from '../const/contract_types'
+
 export default {
   name: 'contractItem',
   props: {
@@ -71,6 +73,60 @@ export default {
     return {
       rightArrow: '../assets/icons/right-arrow-24x24.png'
     }
+  },
+  computed: {
+    valueLabel () {
+      switch (this.custodyType) {
+      case CustodyTypes.FixedIncome:
+        return 'APY'
+      case CustodyTypes.FixedFeeRate:
+        return 'Fee Rate'
+      default:
+        return 'APY'
+      }
+    },
+    rawPower () {
+      if (this.rawPowerBytes > 1024 * 1024 * 1024 * 1024 * 1024 * 1024) {
+        return (this.rawPowerBytes / (1024 * 1024 * 1024 * 1024 * 1024 * 1024)).toFixed(2) + ' EiB'
+      }
+      if (this.rawPowerBytes > 1024 * 1024 * 1024 * 1024 * 1024) {
+        return (this.rawPowerBytes / (1024 * 1024 * 1024 * 1024 * 1024)).toFixed(2) + ' PiB'
+      }
+      if (this.rawPowerBytes > 1024 * 1024 * 1024 * 1024) {
+        return (this.rawPowerBytes / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TiB'
+      }
+      if (this.rawPowerBytes > 1024 * 1024 * 1024) {
+        return (this.rawPowerBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GiB'
+      }
+      if (this.rawPowerBytes > 1024 * 1024) {
+        return (this.rawPowerBytes / (1024 * 1024)).toFixed(2) + ' MiB'
+      }
+      if (this.rawPowerBytes > 1024) {
+        return (this.rawPowerBytes / 1024).toFixed(2) + ' KiB'
+      }
+      return this.rawPowerBytes + ' B'
+    },
+    adjPower () {
+      if (this.adjPowerBytes > 1024 * 1024 * 1024 * 1024 * 1024 * 1024) {
+        return (this.adjPowerBytes / (1024 * 1024 * 1024 * 1024 * 1024 * 1024)).toFixed(2) + ' EiB'
+      }
+      if (this.adjPowerBytes > 1024 * 1024 * 1024 * 1024 * 1024) {
+        return (this.adjPowerBytes / (1024 * 1024 * 1024 * 1024 * 1024)).toFixed(2) + ' PiB'
+      }
+      if (this.adjPowerBytes > 1024 * 1024 * 1024 * 1024) {
+        return (this.adjPowerBytes / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TiB'
+      }
+      if (this.adjPowerBytes > 1024 * 1024 * 1024) {
+        return (this.adjPowerBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GiB'
+      }
+      if (this.adjPowerBytes > 1024 * 1024) {
+        return (this.adjPowerBytes / (1024 * 1024)).toFixed(2) + ' MiB'
+      }
+      if (this.adjPowerBytes > 1024) {
+        return (this.adjPowerBytes / 1024).toFixed(2) + ' KiB'
+      }
+      return this.adjPowerBytes + ' B'
+    }
   }
 }
 </script>
@@ -113,7 +169,7 @@ export default {
 }
 
 .item .inner {
-  width: 100%;
+  width: 240px;
 }
 
 .item .inner .content {
@@ -133,5 +189,12 @@ export default {
 
 .item .inner .content .line {
   line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.item .inner .content .miner {
+  color: #0D99FF;
 }
 </style>
