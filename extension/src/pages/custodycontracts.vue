@@ -1,7 +1,22 @@
 <template>
   <div class='page'>
-    <div class='inner'>
-      Coming soon ...
+    <div
+      class='contract-item'
+      v-for='contract in contracts'
+      :key='contract.title'
+    >
+      <contractItem
+        :title='contract.title'
+        :icon='contract.icon'
+        :subtitle='contract.subtitle'
+        :contract-type='contract.contractType'
+        :value='contract.value'
+        :miners='contract.miners'
+        :raw-power-bytes='contract.rawPowerBytes'
+        :adj-power-bytes='contract.adjPowerBytes'
+        :estimate-daily-reward='contract.estimateDailyReward'
+        v-on:click='() => onContractClick(contract)'
+      />
     </div>
   </div>
   <div class='tabs'>
@@ -17,15 +32,41 @@
 </template>
 
 <script>
+import { CustodyTypes } from '../const/contract_types'
+import contractItem from '../components/contractitem.vue'
+
 export default {
   name: 'custodyContracts',
+  components: {
+    contractItem
+  },
   data () {
     return {
       contractsIcon: '../assets/icons/contracts-40x40.png',
       contractsText: 'My Contracts',
       minersIcon: '../assets/icons/miners-40x40.png',
       minersText: 'My Miners',
-      curTab: 'contracts'
+      curTab: 'contracts',
+      contracts: [
+        {
+          title: 'f078235',
+          subtitle: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+          contractType: CustodyTypes.FixedIncome,
+          value: 30,
+          miners: [
+            "f0182365",
+            "f0135689",
+            "f0135689",
+            "f0135689",
+            "f0135689",
+            "f0135689"
+          ],
+          rawPowerBytes: 17989552222,
+          adjPowerBytes: 1245678946564,
+          estimateDailyReward: 245.9,
+          icon: '../assets/icons/custody-contracts-64x64.png'
+        }
+      ]
     }
   },
   mounted () {
@@ -38,6 +79,9 @@ export default {
     },
     onMinersClick: function () {
       this.curTab = 'miners'
+    },
+    onContractClick: function (contract) {
+      console.log(contract)
     }
   }
 }
@@ -49,9 +93,8 @@ export default {
   height: 394px;
 }
 
-.page .inner {
-  padding: 16px 0 16px 0;
-  text-align: center;
+.page .contract-item {
+  border-bottom: 1px solid #D6D9DC;
 }
 
 .tabs {
