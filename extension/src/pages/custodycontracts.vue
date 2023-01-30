@@ -160,7 +160,7 @@ export default {
 <style scoped>
 .page {
   padding: 0 16px 0 16px;
-  height: 394px;
+  height: 100%;
 }
 
 .page .contract-item {
