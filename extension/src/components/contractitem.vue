@@ -16,7 +16,7 @@
         <div class='right'>
           <div class='line'>{{ custodyType }}</div>
           <div class='line'>{{ value }}%</div>
-          <div class='line miner'>{{ miners.join(' ') }}</div>
+          <div class='line miner'>{{ miners ? miners.join(' ') : '' }}</div>
           <div class='line'>{{ rawPower }}/{{ adjPower }}</div>
           <div class='line'>{{ estimateDailyReward }} FIL</div>
         </div>

@@ -7,6 +7,7 @@ export const store = createStore({
     return {
       ToolbarTitle: 'Home',
       ToolbarShowAddBtn: false,
+      ShowFooterHelp: true,
       NetworkName: 'Hyperspace',
       NetworkRpcEndpoint: 'https://localhost:1234/v1',
       NetworkRpcConnected: true,
@@ -74,6 +75,12 @@ export const store = createStore({
     },
     setToolbarTitle (state, title) {
       state.ToolbarTitle = title
+    },
+    setContracts (state, contracts) {
+      state.Contracts = contracts
+    },
+    setShowFooterHelp (state, show) {
+      state.ShowFooterHelp = show
     }
   },
   getters: {
@@ -94,6 +101,9 @@ export const store = createStore({
     },
     networkAdjPowerBytes (state) {
       return state.NetworkAdjPowerBytes
+    },
+    showFooterHelp (state) {
+      return state.ShowFooterHelp
     }
   }
 })

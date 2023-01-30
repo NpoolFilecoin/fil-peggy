@@ -2,7 +2,11 @@
   <div class="main_app">
     <headerComponent />
     <toolbarComponent />
-    <RouterView />
+    <RouterView class='main_body' />
+    <div v-if='showFooterHelp' class='help'>
+      {{ needHelp }}
+      <span class='contact'>{{ peggySupport }}</span>
+    </div>
   </div>
 </template>
 
@@ -18,6 +22,13 @@ export default {
   },
   data () {
     return {
+      needHelp: 'Need help ? ',
+      peggySupport: 'Peggy support'
+    }
+  },
+  computed: {
+    showFooterHelp () {
+      return this.$store.getters.showFooterHelp
     }
   }
 }
@@ -39,5 +50,27 @@ export default {
 
 .main_app::-webkit-scrollbar {
   display: none; /* Chrome Safari */
+}
+
+.main_body {
+  position: absolute;
+  top: 112px;
+  height: 428px;
+}
+
+.help {
+  position: absolute;
+  top: 540px;
+  background-color: #F2F4F6;
+  height: 32px;
+  width: 100%;
+  line-height: 32px;
+  text-align: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.help .contact {
+  color: #0D99FF;
 }
 </style>

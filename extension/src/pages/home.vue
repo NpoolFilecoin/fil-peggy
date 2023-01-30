@@ -1,24 +1,22 @@
 <template>
-  <div class='all-offers'>
-    <div class='inner'>
-      <img class='icon' :src='allOffersIcon' />
-      <div class='text'>{{ allOffersText }}</div>
+  <div>
+    <div class='all-offers'>
+      <div class='inner'>
+        <img class='icon' :src='allOffersIcon' />
+        <div class='text'>{{ allOffersText }}</div>
+      </div>
     </div>
-  </div>
-  <div class='menus'>
-    <mainItem
-      v-for='menu in menus'
-      :key='menu.title'
-      class='menu-item'
-      :title='menu.title'
-      :icon='menu.icon'
-      :content='menu.content'
-      v-on:click='() => onMenuClick(menu)'
-    />
-  </div>
-  <div class='help'>
-    {{ needHelp }}
-    <span class='contact'>{{ peggySupport }}</span>
+    <div class='menus'>
+      <mainItem
+        v-for='menu in menus'
+        :key='menu.title'
+        class='menu-item'
+        :title='menu.title'
+        :icon='menu.icon'
+        :content='menu.content'
+        v-on:click='() => onMenuClick(menu)'
+      />
+    </div>
   </div>
 </template>
 
@@ -34,8 +32,6 @@ export default {
     return {
       allOffersIcon: '../assets/icons/all-offers-24x24.png',
       allOffersText: 'All Offers',
-      needHelp: 'Need help ? ',
-      peggySupport: 'Peggy support',
       menus: [
         {
           title: 'Storage Providers',
@@ -63,6 +59,7 @@ export default {
   },
   mounted () {
     this.$store.commit('setToolbarShowAddBtn', false)
+    this.$store.commit('setShowFooterHelp', true)
     this.$store.commit('setToolbarTitle', 'Home')
   },
   methods: {
@@ -101,22 +98,6 @@ export default {
 .all-offers .inner .text {
   height: 12px;
   margin-left: 6px;
-}
-
-.help {
-  position: absolute;
-  top: 540px;
-  background-color: #F2F4F6;
-  height: 32px;
-  width: 100%;
-  line-height: 32px;
-  text-align: center;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.help .contact {
-  color: #0D99FF;
 }
 
 .menus {

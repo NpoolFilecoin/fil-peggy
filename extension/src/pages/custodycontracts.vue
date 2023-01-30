@@ -34,19 +34,19 @@
     <div class='area'>
       <div>Code ID</div>
       <div>
-        <input type='text' placeholder='Input code id of contract'>
+        <input type='text' placeholder='Input code id of contract' v-model='contractCodeId'>
       </div>
     </div>
     <div class='area'>
       <div>Actor ID</div>
       <div>
-        <input type='text' placeholder='Input actor id of contract'>
+        <input type='text' placeholder='Input actor id of contract' v-model='contractActorId'>
       </div>
     </div>
     <div class='area'>
       <div>Actor Robust Address</div>
       <div>
-        <input type='text' placeholder='Input robust address of contract'>
+        <input type='text' placeholder='Input robust address of contract' v-model='contractRobustAddress'>
       </div>
     </div>
     <div class='btns'>
@@ -65,6 +65,7 @@
 import contractItem from '../components/contractitem.vue'
 import { GlobalEvents } from '../const/global_events'
 import { evbus } from '../evbus/event_bus'
+import { LocalStorageKeys } from '../const/store_keys'
 
 export default {
   name: 'custodyContracts',
@@ -78,12 +79,19 @@ export default {
       minersIcon: '../assets/icons/miners-40x40.png',
       minersText: 'My Miners',
       curTab: 'contracts',
-      adding: false
+      adding: false,
+      contractCodeId: '',
+      contractActorId: '',
+      contractRobustAddress: ''
     }
   },
   mounted () {
     this.$store.commit('setToolbarShowAddBtn', true)
+    this.$store.commit('setShowFooterHelp', false)
     this.$store.commit('setToolbarTitle', 'Custody Contracts')
+
+    let contracts = localStorage.getItem(LocalStorageKeys.Contracts)
+    this.$store.commit('setContracts', contracts)
 
     evbus.on(GlobalEvents.ToolbarAddClick, this.onAddClick)
   },
@@ -112,7 +120,27 @@ export default {
       this.adding = true
     },
     onAddContractClick: function () {
+      if (this.contractActorId.length === 0 ||
+          this.contractCodeId.length === 0 ||
+          this.contractRobustAddress.length === 0) {
+        return
+      }
+
       this.adding = false
+
+      let contracts = localStorage.getItem(LocalStorageKeys.Contracts)
+      if (!contracts) {
+        contracts = []
+      }
+      contracts.push({
+        CodeID: this.contractCodeId,
+        Title: this.contractActorId,
+        Subtitle: this.contractRobustAddress
+      })
+
+      console.log(contracts)
+
+      localStorage.setItem(LocalStorageKeys.Contracts, JSON.stringify(contracts))
     },
     onCancelClick: function () {
       this.adding = false
@@ -146,6 +174,7 @@ export default {
   height: 64px;
   width: 100%;
   border-top: 1px solid #D6D9DC;
+  background-color: white;
 }
 
 .tabs .tab {

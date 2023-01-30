@@ -43,9 +43,12 @@ export default {
 
 <style scoped>
 .toolbar1 {
+  position: absolute;
+  top: 64px;
   height: 48px;
   width: 100%;
   border-bottom: 1px solid #D6D9DC;
+  background-color: white;
 }
 
 .toolbar-inner {
