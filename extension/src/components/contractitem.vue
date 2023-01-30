@@ -28,6 +28,7 @@
 
 <script>
 import { CustodyTypes } from '../const/contract_types'
+import { powerDisplay } from '../utils/power_display'
 
 export default {
   name: 'contractItem',
@@ -73,35 +74,6 @@ export default {
       icon: '../assets/icons/custody-contracts-64x64.png'
     }
   },
-  methods: {
-    powerDisplay (power) {
-      if (power > 1024 * 1024 * 1024 * 1024 * 1024 * 1024) {
-        // eslint-disable-next-line no-undef
-        return Number((power * BigInt(1000) / BigInt(1024 * 1024 * 1024 * 1024 * 1024 * 1024))) / 1000 + ' EiB'
-      }
-      if (power > 1024 * 1024 * 1024 * 1024 * 1024) {
-        // eslint-disable-next-line no-undef
-        return Number(power * BigInt(1000) / BigInt(1024 * 1024 * 1024 * 1024 * 1024)) / 1000 + ' PiB'
-      }
-      if (power > 1024 * 1024 * 1024 * 1024) {
-        // eslint-disable-next-line no-undef
-        return Number(power * BigInt(1000) / BigInt(1024 * 1024 * 1024 * 1024)) / 1000 + ' TiB'
-      }
-      if (power > 1024 * 1024 * 1024) {
-        // eslint-disable-next-line no-undef
-        return Number(power * BigInt(1000) / BigInt(1024 * 1024 * 1024)) / 1000 + ' GiB'
-      }
-      if (power > 1024 * 1024) {
-        // eslint-disable-next-line no-undef
-        return Number(power * BigInt(1000) / BigInt(1024 * 1024)) / 1000 + ' MiB'
-      }
-      if (power > 1024) {
-        // eslint-disable-next-line no-undef
-        return Number(power * BigInt(1000) / BigInt(1024)) / 1000 + ' KiB'
-      }
-      return power + ' B'
-    },
-  },
   computed: {
     valueLabel () {
       switch (this.custodyType) {
@@ -114,10 +86,10 @@ export default {
       }
     },
     rawPower () {
-      return this.powerDisplay(this.rawPowerBytes)
+      return powerDisplay(this.rawPowerBytes)
     },
     adjPower () {
-      return this.powerDisplay(this.adjPowerBytes)
+      return powerDisplay(this.adjPowerBytes)
     }
   }
 }
