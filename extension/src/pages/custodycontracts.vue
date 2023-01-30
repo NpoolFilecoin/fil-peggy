@@ -43,6 +43,12 @@
         <input type='text' placeholder='Input actor id of contract'>
       </div>
     </div>
+    <div class='area'>
+      <div>Actor Robust Address</div>
+      <div>
+        <input type='text' placeholder='Input robust address of contract'>
+      </div>
+    </div>
     <div class='btns'>
       <button class='btn' v-on:click='onAddContractClick'>Add</button>
       <button class='btn' v-on:click='onCancelClick'>Cancel</button>

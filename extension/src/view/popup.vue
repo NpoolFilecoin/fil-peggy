@@ -40,16 +40,4 @@ export default {
 .main_app::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }
-
-.main_app::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  opacity: 0.1; /* Firefox */
-}
-
-.main_app:-ms-input-placeholder { /* Internet Explorer 10-11 */
-  opacity: 0.1;
-}
-
-.main_app::-ms-input-placeholder { /* Microsoft Edge */
-  opacity: 0.1;
-}
 </style>
