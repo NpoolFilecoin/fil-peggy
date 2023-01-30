@@ -33,6 +33,8 @@
 
 <script>
 import contractItem from '../components/contractitem.vue'
+import { GlobalEvents } from '../const/global_events'
+import { evbus } from '../evbus/event_bus'
 
 export default {
   name: 'custodyContracts',
@@ -51,6 +53,11 @@ export default {
   mounted () {
     this.$store.commit('setToolbarShowAddBtn', true)
     this.$store.commit('setToolbarTitle', 'Custody Contracts')
+
+    evbus.on(GlobalEvents.ToolbarAddClick, this.onAddClick)
+  },
+  unmounted () {
+    evbus.off(GlobalEvents.ToolbarAddClick)
   },
   methods: {
     onContractsClick: function () {
@@ -66,6 +73,9 @@ export default {
           contractId: contract.Title
         }
       })
+    },
+    onAddClick: function () {
+      // TODO: we call contract method through web3 library here
     }
   },
   computed: {

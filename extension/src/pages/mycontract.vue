@@ -149,7 +149,12 @@ export default {
     },
     activityDate: function (act) {
       let date = new Date(act.Timestamp * 1000)
-      return date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate()
+      return date.getFullYear() + '/' +
+             date.getMonth().toString().padStart(2, '0') + '/' +
+             date.getDate().toString().padStart(2, '0') + ' ' +
+             date.getHours().toString().padStart(2, '0') + ':' +
+             date.getMinutes().toString().padStart(2, '0') + ':' +
+             date.getSeconds().toString().padStart(2, '0')
     },
     activityTarget: function (act) {
       switch (activityDir(act.Activity)) {

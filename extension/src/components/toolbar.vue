@@ -3,13 +3,16 @@
     <div class='toolbar-inner'>
       <img class='clickable' :src='leftArrow' v-on:click='onBackClick'/>
       <div :class='[ "title", showAddBtn ? "title-with-add" : ""]'>{{ title }}</div>
-      <img class='clickable' v-show='showAddBtn' :src='add' />
+      <img class='clickable' v-show='showAddBtn' :src='add' v-on:click='onAddClick' />
       <img class='clickable' :src='setting' />
     </div>
   </div>
 </template>
 
 <script>
+import { GlobalEvents } from '../const/global_events'
+import { evbus } from '../evbus/event_bus'
+
 export default {
   name: 'toolbarComponent',
   data () {
@@ -29,8 +32,10 @@ export default {
   },
   methods: {
     onBackClick: function () {
-      console.log('Back')
       this.$router.back()
+    },
+    onAddClick: function () {
+      evbus.emit(GlobalEvents.ToolbarAddClick)
     }
   }
 }
