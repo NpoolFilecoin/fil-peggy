@@ -3,18 +3,18 @@
     <div
       class='contract-item'
       v-for='contract in contracts'
-      :key='contract.title'
+      :key='contract.Title'
     >
       <contractItem
-        :title='contract.title'
-        :icon='contract.icon'
-        :subtitle='contract.subtitle'
-        :custody-type='contract.custodyType'
-        :value='contract.value'
-        :miners='contract.miners'
-        :raw-power-bytes='contract.rawPowerBytes'
-        :adj-power-bytes='contract.adjPowerBytes'
-        :estimate-daily-reward='contract.estimateDailyReward'
+        :title='contract.Title'
+        :icon='contract.Icon'
+        :subtitle='contract.Subtitle'
+        :custody-type='contract.CustodyType'
+        :value='contract.Value'
+        :miners='contract.Miners'
+        :raw-power-bytes='contract.RawPowerBytes'
+        :adj-power-bytes='contract.AdjPowerBytes'
+        :estimate-daily-reward='contract.EstimateDailyReward'
         v-on:click='() => onContractClick(contract)'
       />
     </div>
@@ -60,7 +60,12 @@ export default {
       this.curTab = 'miners'
     },
     onContractClick: function (contract) {
-      console.log(contract)
+      this.$router.push({
+        path: '/mycontract',
+        query: {
+          contractId: contract.Title
+        }
+      })
     }
   },
   computed: {

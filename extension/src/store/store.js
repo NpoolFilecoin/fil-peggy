@@ -12,11 +12,11 @@ export const store = createStore({
       NetworkRpcConnected: true,
       Contracts: [
         {
-          title: 'f078235',
-          subtitle: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
-          custodyType: CustodyTypes.FixedIncome,
-          value: 30,
-          miners: [
+          Title: 'f078235',
+          Subtitle: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+          CustodyType: CustodyTypes.FixedIncome,
+          Value: 30,
+          Miners: [
             "f0182365",
             "f0135689",
             "f0135699",
@@ -24,10 +24,12 @@ export const store = createStore({
             "f0135629",
             "f0135639"
           ],
-          rawPowerBytes: 179895522222356n,
-          adjPowerBytes: 12456789465642323n,
-          estimateDailyReward: 245.9,
-          icon: '../assets/icons/custody-contracts-64x64.png'
+          RawPowerBytes: 179895522222356n,
+          AdjPowerBytes: 12456789465642323n,
+          EstimateDailyReward: 245.9,
+          TotalAttoFilAmount: 832571312649679456n,
+          BalanceAttoFilAmount: 356823546458798n,
+          Icon: '../assets/icons/custody-contracts-64x64.png'
         }
       ]
     }
@@ -49,6 +51,9 @@ export const store = createStore({
     },
     contracts (state) {
       return state.Contracts
+    },
+    contractById: (state) => (id) => {
+      return state.Contracts.find(contract => contract.Title === id)
     }
   }
 })

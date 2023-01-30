@@ -1,4 +1,7 @@
 export const powerDisplay = (power) => {
+  if (!power) {
+    return '0 B'
+  }
   if (power > 1024 * 1024 * 1024 * 1024 * 1024 * 1024) {
     // eslint-disable-next-line no-undef
     return Number((power * BigInt(1000) / BigInt(1024 * 1024 * 1024 * 1024 * 1024 * 1024))) / 1000 + ' EiB'
