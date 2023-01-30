@@ -52,6 +52,7 @@
     <div class='btns'>
       <button class='btn' v-on:click='onAddContractClick'>Add</button>
       <button class='btn' v-on:click='onCancelClick'>Cancel</button>
+      <button class='btn' v-on:click='onVerifyClick'>Verify</button>
     </div>
   </div>
 </template>
@@ -111,6 +112,9 @@ export default {
     },
     onCancelClick: function () {
       this.adding = false
+    },
+    onVerifyClick: function () {
+      // TODO: call preset function here
     }
   },
   computed: {
