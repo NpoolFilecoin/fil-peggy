@@ -6,7 +6,7 @@
       :key='index'
     >
       <contractItem
-        :title='index'
+        :title='contract.Title'
         :icon='contract.Icon'
         :subtitle='contract.Subtitle'
         :custody-type='contract.CustodyType'
