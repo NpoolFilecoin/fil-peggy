@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import { CustodyTypes } from '../const/contract_types'
 import contractItem from '../components/contractitem.vue'
 
 export default {
@@ -46,27 +45,7 @@ export default {
       contractsText: 'My Contracts',
       minersIcon: '../assets/icons/miners-40x40.png',
       minersText: 'My Miners',
-      curTab: 'contracts',
-      contracts: [
-        {
-          title: 'f078235',
-          subtitle: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
-          custodyType: CustodyTypes.FixedIncome,
-          value: 30,
-          miners: [
-            "f0182365",
-            "f0135689",
-            "f0135689",
-            "f0135689",
-            "f0135689",
-            "f0135689"
-          ],
-          rawPowerBytes: 17989552222,
-          adjPowerBytes: 1245678946564,
-          estimateDailyReward: 245.9,
-          icon: '../assets/icons/custody-contracts-64x64.png'
-        }
-      ]
+      curTab: 'contracts'
     }
   },
   mounted () {
@@ -82,6 +61,11 @@ export default {
     },
     onContractClick: function (contract) {
       console.log(contract)
+    }
+  },
+  computed: {
+    contracts () {
+      return this.$store.getters.contracts
     }
   }
 }

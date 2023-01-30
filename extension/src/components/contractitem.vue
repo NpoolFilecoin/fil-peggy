@@ -53,26 +53,54 @@ export default {
       required: true
     },
     rawPowerBytes: {
-      type: Number,
+      // eslint-disable-next-line no-undef
+      type: BigInt,
       required: true
     },
     adjPowerBytes: {
-      type: Number,
+      // eslint-disable-next-line no-undef
+      type: BigInt,
       required: true
     },
     estimateDailyReward: {
       type: Number,
       required: true
-    },
-    icon: {
-      type: String,
-      required: true
     }
   },
   data () {
     return {
-      rightArrow: '../assets/icons/right-arrow-24x24.png'
+      rightArrow: '../assets/icons/right-arrow-24x24.png',
+      icon: '../assets/icons/custody-contracts-64x64.png'
     }
+  },
+  methods: {
+    powerDisplay (power) {
+      if (power > 1024 * 1024 * 1024 * 1024 * 1024 * 1024) {
+        // eslint-disable-next-line no-undef
+        return Number((power * BigInt(1000) / BigInt(1024 * 1024 * 1024 * 1024 * 1024 * 1024))) / 1000 + ' EiB'
+      }
+      if (power > 1024 * 1024 * 1024 * 1024 * 1024) {
+        // eslint-disable-next-line no-undef
+        return Number(power * BigInt(1000) / BigInt(1024 * 1024 * 1024 * 1024 * 1024)) / 1000 + ' PiB'
+      }
+      if (power > 1024 * 1024 * 1024 * 1024) {
+        // eslint-disable-next-line no-undef
+        return Number(power * BigInt(1000) / BigInt(1024 * 1024 * 1024 * 1024)) / 1000 + ' TiB'
+      }
+      if (power > 1024 * 1024 * 1024) {
+        // eslint-disable-next-line no-undef
+        return Number(power * BigInt(1000) / BigInt(1024 * 1024 * 1024)) / 1000 + ' GiB'
+      }
+      if (power > 1024 * 1024) {
+        // eslint-disable-next-line no-undef
+        return Number(power * BigInt(1000) / BigInt(1024 * 1024)) / 1000 + ' MiB'
+      }
+      if (power > 1024) {
+        // eslint-disable-next-line no-undef
+        return Number(power * BigInt(1000) / BigInt(1024)) / 1000 + ' KiB'
+      }
+      return power + ' B'
+    },
   },
   computed: {
     valueLabel () {
@@ -86,46 +114,10 @@ export default {
       }
     },
     rawPower () {
-      if (this.rawPowerBytes > 1024 * 1024 * 1024 * 1024 * 1024 * 1024) {
-        return (this.rawPowerBytes / (1024 * 1024 * 1024 * 1024 * 1024 * 1024)).toFixed(2) + ' EiB'
-      }
-      if (this.rawPowerBytes > 1024 * 1024 * 1024 * 1024 * 1024) {
-        return (this.rawPowerBytes / (1024 * 1024 * 1024 * 1024 * 1024)).toFixed(2) + ' PiB'
-      }
-      if (this.rawPowerBytes > 1024 * 1024 * 1024 * 1024) {
-        return (this.rawPowerBytes / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TiB'
-      }
-      if (this.rawPowerBytes > 1024 * 1024 * 1024) {
-        return (this.rawPowerBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GiB'
-      }
-      if (this.rawPowerBytes > 1024 * 1024) {
-        return (this.rawPowerBytes / (1024 * 1024)).toFixed(2) + ' MiB'
-      }
-      if (this.rawPowerBytes > 1024) {
-        return (this.rawPowerBytes / 1024).toFixed(2) + ' KiB'
-      }
-      return this.rawPowerBytes + ' B'
+      return this.powerDisplay(this.rawPowerBytes)
     },
     adjPower () {
-      if (this.adjPowerBytes > 1024 * 1024 * 1024 * 1024 * 1024 * 1024) {
-        return (this.adjPowerBytes / (1024 * 1024 * 1024 * 1024 * 1024 * 1024)).toFixed(2) + ' EiB'
-      }
-      if (this.adjPowerBytes > 1024 * 1024 * 1024 * 1024 * 1024) {
-        return (this.adjPowerBytes / (1024 * 1024 * 1024 * 1024 * 1024)).toFixed(2) + ' PiB'
-      }
-      if (this.adjPowerBytes > 1024 * 1024 * 1024 * 1024) {
-        return (this.adjPowerBytes / (1024 * 1024 * 1024 * 1024)).toFixed(2) + ' TiB'
-      }
-      if (this.adjPowerBytes > 1024 * 1024 * 1024) {
-        return (this.adjPowerBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GiB'
-      }
-      if (this.adjPowerBytes > 1024 * 1024) {
-        return (this.adjPowerBytes / (1024 * 1024)).toFixed(2) + ' MiB'
-      }
-      if (this.adjPowerBytes > 1024) {
-        return (this.adjPowerBytes / 1024).toFixed(2) + ' KiB'
-      }
-      return this.adjPowerBytes + ' B'
+      return this.powerDisplay(this.adjPowerBytes)
     }
   }
 }
