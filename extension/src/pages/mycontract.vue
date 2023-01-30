@@ -248,6 +248,7 @@ export default {
   color: #0D99FF;
   width: 25%;
   text-align: center;
+  cursor: pointer;
 }
 
 .detail {
