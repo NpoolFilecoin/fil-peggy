@@ -13,7 +13,7 @@
       :title='menu.title'
       :icon='menu.icon'
       :content='menu.content'
-      v-on:click='menu.click'
+      v-on:click='() => onMenuClick(menu)'
     />
   </div>
   <div class='help'>
@@ -41,19 +41,22 @@ export default {
           title: 'Storage Providers',
           icon: '../assets/icons/filecoin-64x64.png',
           content: 'Check Your On-Chain Storage Providers',
-          click: this.clickStorageProviders
+          path: '/storageproviders'
         }, {
           title: 'Investment Shares',
           icon: '../assets/icons/investment-shares-64x64.png',
-          content: 'Deposit / Redeem / Withdraw Your Investment'
+          content: 'Deposit / Redeem / Withdraw Your Investment',
+          path: '/investmentshares'
         }, {
           title: 'Custody Contracts',
           icon: '../assets/icons/custody-contracts-64x64.png',
-          content: 'Custody Storage Provider to Smart Contract'
+          content: 'Custody Storage Provider to Smart Contract',
+          path: '/custodycontracts'
         }, {
           title: 'Filecoin Accounts',
           icon: '../assets/icons/accounts-64x64.png',
-          content: 'Add / Remove / Set Your Filecoin Accounts'
+          content: 'Add / Remove / Set Your Filecoin Accounts',
+          path: '/filecoinaccounts'
         }
       ]
     }
@@ -63,8 +66,8 @@ export default {
     this.$store.commit('setToolbarTitle', 'Home')
   },
   methods: {
-    clickStorageProviders: function () {
-      this.$router.push('/storageproviders')
+    onMenuClick: function (menu) {
+      this.$router.push(menu.path)
     }
   }
 }
