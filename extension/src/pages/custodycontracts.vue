@@ -66,6 +66,7 @@ import contractItem from '../components/contractitem.vue'
 import { GlobalEvents } from '../const/global_events'
 import { evbus } from '../evbus/event_bus'
 import { LocalStorageKeys } from '../const/store_keys'
+import { play } from '../web3/web3'
 
 export default {
   name: 'custodyContracts',
@@ -126,7 +127,7 @@ export default {
         return
       }
 
-      let contract = this.$store.contractById(this.contractActorId)
+      let contract = this.$store.getters.contractById(this.contractActorId)
       if (contract) {
         return
       }
@@ -165,6 +166,7 @@ export default {
     },
     validatePeggyContract: function (actorId, codeId, robustAddress) {
       console.log('Verify', actorId, codeId, robustAddress)
+      play()
       return true
     }
   },
