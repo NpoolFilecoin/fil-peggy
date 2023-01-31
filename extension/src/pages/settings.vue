@@ -14,7 +14,27 @@
     </div>
   </div>
   <div v-if='adding' class='popup'>
-    HHHHHHHHHHHHHH
+    <div class='title'>Add Network</div>
+    <div class='area'>
+      <div>Network Name</div>
+      <div>
+        <input type='text' placeholder='Input network name' v-model='networkName'>
+      </div>
+    </div>
+    <div class='area'>
+      <div>Network Rpc Endpoint</div>
+      <div>
+        <input type='text' placeholder='Input network rpc endpoint' v-model='networkRpcEndpoint'>
+      </div>
+    </div>
+    <div class='btns'>
+      <button class='btn' v-on:click='onAddNetworkClick'>Add</button>
+      <button class='btn' v-on:click='onCancelClick'>Cancel</button>
+      <button class='btn' v-on:click='onCheckClick'>Check</button>
+    </div>
+    <div class='tips' v-on:click='onFindClick'>
+      <span class='find'>Find through Chainlink</span>
+    </div>
   </div>
 </template>
 
@@ -25,7 +45,9 @@ export default {
   name: 'settingsPage',
   data () {
     return {
-      adding: false
+      adding: false,
+      networkName: '',
+      networkRpcEndpoint: ''
     }
   },
   components: {
@@ -40,6 +62,18 @@ export default {
   methods: {
     onAddClick: function () {
       this.adding = true
+    },
+    onAddNetworkClick: function () {
+      this.adding = false
+    },
+    onCancelClick: function () {
+      this.adding = false
+    },
+    onCheckClick: function () {
+      this.adding = false
+    },
+    onFindClick: function () {
+      window.open('https://chainlist.org/?testnets=true')
     }
   },
   computed: {
@@ -87,5 +121,51 @@ export default {
   min-height: 120px;
   width: 296px;
   color: #535A61;
+}
+
+.popup .title {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.popup .area {
+  margin: 10px 0 0 0;
+  width: 100%;
+}
+
+.popup input {
+  border: none;
+  border-bottom: 1px solid #D6D9DC;
+  width: 100%;
+}
+
+.popup input:focus {
+  outline: 1px solid #0D99FF;
+}
+
+.popup .btns {
+  display: flex;
+  margin-top: 24px;
+}
+
+.popup .btns .btn {
+  width: 60px;
+  height: 24px;
+  border-radius: 8px;
+  margin-right: 8px;
+  border: 1px solid #0D99FF;
+  color: #535A61;
+  cursor: pointer;
+}
+
+.tips {
+  color: #535A61;
+  cursor: pointer;
+  margin: 8px 0 16px 0;
+}
+
+.tips .find {
+  color: #0D99FF;
 }
 </style>
