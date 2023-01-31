@@ -92,7 +92,7 @@ const abi = JSON.parse(`[
 	}
 ]`)
 
-const peggyFlag = 'Peggy TZJCLSYW 09231006 .--.----.--....--..--'
+const peggyFlag = 'Peggy TZJCLSYW 09231006 .--././--./--./-.--/-/--../.---/-.-./.-../.../-.--/.--/-----/----./..---/...--/.----/-----/-----/-....'
 
 export const checkPeggy = (rpc, contractAddress) => {
   return new Promise((resolve, reject) => {
@@ -111,3 +111,4 @@ export const checkPeggy = (rpc, contractAddress) => {
     })
   })
 }
+
