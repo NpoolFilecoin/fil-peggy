@@ -126,17 +126,20 @@ export default {
         return
       }
 
+      let contract = this.$store.contractById(this.contractActorId)
+      if (contract) {
+        return
+      }
+
       this.adding = false
 
-      let contracts = localStorage.getItem(LocalStorageKeys.Contracts)
-      if (!contracts) {
-        contracts = []
-      }
+      let contracts = this.$store.getters.contracts
       contracts.push({
         CodeID: this.contractCodeId,
         Title: this.contractActorId,
         Subtitle: this.contractRobustAddress
       })
+      this.$store.commit('setContracts', contracts)
 
       localStorage.setItem(LocalStorageKeys.Contracts, JSON.stringify(contracts))
     },

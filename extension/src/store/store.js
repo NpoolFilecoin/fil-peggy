@@ -85,7 +85,7 @@ export const store = createStore({
     deleteContractById (state, id) {
       let index = state.Contracts.findIndex(contract => contract.Title === id)
       if (index < 0) {
-        return
+        return undefined
       }
       state.Contracts.splice(index, 1)
     }
