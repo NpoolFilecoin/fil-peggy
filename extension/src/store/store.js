@@ -67,7 +67,13 @@ export const store = createStore({
         }
       ],
       NetworkRawPowerBytes: 124597984564321321323131232n,
-      NetworkAdjPowerBytes: 1204597984564321321323131232n
+      NetworkAdjPowerBytes: 1204597984564321321323131232n,
+      Networks: [
+        {
+          Title: 'Filecoin Hyperspace Testnet',
+          RpcEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1'
+        }
+      ]
     }
   },
   mutations: {
@@ -92,6 +98,9 @@ export const store = createStore({
         return undefined
       }
       state.Contracts.splice(index, 1)
+    },
+    setNetworks (state, networks) {
+      state.Networks = networks
     }
   },
   getters: {
@@ -118,6 +127,12 @@ export const store = createStore({
     },
     showFooterHelp (state) {
       return state.ShowFooterHelp
+    },
+    networks (state) {
+      return state.Networks
+    },
+    networkById: (state) => (id) => {
+      return state.Networks.find(network => network.Title === id)
     }
   }
 })
