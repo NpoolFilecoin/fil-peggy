@@ -3,7 +3,7 @@
     <headerComponent />
     <toolbarComponent />
     <div v-if='showGlobalTip' class='global_tip'>
-      {{  tipText  }}
+      <span v-html='tipText' />
     </div>
     <div class='main_body'>
       <RouterView />

@@ -138,10 +138,9 @@ export default {
         this.contractCodeId,
         this.contractRobustAddress,
         (valid) => {
-          console.log(valid)
           if (!valid) {
             this.$store.commit('setShowGlobalTip', true)
-            this.$store.commit('setGlobalTipText', 'Invalid Peggy Contract')
+            this.$store.commit('setGlobalTipText', '<span style="color: red">Invalid Peggy Contract<span>')
             return
           }
 
@@ -173,10 +172,12 @@ export default {
         this.contractCodeId,
         this.contractRobustAddress,
         (valid) => {
+          this.$store.commit('setShowGlobalTip', true)
           if (!valid) {
-            this.$store.commit('setShowGlobalTip', true)
-            this.$store.commit('setGlobalTipText', 'Invalid Peggy Contract')
+            this.$store.commit('setGlobalTipText', '<span style="color: red">Invalid Peggy Contract<span>')
+            return
           }
+          this.$store.commit('setGlobalTipText', '<span style="color: green">Valid Peggy Contract<span>')
         }
       )
     },
