@@ -1,36 +1,37 @@
 <template>
   <div>
-    <div class='all-offers'>
-      <div class='inner'>
-        <img class='icon' :src='allOffersIcon' />
-        <div class='text'>{{ allOffersText }}</div>
+    <div class='section'>
+      <div class='label-line'>
+        <label>Networks</label>
+        <img class='icon' src='../assets/icons/add-24x24.png' />
       </div>
-    </div>
-    <div class='menus'>
-      <mainItem
-        v-for='menu in menus'
-        :key='menu.title'
-        class='menu-item'
-        :title='menu.title'
-        :icon='menu.icon'
-        :content='menu.content'
-        v-on:click='() => onMenuClick(menu)'
+      <networkItem
+        v-for='(network, index) in networks'
+        :key='index'
+        :title='network.Title'
+        :endpoint='network.RpcEndpoint'
       />
     </div>
   </div>
 </template>
 
 <script>
-import mainItem from '../components/mainitem.vue'
+import networkItem from '../components/networkitem.vue'
 
 export default {
   name: 'settingsPage',
-  components: {
-    mainItem
-  },
   data () {
     return {
+      networks: [
+        {
+          Title: 'Filecoin Hyperspace Testnet',
+          RpcEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1'
+        }
+      ]
     }
+  },
+  components: {
+    networkItem,
   },
   mounted () {
     this.$store.commit('setToolbarShowAddBtn', false)
@@ -39,50 +40,24 @@ export default {
     this.$store.commit('setToolbarTitle', 'Settings')
   },
   methods: {
-    onMenuClick: function (menu) {
-      this.$router.push(menu.path)
-    }
   }
 }
 </script>
 
 <style scoped>
-.all-offers {
-  height: 32px;
-  width: 100%;
-  background-color: #F2F4F6;
-  font-size: 12px;
-  color: #0D99FF;
-  text-align: center;
-}
-
-.all-offers .inner {
-  display: flex;
-  height: 24px;
-  padding: 4px 0 4px 0;
-  cursor: pointer;
-  align-items: center;
-  justify-content:center;
-}
-
-
-.all-offers .inner .icon {
-  height: 24px;
-  width: 24px;
-}
-
-.all-offers .inner .text {
-  height: 12px;
-  margin-left: 6px;
-}
-
-.menus {
-  margin: 0 16px 0 16px;
-  height: 396px;
-}
-
-.menu-item {
-  height: 80px;
+.section {
   border-bottom: 1px solid #D6D9DC;
+  padding: 16px;
+}
+
+.label-line {
+  border-bottom: 1px solid #D6D9DC;
+  line-height: 24px;
+  color: #535A61;
+  width: 100%;
+  height: 24px;
+}
+.label-line .icon {
+  float: right;
 }
 </style>
