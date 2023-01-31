@@ -4,7 +4,7 @@
     <div class='selector'>
       <div :class='[ "indicator", connected ? "" : "indicator-not-connected"]' />
       <div class='network'>
-        {{ network }}
+        {{ network ? network.Title : '' }}
       </div>
       <img class='down-arrow' :src='downArrow'/>
     </div>
@@ -16,10 +16,14 @@ export default {
   name: 'headerComponent',
   data () {
     return {
-      network: this.$store.state.NetworkName,
-      connected: this.$store.state.NetworkRpcConnected,
+      connected: true,
       logoPath: '../assets/logos/64x64.png',
       downArrow: '../assets/icons/down-arrow-16x16.png'
+    }
+  },
+  computed: {
+    network () {
+      return this.$store.getters.selectedNetwork
     }
   }
 }
@@ -44,13 +48,15 @@ export default {
   margin: 12px 16px 12px 0px;
   line-height: 40px;
   cursor: pointer;
+  width: 240px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .network {
   font-size: 12px;
   font-weight: bold;
   color: #535A61;
-  width: 110px;
 }
 
 .indicator {
@@ -68,6 +74,6 @@ export default {
 .down-arrow {
   height: 16px;
   width: 16px;
-  margin: 12px 10px 12px 0px;
+  margin: 12px 10px 12px 10px;
 }
 </style>

@@ -9,9 +9,6 @@ export const store = createStore({
       ToolbarShowAddBtn: false,
       ToolbarShowSettingBtn: true,
       ShowFooterHelp: true,
-      NetworkName: 'Hyperspace',
-      NetworkRpcEndpoint: 'https://localhost:1234/v1',
-      NetworkRpcConnected: true,
       Contracts: [
         {
           Title: 'f078235',
@@ -73,7 +70,8 @@ export const store = createStore({
           Title: 'Filecoin Hyperspace Testnet',
           RpcEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1'
         }
-      ]
+      ],
+      SelectedNetwork: 'Filecoin Hyperspace Testnet'
     }
   },
   mutations: {
@@ -117,6 +115,9 @@ export const store = createStore({
       }
       state.Networks.splice(index, 1)
     },
+    setSelectedNetwork (state, network) {
+      state.SelectedNetwork = network.Title
+    }
   },
   getters: {
     toolbarShowAddBtn (state) {
@@ -154,6 +155,12 @@ export const store = createStore({
         return undefined
       }
       return state.Networks.find(network => network.Title === id)
+    },
+    selectedNetwork (state) {
+      if (state.Networks === null || state.Networks === undefined) {
+        return undefined
+      }
+      return state.Networks.find(network => network.Title === state.SelectedNetwork)
     }
   }
 })
