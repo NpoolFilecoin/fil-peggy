@@ -7,11 +7,13 @@
       </div>
       <div class='endpoint'>{{ endpoint }}</div>
     </div>
-    <img class='delete' src='../assets/icons/delete-24x24.png' />
+    <img class='delete' src='../assets/icons/delete-24x24.png' v-on:click='onDeleteClick' />
   </div>
 </template>
 
 <script>
+import { LocalStorageKeys } from '../const/store_keys'
+
 export default {
   name: 'mainItem',
   props: {
@@ -26,6 +28,13 @@ export default {
   },
   data () {
     return {
+    }
+  },
+  methods: {
+    onDeleteClick: function () {
+      this.$store.commit('deleteNetworkById', this.title)
+      let networks = this.$store.getters.networks
+      localStorage.setItem(LocalStorageKeys.Networks, JSON.stringify(networks))
     }
   }
 }
@@ -73,5 +82,6 @@ export default {
   height: 24px;
   width: 24px;
   float: right;
+  cursor: pointer;
 }
 </style>

@@ -40,6 +40,7 @@
 
 <script>
 import networkItem from '../components/networkitem.vue'
+import { LocalStorageKeys } from '../const/store_keys'
 
 export default {
   name: 'settingsPage',
@@ -58,6 +59,9 @@ export default {
     this.$store.commit('setToolbarShowSettingBtn', false)
     this.$store.commit('setShowFooterHelp', true)
     this.$store.commit('setToolbarTitle', 'Settings')
+
+    let networks = JSON.parse(localStorage.getItem(LocalStorageKeys.Networks))
+    this.$store.commit('setNetworks', networks)
   },
   methods: {
     onAddClick: function () {
@@ -65,6 +69,24 @@ export default {
     },
     onAddNetworkClick: function () {
       this.adding = false
+
+      let network = this.$store.getters.networkById(this.networkName)
+      if (network) {
+        return
+      }
+
+      let networks = this.$store.getters.networks
+      if (networks === null || networks === undefined) {
+        networks = []
+      }
+
+      networks.push({
+        Title: this.networkName,
+        RpcEndpoint: this.networkRpcEndpoint
+      })
+      this.$store.commit('setNetworks', networks)
+
+      localStorage.setItem(LocalStorageKeys.Networks, JSON.stringify(networks))
     },
     onCancelClick: function () {
       this.adding = false

@@ -1,3 +1,4 @@
 export const LocalStorageKeys = {
-  Contracts: 'contracts'
+  Contracts: 'contracts',
+  Networks: 'networks'
 }

@@ -93,15 +93,30 @@ export const store = createStore({
       state.ShowFooterHelp = show
     },
     deleteContractById (state, id) {
+      if (state.Contracts === null || state.Contracts === undefined) {
+        return
+      }
+
       let index = state.Contracts.findIndex(contract => contract.Title === id)
       if (index < 0) {
-        return undefined
+        return
       }
       state.Contracts.splice(index, 1)
     },
     setNetworks (state, networks) {
       state.Networks = networks
-    }
+    },
+    deleteNetworkById (state, id) {
+      if (state.Networks === null || state.Networks === undefined) {
+        return
+      }
+
+      let index = state.Networks.findIndex(network => network.Title === id)
+      if (index < 0) {
+        return
+      }
+      state.Networks.splice(index, 1)
+    },
   },
   getters: {
     toolbarShowAddBtn (state) {
@@ -117,6 +132,9 @@ export const store = createStore({
       return state.Contracts
     },
     contractById: (state) => (id) => {
+      if (state.Contracts === null || state.Contracts === undefined) {
+        return undefined
+      }
       return state.Contracts.find(contract => contract.Title === id)
     },
     networkRawPowerBytes (state) {
@@ -132,6 +150,9 @@ export const store = createStore({
       return state.Networks
     },
     networkById: (state) => (id) => {
+      if (state.Networks === null || state.Networks === undefined) {
+        return undefined
+      }
       return state.Networks.find(network => network.Title === id)
     }
   }
