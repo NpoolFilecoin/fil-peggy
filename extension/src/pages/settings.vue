@@ -24,44 +24,19 @@
 import mainItem from '../components/mainitem.vue'
 
 export default {
-  name: 'homePage',
+  name: 'settingsPage',
   components: {
     mainItem
   },
   data () {
     return {
-      allOffersIcon: '../assets/icons/all-offers-24x24.png',
-      allOffersText: 'All Offers',
-      menus: [
-        {
-          title: 'Storage Providers',
-          icon: '../assets/icons/filecoin-64x64.png',
-          content: 'Check Your On-Chain Storage Providers',
-          path: '/storageproviders'
-        }, {
-          title: 'Investment Shares',
-          icon: '../assets/icons/investment-shares-64x64.png',
-          content: 'Deposit / Redeem / Withdraw Your Investment',
-          path: '/investmentshares'
-        }, {
-          title: 'Custody Contracts',
-          icon: '../assets/icons/custody-contracts-64x64.png',
-          content: 'Custody Storage Provider to Smart Contract',
-          path: '/custodycontracts'
-        }, {
-          title: 'Filecoin Accounts',
-          icon: '../assets/icons/accounts-64x64.png',
-          content: 'Add / Remove / Set Your Filecoin Accounts',
-          path: '/filecoinaccounts'
-        }
-      ]
     }
   },
   mounted () {
     this.$store.commit('setToolbarShowAddBtn', false)
-    this.$store.commit('setToolbarShowSettingBtn', true)
+    this.$store.commit('setToolbarShowSettingBtn', false)
     this.$store.commit('setShowFooterHelp', true)
-    this.$store.commit('setToolbarTitle', 'Home')
+    this.$store.commit('setToolbarTitle', 'Settings')
   },
   methods: {
     onMenuClick: function (menu) {

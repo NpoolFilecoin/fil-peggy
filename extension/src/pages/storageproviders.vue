@@ -15,6 +15,8 @@ export default {
   },
   mounted () {
     this.$store.commit('setToolbarShowAddBtn', true)
+    this.$store.commit('setToolbarShowSettingBtn', true)
+    this.$store.commit('setShowFooterHelp', false)
     this.$store.commit('setToolbarTitle', 'Storage Providers')
   },
   methods: {

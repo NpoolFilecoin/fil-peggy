@@ -129,7 +129,10 @@ export default {
   },
   mounted () {
     this.contract = this.$store.getters.contractById(this.$route.query.contractId)
+    
     this.$store.commit('setToolbarShowAddBtn', false)
+    this.$store.commit('setToolbarShowSettingBtn', true)
+    this.$store.commit('setShowFooterHelp', false)
     this.$store.commit('setToolbarTitle', this.contract.Title)
   },
   methods: {

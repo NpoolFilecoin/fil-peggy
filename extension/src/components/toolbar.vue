@@ -4,7 +4,7 @@
       <img class='clickable' :src='leftArrow' v-on:click='onBackClick'/>
       <div :class='[ "title", showAddBtn ? "title-with-add" : ""]'>{{ title }}</div>
       <img class='clickable' v-show='showAddBtn' :src='add' v-on:click='onAddClick' />
-      <img class='clickable' :src='setting' />
+      <img class='clickable' v-show='showSettingBtn' :src='setting' v-on:click='onSettingClick' />
     </div>
   </div>
 </template>
@@ -26,6 +26,9 @@ export default {
     showAddBtn () {
       return this.$store.getters.toolbarShowAddBtn
     },
+    showSettingBtn () {
+      return this.$store.getters.toolbarShowSettingBtn
+    },
     title () {
       return this.$store.getters.toolbarTitle
     }
@@ -36,6 +39,9 @@ export default {
     },
     onAddClick: function () {
       evbus.emit(GlobalEvents.ToolbarAddClick)
+    },
+    onSettingClick: function () {
+      this.$router.push('/settings')
     }
   }
 }

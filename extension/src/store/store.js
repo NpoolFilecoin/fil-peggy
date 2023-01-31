@@ -7,6 +7,7 @@ export const store = createStore({
     return {
       ToolbarTitle: 'Home',
       ToolbarShowAddBtn: false,
+      ToolbarShowSettingBtn: true,
       ShowFooterHelp: true,
       NetworkName: 'Hyperspace',
       NetworkRpcEndpoint: 'https://localhost:1234/v1',
@@ -73,6 +74,9 @@ export const store = createStore({
     setToolbarShowAddBtn (state, show) {
       state.ToolbarShowAddBtn = show
     },
+    setToolbarShowSettingBtn (state, show) {
+      state.ToolbarShowSettingBtn = show
+    },
     setToolbarTitle (state, title) {
       state.ToolbarTitle = title
     },
@@ -93,6 +97,9 @@ export const store = createStore({
   getters: {
     toolbarShowAddBtn (state) {
       return state.ToolbarShowAddBtn
+    },
+    toolbarShowSettingBtn (state) {
+      return state.ToolbarShowSettingBtn
     },
     toolbarTitle (state) {
       return state.ToolbarTitle
