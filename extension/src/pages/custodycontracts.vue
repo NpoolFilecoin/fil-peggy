@@ -131,6 +131,12 @@ export default {
         return
       }
 
+      let valid = this.validatePeggyContract(this.contractActorId, this.contractCodeId, this.contractRobustAddress)
+      if (!valid) {
+        // TODO: show some error
+        return
+      }
+
       this.adding = false
 
       let contracts = this.$store.getters.contracts
@@ -147,7 +153,19 @@ export default {
       this.adding = false
     },
     onVerifyClick: function () {
-      // TODO: call preset function here
+      if (this.contractActorId.length === 0 ||
+          this.contractCodeId.length === 0 ||
+          this.contractRobustAddress.length === 0) {
+        return
+      }
+      let valid = this.validatePeggyContract(this.contractActorId, this.contractCodeId, this.contractRobustAddress)
+      if (!valid) {
+        // TODO: show some error
+      }
+    },
+    validatePeggyContract: function (actorId, codeId, robustAddress) {
+      console.log('Verify', actorId, codeId, robustAddress)
+      return true
     }
   },
   computed: {
