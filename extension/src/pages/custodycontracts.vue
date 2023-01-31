@@ -66,7 +66,7 @@ import contractItem from '../components/contractitem.vue'
 import { GlobalEvents } from '../const/global_events'
 import { evbus } from '../evbus/event_bus'
 import { LocalStorageKeys } from '../const/store_keys'
-import { play } from '../web3/web3'
+import { checkPeggy } from '../web3/peggy'
 
 export default {
   name: 'custodyContracts',
@@ -133,23 +133,31 @@ export default {
         return
       }
 
-      let valid = this.validatePeggyContract(this.contractActorId, this.contractCodeId, this.contractRobustAddress)
-      if (!valid) {
-        // TODO: show some error
-        return
-      }
+      this.validatePeggyContract(
+        this.contractActorId,
+        this.contractCodeId,
+        this.contractRobustAddress,
+        (valid) => {
+          console.log(valid)
+          if (!valid) {
+            this.$store.commit('setShowGlobalTip', true)
+            this.$store.commit('setGlobalTipText', 'Invalid Peggy Contract')
+            return
+          }
 
-      this.adding = false
+          this.adding = false
 
-      let contracts = this.$store.getters.contracts
-      contracts.push({
-        CodeID: this.contractCodeId,
-        Title: this.contractActorId,
-        Subtitle: this.contractRobustAddress
-      })
-      this.$store.commit('setContracts', contracts)
+          let contracts = this.$store.getters.contracts
+          contracts.push({
+            CodeID: this.contractCodeId,
+            Title: this.contractActorId,
+            Subtitle: this.contractRobustAddress
+          })
+          this.$store.commit('setContracts', contracts)
 
-      localStorage.setItem(LocalStorageKeys.Contracts, JSON.stringify(contracts))
+          localStorage.setItem(LocalStorageKeys.Contracts, JSON.stringify(contracts))
+        }
+      )
     },
     onCancelClick: function () {
       this.adding = false
@@ -160,15 +168,31 @@ export default {
           this.contractRobustAddress.length === 0) {
         return
       }
-      let valid = this.validatePeggyContract(this.contractActorId, this.contractCodeId, this.contractRobustAddress)
-      if (!valid) {
-        // TODO: show some error
-      }
+      this.validatePeggyContract(
+        this.contractActorId,
+        this.contractCodeId,
+        this.contractRobustAddress,
+        (valid) => {
+          if (!valid) {
+            this.$store.commit('setShowGlobalTip', true)
+            this.$store.commit('setGlobalTipText', 'Invalid Peggy Contract')
+          }
+        }
+      )
     },
-    validatePeggyContract: function (actorId, codeId, robustAddress) {
-      console.log('Verify', actorId, codeId, robustAddress)
-      play()
-      return true
+    validatePeggyContract: function (actorId, codeId, robustAddress, handler) {
+      let network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+
+      checkPeggy(network.RpcEndpoint, robustAddress)
+        .then(() => {
+          handler(true)
+        })
+        .catch(() => {
+          handler(false)
+        })
     },
     onDeployClick: function () {
       window.open('https://remix.ethereum.org/')

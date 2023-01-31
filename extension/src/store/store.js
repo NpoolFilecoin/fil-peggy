@@ -72,7 +72,9 @@ export const store = createStore({
           Connected: true
         }
       ],
-      SelectedNetwork: 'Filecoin Hyperspace Testnet'
+      SelectedNetwork: 'Filecoin Hyperspace Testnet',
+      ShowGlobalTip: false,
+      GlobalTipText: ''
     }
   },
   mutations: {
@@ -118,6 +120,12 @@ export const store = createStore({
     },
     setSelectedNetwork (state, network) {
       state.SelectedNetwork = network.Title
+    },
+    setShowGlobalTip (state, show) {
+      state.ShowGlobalTip = show
+    },
+    setGlobalTipText (state, text) {
+      state.GlobalTipText = text
     }
   },
   getters: {
@@ -162,6 +170,12 @@ export const store = createStore({
         return undefined
       }
       return state.Networks.find(network => network.Title === state.SelectedNetwork)
+    },
+    showGlobalTip (state) {
+      return state.ShowGlobalTip
+    },
+    globalTipText (state) {
+      return state.GlobalTipText
     }
   }
 })

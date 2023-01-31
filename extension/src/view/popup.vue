@@ -2,6 +2,9 @@
   <div class="main_app">
     <headerComponent />
     <toolbarComponent />
+    <div v-if='showGlobalTip' class='global_tip'>
+      {{  tipText  }}
+    </div>
     <div class='main_body'>
       <RouterView />
     </div>
@@ -31,6 +34,23 @@ export default {
   computed: {
     showFooterHelp () {
       return this.$store.getters.showFooterHelp
+    },
+    showGlobalTip () {
+      return this.$store.getters.showGlobalTip
+    },
+    tipText () {
+      return this.$store.getters.globalTipText
+    }
+  },
+  watch: {
+    showGlobalTip (val) {
+      if (!val) {
+        return
+      }
+
+      setTimeout(() => {
+        this.$store.commit('setShowGlobalTip', false)
+      }, 3000)
     }
   }
 }
@@ -73,5 +93,16 @@ export default {
 
 .help .contact {
   color: #0D99FF;
+}
+
+.global_tip {
+  position: absolute;
+  top: 64px;
+  height: 48px;
+  background-color: #FFFBE5;
+  width: 100%;
+  line-height: 48px;
+  color: #535A61;
+  text-align: center;
 }
 </style>
