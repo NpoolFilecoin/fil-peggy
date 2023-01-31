@@ -68,7 +68,8 @@ export const store = createStore({
       Networks: [
         {
           Title: 'Filecoin Hyperspace Testnet',
-          RpcEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1'
+          RpcEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1',
+          Connected: true
         }
       ],
       SelectedNetwork: 'Filecoin Hyperspace Testnet'

@@ -16,7 +16,6 @@ export default {
   name: 'headerComponent',
   data () {
     return {
-      connected: true,
       logoPath: '../assets/logos/64x64.png',
       downArrow: '../assets/icons/down-arrow-16x16.png'
     }
@@ -24,6 +23,12 @@ export default {
   computed: {
     network () {
       return this.$store.getters.selectedNetwork
+    },
+    connected () {
+      if (!this.network) {
+        return false
+      }
+      return this.network.Connected
     }
   }
 }
