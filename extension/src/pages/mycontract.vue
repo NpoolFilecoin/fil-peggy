@@ -107,6 +107,7 @@
         </div>
       </div>
     </div>
+    <button class='btn' v-on:click='onDeleteClick'>Delete Contract</button>
   </div>
 </template>
 
@@ -117,6 +118,7 @@ import { CustodyTypes } from '../const/contract_types'
 import { durationDisplay } from '../utils/time_display'
 import { activityDir } from '../utils/activity_dir'
 import { ActivityDirs } from '../const/contract_types'
+import { LocalStorageKeys } from '../const/store_keys'
 
 export default {
   name: 'myContract',
@@ -163,6 +165,11 @@ export default {
       case ActivityDirs.Outcoming:
         return act.Target
       }
+    },
+    onDeleteClick: function () {
+      this.$store.commit('deleteContractById', this.contract.Title)
+      localStorage.setItem(LocalStorageKeys.Contracts, JSON.stringify(this.$store.getters.contracts))
+      this.$router.back()
     }
   },
   computed: {
@@ -358,5 +365,15 @@ export default {
 
 .activities .activity .content .target {
   color: #8A8A8A;
+}
+
+.btn {
+  width: calc(100% - 20px);
+  height: 24px;
+  border-radius: 8px;
+  border: 1px solid #0D99FF;
+  color: #535A61;
+  cursor: pointer;
+  margin: 16px 10px 16px 10px;
 }
 </style>

@@ -91,7 +91,7 @@ export default {
     this.$store.commit('setToolbarTitle', 'Custody Contracts')
 
     let contracts = localStorage.getItem(LocalStorageKeys.Contracts)
-    this.$store.commit('setContracts', contracts)
+    this.$store.commit('setContracts', JSON.parse(contracts))
 
     evbus.on(GlobalEvents.ToolbarAddClick, this.onAddClick)
   },
@@ -137,8 +137,6 @@ export default {
         Title: this.contractActorId,
         Subtitle: this.contractRobustAddress
       })
-
-      console.log(contracts)
 
       localStorage.setItem(LocalStorageKeys.Contracts, JSON.stringify(contracts))
     },

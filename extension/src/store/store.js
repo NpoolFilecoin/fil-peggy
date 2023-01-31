@@ -81,6 +81,13 @@ export const store = createStore({
     },
     setShowFooterHelp (state, show) {
       state.ShowFooterHelp = show
+    },
+    deleteContractById (state, id) {
+      let index = state.Contracts.findIndex(contract => contract.Title === id)
+      if (index < 0) {
+        return
+      }
+      state.Contracts.splice(index, 1)
     }
   },
   getters: {
