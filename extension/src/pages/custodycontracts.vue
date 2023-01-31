@@ -54,7 +54,7 @@
       <button class='btn' v-on:click='onCancelClick'>Cancel</button>
       <button class='btn' v-on:click='onVerifyClick'>Verify</button>
     </div>
-    <div class='tips'>
+    <div class='tips' v-on:click='onDeployClick'>
       <span>Don't have a Peggy Actor ? </span>
       <span class='deploy'>Deploy</span>
     </div>
@@ -168,6 +168,9 @@ export default {
       console.log('Verify', actorId, codeId, robustAddress)
       play()
       return true
+    },
+    onDeployClick: function () {
+      window.open('https://remix.ethereum.org/')
     }
   },
   computed: {
