@@ -13,6 +13,7 @@
 
 <script>
 import { LocalStorageKeys } from '../const/store_keys'
+import { checkAlive } from '../filapi/filapi'
 
 export default {
   name: 'mainItem',
@@ -28,13 +29,41 @@ export default {
   },
   data () {
     return {
+      checker: -1
     }
+  },
+  mounted () {
+    this.checkAlive()
+    this.checker = setInterval(() => {
+      this.checkAlive()
+    }, 60000)
+  },
+  unmounted () {
+    if (this.checker < 0) {
+      return
+    }
+    clearInterval(this.checker)
   },
   methods: {
     onDeleteClick: function () {
       this.$store.commit('deleteNetworkById', this.title)
       let networks = this.$store.getters.networks
       localStorage.setItem(LocalStorageKeys.Networks, JSON.stringify(networks))
+    },
+    checkAlive: function () {
+      let network = this.$store.getters.networkById(this.title)
+      if (!network) {
+        return
+      }
+      checkAlive(network.RpcEndpoint)
+        .then(() => {
+          network.Connected = true
+          this.$store.commit('updateNetwork', network)
+        })
+        .catch(() => {
+          network.Connected = false
+          this.$store.commit('updateNetwork', network)
+        })
     }
   }
 }

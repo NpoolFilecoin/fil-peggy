@@ -126,6 +126,18 @@ export const store = createStore({
     },
     setGlobalTipText (state, text) {
       state.GlobalTipText = text
+    },
+    updateNetwork (state, network) {
+      if (state.Networks === null || state.Networks === undefined) {
+        return
+      }
+
+      let index = state.Networks.findIndex(network => network.Title === network.Title)
+      if (index < 0) {
+        return
+      }
+
+      state.Networks[index] = network
     }
   },
   getters: {

@@ -12,12 +12,44 @@
 </template>
 
 <script>
+import { checkAlive } from '../filapi/filapi'
+
 export default {
   name: 'headerComponent',
   data () {
     return {
       logoPath: '../assets/logos/64x64.png',
-      downArrow: '../assets/icons/down-arrow-16x16.png'
+      downArrow: '../assets/icons/down-arrow-16x16.png',
+      checker: -1
+    }
+  },
+  mounted () {
+    this.checkAlive()
+    this.checker = setInterval(() => {
+      this.checkAlive()
+    }, 60000)
+  },
+  unmounted () {
+    if (this.checker < 0) {
+      return
+    }
+    clearInterval(this.checker)
+  },
+  methods: {
+    checkAlive: function () {
+      let network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+      checkAlive(network.RpcEndpoint)
+        .then(() => {
+          network.Connected = true
+          this.$store.commit('updateNetwork', network)
+        })
+        .catch(() => {
+          network.Connected = false
+          this.$store.commit('updateNetwork', network)
+        })
     }
   },
   computed: {
