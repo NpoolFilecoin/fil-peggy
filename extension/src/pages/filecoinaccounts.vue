@@ -136,6 +136,7 @@ export default {
 
 .page .account-item {
   border-bottom: 1px solid #D6D9DC;
+  width: 100%;
 }
 
 .popup {

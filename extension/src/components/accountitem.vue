@@ -65,6 +65,10 @@ export default {
 .item .content {
   width: 100%;
   margin-right: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: calc(100% - 58px);
 }
 
 .item .icon {
