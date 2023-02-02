@@ -47,6 +47,21 @@ export const importWallet = (hexSecKey) => {
   return privateKeyToAddress(hexSecKey)
 }
 
+export const stateAccountKey = (rpc, accountId) => {
+  let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+  return axios
+    .post(rpc, {
+      jsonrpc: '2.0',
+      method: 'Filecoin.StateAccountKey',
+      params: [accountId, []],
+      id: rpcId
+    }, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+}
+
 /*
 export const setOwner = (rpc, minerId, curOwnerPrivKey, newOwner) => {
   let web3 = new Web3(rpc);
