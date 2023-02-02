@@ -130,6 +130,9 @@ export default {
     let contracts = localStorage.getItem(LocalStorageKeys.Contracts)
     this.$store.commit('setContracts', JSON.parse(contracts))
 
+    let miners = localStorage.getItem(LocalStorageKeys.Miners)
+    this.$store.commit('setMiners', JSON.parse(miners))
+
     evbus.on(GlobalEvents.ToolbarAddClick, this.onAddClick)
   },
   unmounted () {
@@ -244,7 +247,38 @@ export default {
       window.open('https://remix.ethereum.org/')
     },
     onAddMinerClick: function () {
+      if (this.minerId.length === 0) {
+        return
+      }
+
+      let network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+
+      let miner = this.$store.getters.minerById(this.minerId)
+      if (miner) {
+        return
+      }
+
       this.addingMiner = false
+
+      this.validateMiner(this.minerId, (miner) => {
+        let miners = this.$store.getters.miners
+        if (miners === null || miners === undefined) {
+          miners = []
+        }
+
+        miner.MinerId = this.minerId
+
+        // TODO: get other miner info
+        miner.EstimateDailyReward = 123.0
+
+        miners.push(miner)
+
+        this.$store.commit('setMiners', miners)
+        localStorage.setItem(LocalStorageKeys.Miners, JSON.stringify(miners))
+      })
     },
     onCancelMinerClick: function () {
       this.addingMiner = false
@@ -259,12 +293,24 @@ export default {
         return
       }
 
-      minerInfo(network.RpcEndpoint, this.minerId)
+      this.validateMiner(this.minerId, () => {})
+    },
+    validateMiner: function (minerId, handler) {
+      let network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+
+      let self = this
+      this.$store.commit('setShowGlobalTip', true)
+
+      minerInfo(network.HttpEndpoint, minerId)
         .then((resp) => {
-          console.log(resp)
+          handler(resp.data.result)
+          self.$store.commit('setGlobalTipText', '<span style="color: green">Valid Miner<span>')
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(() => {
+          self.$store.commit('setGlobalTipText', '<span style="color: red">Invalid Miner<span>')
         })
     }
   },

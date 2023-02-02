@@ -26,7 +26,7 @@ export const minerInfo = (rpc, minerId) => {
     .post(rpc, {
       jsonrpc: '2.0',
       method: 'Filecoin.StateMinerInfo',
-      params: [minerId],
+      params: [minerId, []],
       id: rpcId
     }, {
       headers: {

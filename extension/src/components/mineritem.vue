@@ -22,7 +22,8 @@
         </div>
       </div>
 
-      <div v-if='!validCustodyContract' class='error'>Invalid custody contract</div>
+      <div v-if='!validCustodyContract' class='error'>Invalid contract of selected network</div>
+      <div v-if='!validMiner' class='error'>Invalid miner of selected network</div>
     </div>
     <img class='right-arrow' :src='rightArrow' />
   </div>
@@ -32,6 +33,7 @@
 import { CustodyTypes } from '../const/contract_types'
 import { powerDisplay } from '../utils/power_display'
 import { checkPeggy } from '../web3/peggy'
+import { minerInfo } from '../filapi/filapi'
 
 export default {
   name: 'minerItem',
@@ -63,7 +65,8 @@ export default {
     return {
       rightArrow: '../assets/icons/right-arrow-24x24.png',
       icon: '../assets/icons/miner-64x64.png',
-      validCustodyContract: true
+      validCustodyContract: true,
+      validMiner: true
     }
   },
   mounted () {
@@ -80,6 +83,12 @@ export default {
       .then()
       .catch(() => {
         this.validCustodyContract = false
+      })
+
+      minerInfo(network.RpcEndpoint, this.title)
+      .then()
+      .catch(() => {
+        this.validMiner = false
       })
   },
   computed: {

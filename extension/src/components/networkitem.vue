@@ -5,7 +5,12 @@
         <div class='indicator' />
         <div class='text'>{{ title }}</div>
       </div>
-      <div class='endpoint'>{{ endpoint }}</div>
+      <div v-if='rpcEndpoint' class='endpoint'>
+        {{ rpcEndpoint }}
+      </div>
+      <div v-if='httpEndpoint' class='endpoint'>
+        {{ httpEndpoint }}
+      </div>
     </div>
     <img class='delete' src='../assets/icons/delete-24x24.png' v-on:click='onDeleteClick' />
   </div>
@@ -22,9 +27,13 @@ export default {
       type: String,
       required: true
     },
-    endpoint: {
+    rpcEndpoint: {
       type: String,
-      required: true
+      required: false
+    },
+    httpEndpoint: {
+      type: String,
+      required: false
     }
   },
   data () {

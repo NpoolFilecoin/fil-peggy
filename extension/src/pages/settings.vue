@@ -9,7 +9,8 @@
         v-for='(network, index) in networks'
         :key='index'
         :title='network.Title'
-        :endpoint='network.RpcEndpoint'
+        :rpc-endpoint='network.RpcEndpoint'
+        :http-endpoint='network.HttpEndpoint'
       />
     </div>
   </div>
@@ -27,6 +28,12 @@
         <input type='text' placeholder='Input network rpc endpoint' v-model='networkRpcEndpoint'>
       </div>
     </div>
+    <div class='area'>
+      <div>Network Http Endpoint</div>
+      <div>
+        <input type='text' placeholder='Input network http endpoint' v-model='networkHttpEndpoint'>
+      </div>
+    </div>
     <div class='btns'>
       <button class='btn' v-on:click='onAddNetworkClick'>Add</button>
       <button class='btn' v-on:click='onCancelClick'>Cancel</button>
@@ -41,6 +48,7 @@
 <script>
 import networkItem from '../components/networkitem.vue'
 import { LocalStorageKeys } from '../const/store_keys'
+import { checkAlive } from '../filapi/filapi'
 
 export default {
   name: 'settingsPage',
@@ -48,7 +56,8 @@ export default {
     return {
       adding: false,
       networkName: '',
-      networkRpcEndpoint: ''
+      networkRpcEndpoint: '',
+      networkHttpEndpoint: ''
     }
   },
   components: {
@@ -68,34 +77,48 @@ export default {
       this.adding = true
     },
     onAddNetworkClick: function () {
-      this.adding = false
-
       let network = this.$store.getters.networkById(this.networkName)
       if (network) {
         return
       }
 
-      let networks = this.$store.getters.networks
-      if (networks === null || networks === undefined) {
-        networks = []
-      }
+      this.adding = false
 
-      networks.push({
-        Title: this.networkName,
-        RpcEndpoint: this.networkRpcEndpoint
+      this.checkAlive(this.networkRpcEndpoint, () => {
+        let networks = this.$store.getters.networks
+        if (networks === null || networks === undefined) {
+          networks = []
+        }
+
+        networks.push({
+          Title: this.networkName,
+          RpcEndpoint: this.networkRpcEndpoint,
+          HttpEndpoint: this.networkHttpEndpoint
+        })
+        this.$store.commit('setNetworks', networks)
+
+        localStorage.setItem(LocalStorageKeys.Networks, JSON.stringify(networks))
       })
-      this.$store.commit('setNetworks', networks)
-
-      localStorage.setItem(LocalStorageKeys.Networks, JSON.stringify(networks))
     },
     onCancelClick: function () {
       this.adding = false
     },
     onCheckClick: function () {
-      this.adding = false
+      this.$store.commit('setShowGlobalTip', true)
+      this.checkAlive(this.networkRpcEndpoint, () => {})
     },
     onFindClick: function () {
       window.open('https://chainlist.org/?testnets=true')
+    },
+    checkAlive: function (rpc, handler) {
+      checkAlive(rpc)
+        .then(() => {
+          this.$store.commit('setGlobalTipText', '<span style="color: green">Valid Network Endpoint<span>')
+          handler()
+        })
+        .catch(() => {
+          this.$store.commit('setGlobalTipText', '<span style="color: red">Invalid Peggy Contract<span>')
+        })
     }
   },
   computed: {

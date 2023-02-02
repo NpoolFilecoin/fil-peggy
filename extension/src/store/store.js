@@ -193,6 +193,12 @@ export const store = createStore({
       }
       return state.Contracts.find(contract => contract.Subtitle === addr)
     },
+    minerById: (state) => (id) => {
+      if (state.Miners === null || state.Miners === undefined) {
+        return undefined
+      }
+      return state.Miners.find(miner => miner.MinerId === id)
+    },
     networkRawPowerBytes (state) {
       return state.NetworkRawPowerBytes
     },
