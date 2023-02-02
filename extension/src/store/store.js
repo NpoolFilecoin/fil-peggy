@@ -103,8 +103,8 @@ export const store = createStore({
           ]
         }
       ],
-      NetworkRawPowerBytes: 124597984564321321323131232n,
-      NetworkAdjPowerBytes: 1204597984564321321323131232n,
+      NetworkRawPowerBytes: 1245321321323131232n,
+      NetworkAdjPowerBytes: 12045979845623131232n,
       Networks: [
         {
           Title: 'Filecoin Hyperspace Testnet',

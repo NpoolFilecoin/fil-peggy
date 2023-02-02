@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class='[custoding ? "blur" : ""]'>
     <div class='abrev'>
       <div class='abrev1'>{{ rawPower }}/{{ adjPower }}</div>
       <div class='abrev2'>
@@ -101,6 +101,39 @@
     </div>
     <button class='btn' v-on:click='onDeleteClick'>Delete Miner</button>
   </div>
+  <div v-if='custoding' class='popup'>
+    <div class='title'>Custody My Miner</div>
+    <div class='area'>
+      <div>Miner ID</div>
+      <div>
+        <input type='text' v-model='miner.MinerId' disabled>
+      </div>
+    </div>
+    <div class='area'>
+      <div>Owner Contract Address</div>
+      <select v-model='contractAddress'>
+        <option
+          v-for='(contract, index) in contracts'
+          :key='index'
+          :value='contract.Subtitle'
+        >
+          <div class='line'>
+            {{ contract.Subtitle }}
+          </div>
+          <div class='line'>
+            {{ contract.CustodyType }}/{{ contract.Value }}%
+          </div>
+        </option>
+      </select>
+    </div>
+    <div class='btns'>
+      <button class='btn' v-on:click='onCustodyClick'>Custody</button>
+      <button class='btn' v-on:click='onCancelClick'>Cancel</button>
+    </div>
+    <div class='tips' v-on:click='onFindClick'>
+      <span class='find'>Find offers through peggy website</span>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -117,7 +150,9 @@ export default {
   data () {
     return {
       miner: {},
-      contract: undefined
+      contract: undefined,
+      custoding: false,
+      contractAddress: ''
     }
   },
   mounted () {
@@ -170,6 +205,22 @@ export default {
       this.$store.commit('deleteMinerById', this.miner.MinerId)
       localStorage.setItem(LocalStorageKeys.Miners, JSON.stringify(this.$store.getters.miners))
       this.$router.back()
+    },
+    onCustodyMinerClick: function () {
+      this.custoding = true
+    },
+    onCustodyClick: function () {
+      if (this.contractAddress.length === 0) {
+        return
+      }
+
+      this.custoding = false
+    },
+    onCancelClick: function () {
+      this.custoding = false
+    },
+    onFindClick: function () {
+      // TODO: goto peggy website
     }
   },
   computed: {
@@ -227,6 +278,9 @@ export default {
     },
     balance () {
       return amountDisplay(this.miner.BalanceAttoFilAmount)
+    },
+    contracts () {
+      return this.$store.getters.contracts
     }
   }
 }
@@ -384,5 +438,80 @@ export default {
   color: #535A61;
   cursor: pointer;
   margin: 16px 10px 16px 10px;
+}
+
+.blur {
+  filter: blur(8px);
+  background-color: rgba(83, 90, 97, 0.2);
+}
+
+.popup {
+  position: absolute;
+  margin: 16px;
+  padding: 16px;
+  background-color: white;
+  border-radius: 8px;
+  top: 110px;
+  min-height: 120px;
+  width: 296px;
+  color: #535A61;
+}
+
+.popup .title {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.popup .area {
+  margin: 10px 0 0 0;
+  width: 100%;
+}
+
+.popup input {
+  border: none;
+  border-bottom: 1px solid #D6D9DC;
+  width: 100%;
+}
+
+.popup input:focus {
+  outline: 1px solid #0D99FF;
+}
+
+.popup .btns {
+  display: flex;
+  margin-top: 24px;
+}
+
+.popup .btns .btn {
+  width: 60px;
+  height: 24px;
+  border-radius: 8px;
+  margin: 0 8px 0 0;
+  border: 1px solid #0D99FF;
+  color: #535A61;
+  cursor: pointer;
+}
+
+.popup .area select {
+  width: 100%;
+}
+
+.popup .area select option {
+  width: 100%;
+}
+
+.popup .area select option .line {
+  width: 100%;
+}
+
+.tips {
+  color: #535A61;
+  cursor: pointer;
+  margin: 8px 0 16px 0;
+}
+
+.tips .find {
+  color: #0D99FF;
 }
 </style>
