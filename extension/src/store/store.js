@@ -69,19 +69,38 @@ export const store = createStore({
           RawPowerBytes: 179895522222356n,
           AdjPowerBytes: 12456789465642323n,
           EstimateDailyReward: 245.9,
-          CustodyContract: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq'
-        }, {
-          MinerId: 'f07824',
-          RawPowerBytes: 179895522222356n,
-          AdjPowerBytes: 12456789465642323n,
-          EstimateDailyReward: 245.9,
-          CustodyContract: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq'
-        }, {
-          MinerId: 'f07824',
-          RawPowerBytes: 179895522222356n,
-          AdjPowerBytes: 12456789465642323n,
-          EstimateDailyReward: 245.9,
-          CustodyContract: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq'
+          CustodyContract: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+          InitialRawPowerBytes: 179895522222356n,
+          InitialAdjPowerBytes: 12456789465642323n,
+          TotalRewardAttoFilAmount: 832571312649679456n,
+          TotalSlashPenaltyAttoFilAmount: 123456546546n,
+          AvgPowerLostIntervalSeconds: 1234567896544,
+          AvgPowerLostRecoverSeconds: 1245,
+          LastMonthRawPowerBytesIncrement: 454132432132n,
+          LastMonthAdjPowerBytesIncrement: 454132432132n,
+          LastHalfYearRawPowerBytesIncrement: 12465789453413n,
+          LastHalfYearAdjPowerBytesIncrement: 12465789453413n,
+          LastYearPowerRawBytesIncrement: 1234657987n,
+          LastYearPowerAdjBytesIncrement: 1234657987n,
+          BalanceAttoFilAmount: 356823546458798n,
+          Activities: [
+            {
+              Activity: ActivityTypes.Withdraw,
+              Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+              Timestamp: 1256456465,
+              AttoFilAmount: 123456456452265613221n
+            }, {
+              Activity: ActivityTypes.Deposit,
+              Target: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq',
+              Timestamp: 1236456465,
+              AttoFilAmount: 1234564564523454879n
+            }, {
+              Activity: ActivityTypes.WithdrawMinerBalance,
+              Target: 'f0178352',
+              Timestamp: 1206456465,
+              AttoFilAmount: 12345645640265132456n
+            }
+          ]
         }
       ],
       NetworkRawPowerBytes: 124597984564321321323131232n,
@@ -128,6 +147,17 @@ export const store = createStore({
         return
       }
       state.Contracts.splice(index, 1)
+    },
+    deleteMinerById (state, id) {
+      if (state.Miners === null || state.Miners === undefined) {
+        return
+      }
+
+      let index = state.Miners.findIndex(miner => miner.MinerId === id)
+      if (index < 0) {
+        return
+      }
+      state.Miners.splice(index, 1)
     },
     setNetworks (state, networks) {
       state.Networks = networks

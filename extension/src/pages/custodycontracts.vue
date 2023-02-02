@@ -157,7 +157,15 @@ export default {
       })
     },
     onMinerClick: function (miner) {
-      console.log(miner)
+      if (this.addingMiner) {
+        return
+      }
+      this.$router.push({
+        path: '/myminer',
+        query: {
+          minerId: miner.MinerId
+        }
+      })
     },
     onAddClick: function () {
       switch (this.curTab) {

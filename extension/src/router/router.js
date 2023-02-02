@@ -5,6 +5,7 @@ import custodyContractsPage from '../pages/custodycontracts.vue'
 import investmentSharesPage from '../pages/investmentshares.vue'
 import filecoinAccountsPage from '../pages/filecoinaccounts.vue'
 import myContractPage from '../pages/mycontract.vue'
+import myMinerPage from '../pages/myminer.vue'
 import settingsPage from '../pages/settings.vue'
 
 const routes = [
@@ -14,6 +15,7 @@ const routes = [
   { path: '/investmentshares', component: investmentSharesPage },
   { path: '/filecoinaccounts', component: filecoinAccountsPage },
   { path: '/mycontract', component: myContractPage },
+  { path: '/myminer', component: myMinerPage },
   { path: '/settings', component: settingsPage }
 ]
 
