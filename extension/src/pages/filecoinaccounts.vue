@@ -49,6 +49,7 @@ import { GlobalEvents } from '../const/global_events'
 import accountItem from '../components/accountitem.vue'
 import { LocalStorageKeys } from '../const/store_keys'
 import { evbus } from '../evbus/event_bus'
+import { playFil } from '../filapi/filapi'
 
 export default {
   name: 'filecoinAccounts',
@@ -79,6 +80,7 @@ export default {
       this.adding = true
     },
     onImportAddressClick: function () {
+      playFil()
       this.adding = false
     },
     onCancelClick: function () {

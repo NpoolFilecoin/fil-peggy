@@ -1,4 +1,5 @@
 import BN from 'bn.js'
+import { Buffer } from 'buffer'
 
 export function serializeBigNum(gasprice) {
   if (gasprice == '0') {

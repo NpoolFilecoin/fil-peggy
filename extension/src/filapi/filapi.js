@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Web3 from 'web3';
 import { serializeBigNum } from './sign.js';
+import { generateAddress, KeyTypes } from './wallet.js';
 
 export const checkAlive = (rpc) => {
   return new Promise((resolve, reject) => {
@@ -18,6 +19,9 @@ export const checkAlive = (rpc) => {
 export const playFil = () => {
   let bn = serializeBigNum(100000)
   console.log(bn)
+
+  generateAddress(KeyTypes.Bls)
+  generateAddress(KeyTypes.Secp256k1)
 }
 
 export const minerInfo = (rpc, minerId) => {

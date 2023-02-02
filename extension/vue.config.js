@@ -54,7 +54,7 @@ module.exports = {
       filename: `[name].js`,
       chunkFilename: `[name].js`
     },
-    devtool: isDevMode ? 'inline-source-map' : false
+    devtool: isDevMode ? 'inline-source-map' : false,
   },
   css: {
     extract: false // Make sure the css is the same
