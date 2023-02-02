@@ -21,6 +21,8 @@
           <div class='line'>{{ estimateDailyReward }} FIL</div>
         </div>
       </div>
+
+      <div v-if='!validCustodyContract' class='error'>Invalid custody contract</div>
     </div>
     <img class='right-arrow' :src='rightArrow' />
   </div>
@@ -29,6 +31,7 @@
 <script>
 import { CustodyTypes } from '../const/contract_types'
 import { powerDisplay } from '../utils/power_display'
+import { checkPeggy } from '../web3/peggy'
 
 export default {
   name: 'minerItem',
@@ -59,8 +62,25 @@ export default {
   data () {
     return {
       rightArrow: '../assets/icons/right-arrow-24x24.png',
-      icon: '../assets/icons/miner-64x64.png'
+      icon: '../assets/icons/miner-64x64.png',
+      validCustodyContract: true
     }
+  },
+  mounted () {
+    if (!this.subtitle) {
+      return
+    }
+
+    let network = this.$store.getters.selectedNetwork
+    if (!network) {
+      return
+    }
+
+    checkPeggy(network.RpcEndpoint, this.subtitle)
+      .then()
+      .catch(() => {
+        this.validCustodyContract = false
+      })
   },
   computed: {
     contract () {
@@ -166,5 +186,10 @@ export default {
 
 .item .inner .content .miner {
   color: #0D99FF;
+}
+
+.item .inner .error {
+  color: red;
+  margin-top: 10px;
 }
 </style>
