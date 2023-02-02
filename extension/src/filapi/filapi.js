@@ -43,6 +43,10 @@ export const minerInfo = (rpc, minerId) => {
     })
 }
 
+export const importWallet = (hexSecKey) => {
+  return privateKeyToAddress(hexSecKey)
+}
+
 /*
 export const setOwner = (rpc, minerId, curOwnerPrivKey, newOwner) => {
   let web3 = new Web3(rpc);

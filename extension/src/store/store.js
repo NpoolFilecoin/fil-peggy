@@ -110,13 +110,15 @@ export const store = createStore({
           Name: 'Filecoin Hyperspace Test Account',
           Balance: 2574561321313212312312321n,
           UsedFor: AccountUsedFors.FundsAccount,
-          Warm: true
+          Warm: true,
+          PriavateKey: ''
         }, {
           Address: 't1213464564565safdsaasfd46',
           Name: 'Filecoin Hyperspace Test Account1',
           Balance: 2574561321313212312312321n,
           UsedFor: AccountUsedFors.InitialOwner,
-          Warm: true
+          Warm: true,
+          PriavateKey: ''
         }, {
           Address: 't1213464564565safdsaasfd46',
           Name: 'F07824 Worker',
@@ -292,6 +294,12 @@ export const store = createStore({
     },
     filecoinAccounts (state) {
       return state.FilecoinAccounts
+    },
+    filecoinAccountByAddress: (state) => (id) => {
+      if (state.FilecoinAccounts === null || state.FilecoinAccounts === undefined) {
+        return undefined
+      }
+      return state.FilecoinAccounts.find(account => account.Address === id)
     }
   }
 })

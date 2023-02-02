@@ -14,11 +14,11 @@
     </div>
   </div>
   <div v-if='adding' class='popup'>
-    <div class='title'>Import Filecoin Address</div>
+    <div class='title'>Import Filecoin Account</div>
     <div class='area'>
       <div>Private Key</div>
       <div>
-        <input type='text' placeholder='Input private key' v-model='privateKey'>
+        <input type='text' placeholder='Input private key' v-model='privateKey' v-on:blur='onPrivateKeyEntered'>
       </div>
     </div>
     <div class='area'>
@@ -38,7 +38,7 @@
       <button class='btn' v-on:click='onCancelClick'>Cancel</button>
     </div>
     <div class='tips' v-on:click='onCreateClick'>
-      <span>Don't have address ? </span>
+      <span>Don't have account ? </span>
       <span class='create'>Create</span>
     </div>
   </div>
@@ -49,7 +49,7 @@ import { GlobalEvents } from '../const/global_events'
 import accountItem from '../components/accountitem.vue'
 import { LocalStorageKeys } from '../const/store_keys'
 import { evbus } from '../evbus/event_bus'
-import { playFil } from '../filapi/filapi'
+import { importWallet } from '../filapi/filapi'
 
 export default {
   name: 'filecoinAccounts',
@@ -80,14 +80,40 @@ export default {
       this.adding = true
     },
     onImportAddressClick: function () {
-      playFil()
+      if (this.address.length === 0) {
+        return
+      }
+
+      let address = this.$store.getters.filecoinAccountByAddress(this.address)
+      if (address) {
+        return
+      }
+
       this.adding = false
+
+      let accounts = this.$store.getters.filecoinAccounts
+      if (accounts === null || accounts === undefined) {
+        accounts = []
+      }
+      accounts.push({
+        Address: this.address,
+        Name: this.addressName,
+        Warm: this.privateKey.length > 0,
+        PrivateKey: this.privateKey
+      })
+
+      this.$store.commit('setFilecoinAccounts', accounts)
+      localStorage.setItem(LocalStorageKeys.FilecoinAccounts, JSON.stringify(accounts))
     },
     onCancelClick: function () {
       this.adding = false
     },
     onCreateClick: function () {
       this.adding = false
+    },
+    onPrivateKeyEntered: function () {
+      let address = importWallet(this.privateKey)
+      this.address = address.Address
     }
   },
   computed: {
