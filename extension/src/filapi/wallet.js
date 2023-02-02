@@ -8,10 +8,8 @@ export const KeyTypes = {
   Secp256k1: 'secp256k1'
 }
 
-const generateBlsAddress = () => {
-  /* const secKey = bls.SecretKey.fromKeygen()
-  const pubKey = secKey.toPublicKey()
-  console.log(secKey, pubKey) */
+const generateBlsAddress = async () => {
+  // TODO: support bls address
 }
 
 const generateSecp256k1Address = () => {
@@ -47,8 +45,6 @@ const generateSecp256k1Address = () => {
       }
     ).toLowerCase()
 
-  console.log(upkb, secKey, address)
-
   return {
     PublicKey: upkb,
     PrivateKey: secKey,
@@ -57,11 +53,24 @@ const generateSecp256k1Address = () => {
 }
 
 export const generateAddress = (keyType) => {
+  let address
   switch (keyType) {
   case KeyTypes.Bls:
-    return generateBlsAddress()
+    address = generateBlsAddress()
+    break
   case KeyTypes.Secp256k1:
   default:
-    return generateSecp256k1Address()
+    address = generateSecp256k1Address()
+    break
   }
+
+  let ki = {
+    Type: keyType,
+    PrivateKey: Array.from(address.PrivateKey)
+  }
+
+  let str = JSON.stringify(ki)
+  let hex = Buffer.from(str).toString('hex')
+
+  console.log(hex, str, address.Address, address.PrivateKey)
 }

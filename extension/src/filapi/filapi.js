@@ -20,7 +20,6 @@ export const playFil = () => {
   let bn = serializeBigNum(100000)
   console.log(bn)
 
-  generateAddress(KeyTypes.Bls)
   generateAddress(KeyTypes.Secp256k1)
 }
 
