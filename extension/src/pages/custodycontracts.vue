@@ -1,7 +1,7 @@
 <template>
-  <div :class='["page", adding ? "blur" : ""]'>
+  <div v-if='curTab === "contracts"' :class='["page", addingContract ? "blur" : ""]'>
     <div
-      class='contract-item'
+      class='inner-item'
       v-for='(contract, index) in contracts'
       :key='index'
     >
@@ -19,17 +19,33 @@
       />
     </div>
   </div>
+  <div v-if='curTab === "miners"' :class='["page", addingMiner ? "blur" : ""]'>
+    <div
+      class='inner-item'
+      v-for='(miner, index) in miners'
+      :key='index'
+    >
+      <minerItem
+        :title='miner.MinerId'
+        :subtitle='miner.CustodyContract'
+        :raw-power-bytes='miner.RawPowerBytes'
+        :adj-power-bytes='miner.AdjPowerBytes'
+        :estimate-daily-reward='miner.EstimateDailyReward'
+        v-on:click='() => onMinerClick(miner)'
+      />
+    </div>
+  </div>
   <div class='tabs'>
-    <div :class='["tab", curTab == "contracts" ? "tab-selected" : ""]' v-on:click='onContractsClick'>
+    <div :class='["tab", curTab === "contracts" ? "tab-selected" : ""]' v-on:click='onContractsClick'>
       <img class='icon' :src='contractsIcon' />
       <div class='text'>{{ contractsText }}</div>
     </div>
-    <div :class='["tab", curTab == "miners" ? "tab-selected" : ""]' v-on:click='onMinersClick'>
+    <div :class='["tab", curTab === "miners" ? "tab-selected" : ""]' v-on:click='onMinersClick'>
       <img class='icon' :src='minersIcon' />
       <div class='text'>{{ minersText }}</div>
     </div>
   </div>
-  <div v-if='adding' class='popup'>
+  <div v-if='addingContract' class='popup'>
     <div class='title'>Add My Contract</div>
     <div class='area'>
       <div>Code ID</div>
@@ -51,7 +67,7 @@
     </div>
     <div class='btns'>
       <button class='btn' v-on:click='onAddContractClick'>Add</button>
-      <button class='btn' v-on:click='onCancelClick'>Cancel</button>
+      <button class='btn' v-on:click='onCancelContractClick'>Cancel</button>
       <button class='btn' v-on:click='onVerifyClick'>Verify</button>
     </div>
     <div class='tips' v-on:click='onDeployClick'>
@@ -63,6 +79,7 @@
 
 <script>
 import contractItem from '../components/contractitem.vue'
+import minerItem from '../components/mineritem.vue'
 import { GlobalEvents } from '../const/global_events'
 import { evbus } from '../evbus/event_bus'
 import { LocalStorageKeys } from '../const/store_keys'
@@ -71,7 +88,8 @@ import { checkPeggy } from '../web3/peggy'
 export default {
   name: 'custodyContracts',
   components: {
-    contractItem
+    contractItem,
+    minerItem
   },
   data () {
     return {
@@ -80,7 +98,8 @@ export default {
       minersIcon: '../assets/icons/miners-40x40.png',
       minersText: 'My Miners',
       curTab: 'contracts',
-      adding: false,
+      addingContract: false,
+      addingMiner: false,
       contractCodeId: '',
       contractActorId: '',
       contractRobustAddress: ''
@@ -108,7 +127,7 @@ export default {
       this.curTab = 'miners'
     },
     onContractClick: function (contract) {
-      if (this.adding) {
+      if (this.addingContract) {
         return
       }
       this.$router.push({
@@ -118,8 +137,18 @@ export default {
         }
       })
     },
+    onMinerClick: function (miner) {
+      console.log(miner)
+    },
     onAddClick: function () {
-      this.adding = true
+      switch (this.curTab) {
+      case 'contracts':
+        this.addingContract = true
+        break
+      case 'miners':
+        this.addingMiner = true
+        break
+      }
     },
     onAddContractClick: function () {
       if (this.contractActorId.length === 0 ||
@@ -144,7 +173,7 @@ export default {
             return
           }
 
-          this.adding = false
+          this.addingContract = false
 
           let contracts = this.$store.getters.contracts
           contracts.push({
@@ -158,8 +187,8 @@ export default {
         }
       )
     },
-    onCancelClick: function () {
-      this.adding = false
+    onCancelContractClick: function () {
+      this.addingContract = false
     },
     onVerifyClick: function () {
       if (this.contractActorId.length === 0 ||
@@ -202,6 +231,9 @@ export default {
   computed: {
     contracts () {
       return this.$store.getters.contracts
+    },
+    miners () {
+      return this.$store.getters.miners
     }
   }
 }
@@ -213,7 +245,7 @@ export default {
   height: 100%;
 }
 
-.page .contract-item {
+.page .inner-item {
   border-bottom: 1px solid #D6D9DC;
 }
 

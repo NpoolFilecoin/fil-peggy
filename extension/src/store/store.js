@@ -63,6 +63,27 @@ export const store = createStore({
           ]
         }
       ],
+      Miners: [
+        {
+          MinerId: 'f07824',
+          RawPowerBytes: 179895522222356n,
+          AdjPowerBytes: 12456789465642323n,
+          EstimateDailyReward: 245.9,
+          CustodyContract: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq'
+        }, {
+          MinerId: 'f07824',
+          RawPowerBytes: 179895522222356n,
+          AdjPowerBytes: 12456789465642323n,
+          EstimateDailyReward: 245.9,
+          CustodyContract: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq'
+        }, {
+          MinerId: 'f07824',
+          RawPowerBytes: 179895522222356n,
+          AdjPowerBytes: 12456789465642323n,
+          EstimateDailyReward: 245.9,
+          CustodyContract: 't410fafsypcszjsrfkm4k36snjbcj62jef24pn7ysykq'
+        }
+      ],
       NetworkRawPowerBytes: 124597984564321321323131232n,
       NetworkAdjPowerBytes: 1204597984564321321323131232n,
       Networks: [
@@ -89,6 +110,9 @@ export const store = createStore({
     },
     setContracts (state, contracts) {
       state.Contracts = contracts
+    },
+    setMiners (state, miners) {
+      state.Miners = miners
     },
     setShowFooterHelp (state, show) {
       state.ShowFooterHelp = show
@@ -153,11 +177,20 @@ export const store = createStore({
     contracts (state) {
       return state.Contracts
     },
+    miners (state) {
+      return state.Miners
+    },
     contractById: (state) => (id) => {
       if (state.Contracts === null || state.Contracts === undefined) {
         return undefined
       }
       return state.Contracts.find(contract => contract.Title === id)
+    },
+    contractByAddress: (state) => (addr) => {
+      if (state.Contracts === null || state.Contracts === undefined) {
+        return undefined
+      }
+      return state.Contracts.find(contract => contract.Subtitle === addr)
     },
     networkRawPowerBytes (state) {
       return state.NetworkRawPowerBytes
