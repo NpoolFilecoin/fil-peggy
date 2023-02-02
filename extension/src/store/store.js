@@ -90,6 +90,7 @@ export const store = createStore({
         {
           Title: 'Filecoin Hyperspace Testnet',
           RpcEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1',
+          HttpEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1',
           Connected: true
         }
       ],

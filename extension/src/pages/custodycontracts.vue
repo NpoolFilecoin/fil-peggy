@@ -68,11 +68,25 @@
     <div class='btns'>
       <button class='btn' v-on:click='onAddContractClick'>Add</button>
       <button class='btn' v-on:click='onCancelContractClick'>Cancel</button>
-      <button class='btn' v-on:click='onVerifyClick'>Verify</button>
+      <button class='btn' v-on:click='onVerifyContractClick'>Verify</button>
     </div>
     <div class='tips' v-on:click='onDeployClick'>
       <span>Don't have a Peggy Actor ? </span>
       <span class='deploy'>Deploy</span>
+    </div>
+  </div>
+  <div v-if='addingMiner' class='popup'>
+    <div class='title'>Add My Miner</div>
+    <div class='area'>
+      <div>Miner ID</div>
+      <div>
+        <input type='text' placeholder='Input miner id of contract' v-model='minerId'>
+      </div>
+    </div>
+    <div class='btns'>
+      <button class='btn' v-on:click='onAddMinerClick'>Add</button>
+      <button class='btn' v-on:click='onCancelMinerClick'>Cancel</button>
+      <button class='btn' v-on:click='onVerifyMinerClick'>Verify</button>
     </div>
   </div>
 </template>
@@ -84,6 +98,7 @@ import { GlobalEvents } from '../const/global_events'
 import { evbus } from '../evbus/event_bus'
 import { LocalStorageKeys } from '../const/store_keys'
 import { checkPeggy } from '../web3/peggy'
+import { minerInfo } from '../filapi/filapi'
 
 export default {
   name: 'custodyContracts',
@@ -102,7 +117,8 @@ export default {
       addingMiner: false,
       contractCodeId: '',
       contractActorId: '',
-      contractRobustAddress: ''
+      contractRobustAddress: '',
+      minerId: ''
     }
   },
   mounted () {
@@ -190,7 +206,7 @@ export default {
     onCancelContractClick: function () {
       this.addingContract = false
     },
-    onVerifyClick: function () {
+    onVerifyContractClick: function () {
       if (this.contractActorId.length === 0 ||
           this.contractCodeId.length === 0 ||
           this.contractRobustAddress.length === 0) {
@@ -226,6 +242,30 @@ export default {
     },
     onDeployClick: function () {
       window.open('https://remix.ethereum.org/')
+    },
+    onAddMinerClick: function () {
+      this.addingMiner = false
+    },
+    onCancelMinerClick: function () {
+      this.addingMiner = false
+    },
+    onVerifyMinerClick: function () {
+      if (this.minerId.length === 0) {
+        return
+      }
+
+      let network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+
+      minerInfo(network.RpcEndpoint, this.minerId)
+        .then((resp) => {
+          console.log(resp)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   },
   computed: {

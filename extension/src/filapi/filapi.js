@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Web3 from 'web3';
 import { serializeBigNum } from './sign.js';
 
@@ -17,6 +18,21 @@ export const checkAlive = (rpc) => {
 export const playFil = () => {
   let bn = serializeBigNum(100000)
   console.log(bn)
+}
+
+export const minerInfo = (rpc, minerId) => {
+  let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+  return axios
+    .post(rpc, {
+      jsonrpc: '2.0',
+      method: 'Filecoin.StateMinerInfo',
+      params: [minerId],
+      id: rpcId
+    }, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
 }
 
 /*
