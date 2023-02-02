@@ -12,14 +12,7 @@ const generateBlsAddress = async () => {
   // TODO: support bls address
 }
 
-const generateSecp256k1Address = () => {
-  let secKey = new Uint8Array()
-  do {
-    secKey = new Uint8Array(32)
-    for (let i = 0; i < 32; i++) {
-      secKey[i] = Math.floor(Math.random() * 255)
-    }
-  } while (!secp256k1.privateKeyVerify(secKey))
+const generateSecp256k1Address = (secKey) => {
   const pubKey = secp256k1.publicKeyCreate(secKey)
   
   const upk = new Uint8Array(65)
@@ -47,7 +40,7 @@ const generateSecp256k1Address = () => {
 
   return {
     PublicKey: upkb,
-    PrivateKey: secKey,
+    PrivateKey: Buffer.from(secKey).toString('base64'),
     Address: address
   }
 }
@@ -59,18 +52,47 @@ export const generateAddress = (keyType) => {
     address = generateBlsAddress()
     break
   case KeyTypes.Secp256k1:
-  default:
-    address = generateSecp256k1Address()
-    break
+  default: {
+      let secKey = new Uint8Array()
+      do {
+        secKey = new Uint8Array(32)
+        for (let i = 0; i < 32; i++) {
+          secKey[i] = Math.floor(Math.random() * 255)
+        }
+      } while (!secp256k1.privateKeyVerify(secKey))
+      address = generateSecp256k1Address(secKey)
+      break
+    }
   }
 
   let ki = {
     Type: keyType,
-    PrivateKey: Array.from(address.PrivateKey)
+    PrivateKey: address.PrivateKey
   }
 
   let str = JSON.stringify(ki)
-  let hex = Buffer.from(str).toString('hex')
+  address.HexPrivateKey = Buffer.from(str).toString('hex')
 
-  console.log(hex, str, address.Address, address.PrivateKey)
+  return address
+}
+
+export const privateKeyToAddress = (hexSecKey) => {
+  const ki = JSON.parse(Buffer.from(hexSecKey, 'hex').toString())
+  const secKey = Buffer.from(ki.PrivateKey, 'base64')
+  
+  let address
+  switch (ki.Type) {
+  case KeyTypes.Bls:
+    address = generateBlsAddress()
+    break
+  case KeyTypes.Secp256k1:
+  default: {
+      address = generateSecp256k1Address(secKey)
+      break
+    }
+  }
+
+  address.HexPrivateKey = hexSecKey
+
+  return address
 }
