@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 
 import { CustodyTypes, ActivityTypes } from '../const/contract_types'
+import { AccountUsedFors } from '../const/account_used_for'
 
 export const store = createStore({
   state () {
@@ -103,6 +104,26 @@ export const store = createStore({
           ]
         }
       ],
+      FilecoinAccounts: [
+        {
+          Address: 't121346456456546',
+          Name: 'Filecoin Hyperspace Test Account',
+          Balance: 2574561321313212312312321n,
+          UsedFor: AccountUsedFors.FundsAccount,
+          Warm: true
+        }, {
+          Address: 't1213464564565safdsaasfd46',
+          Name: 'Filecoin Hyperspace Test Account1',
+          Balance: 2574561321313212312312321n,
+          UsedFor: AccountUsedFors.InitialOwner,
+          Warm: true
+        }, {
+          Address: 't1213464564565safdsaasfd46',
+          Name: 'F07824 Worker',
+          Balance: 2574561321313212312312321n,
+          Warm: false
+        }
+      ],
       NetworkRawPowerBytes: 1245321321323131232n,
       NetworkAdjPowerBytes: 12045979845623131232n,
       Networks: [
@@ -197,6 +218,9 @@ export const store = createStore({
     },
     setContractTab (state, tab) {
       state.ContractTab = tab
+    },
+    setFilecoinAccounts (state, accounts) {
+      state.FilecoinAccounts = accounts
     }
   },
   getters: {
@@ -265,6 +289,9 @@ export const store = createStore({
     },
     contractTab (state) {
       return state.ContractTab
+    },
+    filecoinAccounts (state) {
+      return state.FilecoinAccounts
     }
   }
 })

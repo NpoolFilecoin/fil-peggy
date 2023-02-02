@@ -17,7 +17,6 @@
 
 <script>
 import accountItem from '../components/accountitem.vue'
-import { AccountUsedFors } from '../const/account_used_for'
 
 export default {
   name: 'filecoinAccounts',
@@ -26,26 +25,6 @@ export default {
   },
   data () {
     return {
-      accounts: [
-        {
-          Address: 't121346456456546',
-          Name: 'Filecoin Hyperspace Test Account',
-          Balance: 2574561321313212312312321n,
-          UsedFor: AccountUsedFors.FundsAccount,
-          Warm: true
-        }, {
-          Address: 't1213464564565safdsaasfd46',
-          Name: 'Filecoin Hyperspace Test Account1',
-          Balance: 2574561321313212312312321n,
-          UsedFor: AccountUsedFors.InitialOwner,
-          Warm: true
-        }, {
-          Address: 't1213464564565safdsaasfd46',
-          Name: 'F07824 Worker',
-          Balance: 2574561321313212312312321n,
-          Warm: false
-        }
-      ]
     }
   },
   mounted () {
@@ -55,6 +34,11 @@ export default {
     this.$store.commit('setToolbarTitle', 'Filecoin Accounts')
   },
   methods: {
+  },
+  computed: {
+    accounts () {
+      return this.$store.getters.filecoinAccounts
+    }
   }
 }
 </script>
