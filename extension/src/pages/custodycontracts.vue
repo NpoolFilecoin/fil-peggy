@@ -112,7 +112,6 @@ export default {
       contractsText: 'My Contracts',
       minersIcon: '../assets/icons/miners-40x40.png',
       minersText: 'My Miners',
-      curTab: 'contracts',
       addingContract: false,
       addingMiner: false,
       contractCodeId: '',
@@ -140,10 +139,10 @@ export default {
   },
   methods: {
     onContractsClick: function () {
-      this.curTab = 'contracts'
+      this.$store.commit('setContractTab', 'contracts')
     },
     onMinersClick: function () {
-      this.curTab = 'miners'
+      this.$store.commit('setContractTab', 'miners')
     },
     onContractClick: function (contract) {
       if (this.addingContract) {
@@ -328,6 +327,12 @@ export default {
     },
     miners () {
       return this.$store.getters.miners
+    },
+    curTab () {
+      if (!this.$store.getters.contractTab) {
+        return 'contracts'
+      }
+      return this.$store.getters.contractTab
     }
   }
 }

@@ -115,7 +115,8 @@ export const store = createStore({
       ],
       SelectedNetwork: 'Filecoin Hyperspace Testnet',
       ShowGlobalTip: false,
-      GlobalTipText: ''
+      GlobalTipText: '',
+      ContractTab: 'contracts'
     }
   },
   mutations: {
@@ -193,6 +194,9 @@ export const store = createStore({
       }
 
       state.Networks[index] = network
+    },
+    setContractTab (state, tab) {
+      state.ContractTab = tab
     }
   },
   getters: {
@@ -258,6 +262,9 @@ export const store = createStore({
     },
     globalTipText (state) {
       return state.GlobalTipText
+    },
+    contractTab (state) {
+      return state.ContractTab
     }
   }
 })
