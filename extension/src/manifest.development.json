@@ -26,5 +26,8 @@
         "64": "assets/logos/64x64.png",
         "128": "assets/logos/128x128.png",
         "256": "assets/logos/256x256.png"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
     }
 }

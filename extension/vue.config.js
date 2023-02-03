@@ -60,7 +60,23 @@ module.exports = {
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
       })
-    ]
+    ],
+    experiments :{
+      syncWebAssembly: true,
+      asyncWebAssembly: true,
+    },
+    optimization: {
+      minimize: true,
+    },
+    resolve: {
+      alias: {
+        '@zondax/filecoin-signing-tools': '@zondax/filecoin-signing-tools/js'
+      },
+      fallback: {
+        'assert': require.resolve('assert/'),
+        'stream': require.resolve('stream-browserify')
+      }
+    }
   },
   css: {
     extract: false // Make sure the css is the same

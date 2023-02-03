@@ -156,6 +156,7 @@ import { durationDisplay } from '../utils/time_display'
 import { activityDir } from '../utils/activity_dir'
 import { ActivityDirs } from '../const/contract_types'
 import { LocalStorageKeys } from '../const/store_keys'
+import { mpoolGetNonce, setOwner } from '../filapi/filapi'
 
 export default {
   name: 'myMiner',
@@ -225,12 +226,35 @@ export default {
         this.$store.commit('setGlobalTipText', '<span style="color: red">Need to import owner<span>')
         return
       }
+
       this.custoding = true
     },
     onCustodyClick: function () {
       if (this.contractAddress.length === 0) {
         return
       }
+
+      const network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+
+      mpoolGetNonce(network.HttpEndpoint, this.miner.OwnerAddress)
+        .then((resp) => {
+          this.setOwner(resp.data.result)
+            .then((resp) => {
+              console.log(resp)
+            })
+            .catch(() => {
+              this.$store.commit('setShowGlobalTip', true)
+            this.$store.commit('setGlobalTipText', '<span style="color: red">Fail set owner<span>')
+            })
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$store.commit('setShowGlobalTip', true)
+          this.$store.commit('setGlobalTipText', '<span style="color: red">Fail get nonce<span>')
+        })
 
       this.custoding = false
     },
@@ -239,6 +263,30 @@ export default {
     },
     onFindClick: function () {
       // TODO: goto peggy website
+    },
+    setOwner: function (nonce) {
+      const network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+
+      let owner = this.$store.getters.filecoinAccountByAddress(this.miner.OwnerAddress)
+      if (!owner || owner.PrivateKey.length === 0 || !owner.Warm) {
+        return
+      }
+
+      if (this.contractAddress.length === 0) {
+        return
+      }
+
+      return setOwner(
+        network.HttpEndpoint,
+        this.minerId,
+        this.miner.OwnerAddress,
+        owner.PrivateKey,
+        nonce,
+        this.contractAddress
+      )
     }
   },
   computed: {

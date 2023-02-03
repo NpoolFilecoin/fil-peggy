@@ -6,7 +6,8 @@ import {
   KeyTypes,
   privateKeyToAddress
 } from './wallet.js'
-import { ethAddressFromDelegated } from '@glif/filecoin-address'
+import { ethAddressFromDelegated, Network } from '@glif/filecoin-address'
+import { SingleKeyProvider } from '@glif/local-managed-provider'
 
 export const checkAlive = (rpc) => {
   return new Promise((resolve, reject) => {
@@ -86,8 +87,42 @@ export const ethAddress = (filAddr) => {
   return ethAddressFromDelegated(filAddr)
 }
 
-/*
-export const setOwner = (rpc, minerId, curOwnerPrivKey, newOwner) => {
-  let web3 = new Web3(rpc);
+export const mpoolGetNonce = (rpc, accountId) => {
+  let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+  return axios
+    .post(rpc, {
+      jsonrpc: '2.0',
+      method: 'Filecoin.MpoolGetNonce',
+      params: [accountId],
+      id: rpcId
+    }, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
 }
-*/
+
+export const setOwner = (rpc, minerId, curOwnerAddress, curOwnerPrivKey, curOwnerNonce, newOwner) => {
+  const message = {
+    To: minerId,
+    From: curOwnerAddress,
+    Nonce: curOwnerNonce,
+    Value: '0',
+    GasLimit: 3000000,
+    GasFeeCap: '100000000',
+    GasPremium: '100000000',
+    Method: 23,
+    Params: newOwner
+  }
+
+  const provider = new SingleKeyProvider(curOwnerPrivKey, Network.TEST)
+  return new Promise((resolve, reject) => {
+    provider.sign(curOwnerAddress, message)
+      .then((resp) => {
+        resolve(resp)
+      })
+      .catch(() => {
+        reject()
+      })
+  })
+}
