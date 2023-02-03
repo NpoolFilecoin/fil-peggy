@@ -98,7 +98,7 @@ import { GlobalEvents } from '../const/global_events'
 import { evbus } from '../evbus/event_bus'
 import { LocalStorageKeys } from '../const/store_keys'
 import { checkPeggy } from '../web3/peggy'
-import { minerInfo } from '../filapi/filapi'
+import { minerInfo, stateGetActor, ethAddress } from '../filapi/filapi'
 
 export default {
   name: 'custodyContracts',
@@ -277,15 +277,37 @@ export default {
         }
 
         miner.MinerId = this.minerId
-
-        // TODO: get other miner info
         miner.EstimateDailyReward = 123.0
-
         miners.push(miner)
 
         this.$store.commit('setMiners', miners)
         localStorage.setItem(LocalStorageKeys.Miners, JSON.stringify(miners))
+
+        this.fillMinerInfo(miner)
       })
+    },
+    fillMinerInfo: function (miner) {
+      let network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+      stateGetActor(network.HttpEndpoint, miner.Owner)
+        .then((resp) => {
+          if (!resp.data.result.Address) {
+            return
+          }
+          let addr = ethAddress(resp.data.result.Address)
+          checkPeggy(network.RpcEndpoint, addr)
+            .then(() => {
+              miner.CustodyContract = addr
+              this.$store.commit('updateMiner', miner)
+              let miners = this.$store.getters.miners
+              localStorage.setItem(LocalStorageKeys.Miners, JSON.stringify(miners))
+            })
+        })
+        .catch(() => {
+          self.$store.commit('setGlobalTipText', '<span style="color: red">Invalid Owner<span>')
+        })
     },
     onCancelMinerClick: function () {
       this.addingMiner = false

@@ -223,6 +223,18 @@ export const store = createStore({
     },
     setFilecoinAccounts (state, accounts) {
       state.FilecoinAccounts = accounts
+    },
+    updateMiner (state, miner) {
+      if (state.Miners === null || state.Miners === undefined) {
+        return
+      }
+
+      let index = state.Miners.findIndex(mi => mi.MinerId === miner.MinerId)
+      if (index < 0) {
+        return
+      }
+
+      state.Miners[index] = miner
     }
   },
   getters: {

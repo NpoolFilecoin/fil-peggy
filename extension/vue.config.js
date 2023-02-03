@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const webpack = require("webpack")
 
 // Generate pages object
 const pages = {}
@@ -55,6 +56,11 @@ module.exports = {
       chunkFilename: `[name].js`
     },
     devtool: isDevMode ? 'inline-source-map' : false,
+    plugins: [
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+      })
+    ]
   },
   css: {
     extract: false // Make sure the css is the same

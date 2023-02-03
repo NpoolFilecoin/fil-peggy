@@ -1,7 +1,12 @@
 import axios from 'axios'
 import Web3 from 'web3'
 import { serializeBigNum } from './sign.js'
-import { generateAddress, KeyTypes, privateKeyToAddress } from './wallet.js'
+import {
+  generateAddress,
+  KeyTypes,
+  privateKeyToAddress
+} from './wallet.js'
+import { ethAddressFromDelegated } from '@glif/filecoin-address'
 
 export const checkAlive = (rpc) => {
   return new Promise((resolve, reject) => {
@@ -60,6 +65,25 @@ export const stateAccountKey = (rpc, accountId) => {
         "Content-Type": "application/json"
       }
     })
+}
+
+export const stateGetActor = (rpc, actorId) => {
+  let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+  return axios
+    .post(rpc, {
+      jsonrpc: '2.0',
+      method: 'Filecoin.StateGetActor',
+      params: [actorId, []],
+      id: rpcId
+    }, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+}
+
+export const ethAddress = (filAddr) => {
+  return ethAddressFromDelegated(filAddr)
 }
 
 /*
