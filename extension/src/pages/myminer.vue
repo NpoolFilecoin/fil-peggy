@@ -156,7 +156,13 @@ import { durationDisplay } from '../utils/time_display'
 import { activityDir } from '../utils/activity_dir'
 import { ActivityDirs } from '../const/contract_types'
 import { LocalStorageKeys } from '../const/store_keys'
-import { mpoolGetNonce, setOwner, stateLookupId, delegateAddress } from '../filapi/filapi'
+import {
+  mpoolGetNonce,
+  setOwner,
+  stateLookupId,
+  delegateAddress,
+  stateWaitMsg
+} from '../filapi/filapi'
 
 export default {
   name: 'myMiner',
@@ -243,10 +249,9 @@ export default {
         .then((resp) => {
           this.setOwner(resp.data.result)
             .then((resp) => {
-              console.log(resp)
+              this.waitMessage(resp.data.result['/'])
             })
-            .catch((error) => {
-              console.log(error)
+            .catch(() => {
               this.$store.commit('setShowGlobalTip', true)
               this.$store.commit('setGlobalTipText', '<span style="color: red">Fail set owner<span>')
             })
@@ -257,6 +262,22 @@ export default {
         })
 
       this.custoding = false
+    },
+    waitMessage: function (cid) {
+      const network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+      stateWaitMsg(network.HttpEndpoint, cid)
+        .then((resp) => {
+          console.log(resp)
+        })
+        .catch((error) => {
+          console.log(error)
+          setTimeout(() => {
+            this.waitMessage(cid)
+          }, 30000)
+        })
     },
     onCancelClick: function () {
       this.custoding = false

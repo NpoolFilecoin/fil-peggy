@@ -103,6 +103,21 @@ export const stateGetActor = (rpc, actorId) => {
     })
 }
 
+export const stateWaitMsg = (rpc, cid) => {
+  let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+  return axios
+    .post(rpc, {
+      jsonrpc: '2.0',
+      method: 'Filecoin.StateWaitMsg',
+      params: [{'/': cid}, 2, 10, true],
+      id: rpcId
+    }, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+}
+
 export const ethAddress = (filAddr) => {
   return ethAddressFromDelegated(filAddr)
 }
@@ -169,7 +184,6 @@ export const setOwner = (rpc, minerId, curOwnerAddress, curOwnerPrivKey, curOwne
             }
           })
           .then((resp) => {
-            console.log(resp)
             resolve(resp)
           })
           .catch((error) => {
