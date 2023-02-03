@@ -513,6 +513,7 @@ export default {
 
 .popup .area select {
   width: 100%;
+  border: 1px solid #0D99FF;
 }
 
 .popup .area select option {
