@@ -98,7 +98,12 @@ import { GlobalEvents } from '../const/global_events'
 import { evbus } from '../evbus/event_bus'
 import { LocalStorageKeys } from '../const/store_keys'
 import { checkPeggy } from '../web3/peggy'
-import { minerInfo, stateGetActor, ethAddress } from '../filapi/filapi'
+import {
+  minerInfo,
+  stateGetActor,
+  ethAddress,
+  stateAccountKey
+} from '../filapi/filapi'
 
 export default {
   name: 'custodyContracts',
@@ -294,8 +299,16 @@ export default {
       stateGetActor(network.HttpEndpoint, miner.Owner)
         .then((resp) => {
           if (!resp.data.result.Address) {
+            stateAccountKey(network.RpcEndpoint, miner.Owner)
+              .then((resp) => {
+                miner.OwnerAddress = resp.data.result
+                this.$store.commit('updateMiner', miner)
+                let miners = this.$store.getters.miners
+                localStorage.setItem(LocalStorageKeys.Miners, JSON.stringify(miners))
+              })
             return
           }
+          miner.OwnerAddress = resp.data.result.Address
           let addr = ethAddress(resp.data.result.Address)
           checkPeggy(network.RpcEndpoint, addr)
             .then(() => {

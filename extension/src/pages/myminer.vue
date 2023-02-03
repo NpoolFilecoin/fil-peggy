@@ -20,6 +20,18 @@
           <span class='left'>Miner ID</span>
           <span class='right miner-id'>{{ miner.MinerId }}</span>
         </div>
+        <div class='line'>
+          <span class='left'>Owner ID</span>
+          <span class='right'>{{ miner.Owner }}</span>
+        </div>
+        <div class='line'>
+          <span class='left'>Owner Address</span>
+          <span class='right'>{{ miner.OwnerAddress }}</span>
+        </div>
+        <div class='line'>
+          <span class='left'>Worker ID</span>
+          <span class='right'>{{ miner.Worker }}</span>
+        </div>
         <div v-if='miner && miner.CustodyContract' class='line'>
           <span class='left'>Owner Contract</span>
           <span class='right contract-address'>{{ miner.CustodyContract }}</span>
