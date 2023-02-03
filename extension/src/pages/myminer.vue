@@ -247,11 +247,10 @@ export default {
             })
             .catch(() => {
               this.$store.commit('setShowGlobalTip', true)
-            this.$store.commit('setGlobalTipText', '<span style="color: red">Fail set owner<span>')
+              this.$store.commit('setGlobalTipText', '<span style="color: red">Fail set owner<span>')
             })
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(() => {
           this.$store.commit('setShowGlobalTip', true)
           this.$store.commit('setGlobalTipText', '<span style="color: red">Fail get nonce<span>')
         })
@@ -281,7 +280,7 @@ export default {
 
       return setOwner(
         network.HttpEndpoint,
-        this.minerId,
+        this.miner.MinerId,
         this.miner.OwnerAddress,
         owner.PrivateKey,
         nonce,

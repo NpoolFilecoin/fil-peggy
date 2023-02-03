@@ -115,14 +115,16 @@ export const setOwner = (rpc, minerId, curOwnerAddress, curOwnerPrivKey, curOwne
     Params: newOwner
   }
 
+  console.log(message)
+
   const provider = new SingleKeyProvider(curOwnerPrivKey, Network.TEST)
   return new Promise((resolve, reject) => {
     provider.sign(curOwnerAddress, message)
       .then((resp) => {
         resolve(resp)
       })
-      .catch(() => {
-        reject()
+      .catch((error) => {
+        reject(error)
       })
   })
 }
