@@ -121,7 +121,27 @@ export const setOwner = (rpc, minerId, curOwnerAddress, curOwnerPrivKey, curOwne
   return new Promise((resolve, reject) => {
     provider.sign(curOwnerAddress, message)
       .then((resp) => {
-        resolve(resp)
+        let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+        axios
+          .post(rpc, {
+            jsonrpc: '2.0',
+            method: 'Filecoin.MpoolPush',
+            params: [{
+              Message: resp,
+            }],
+            id: rpcId
+          }, {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+          .then((resp) => {
+            console.log(resp)
+            resolve(resp)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
       .catch((error) => {
         reject(error)
