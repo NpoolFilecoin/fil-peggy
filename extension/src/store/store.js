@@ -133,7 +133,8 @@ export const store = createStore({
           Title: 'Filecoin Hyperspace Testnet',
           RpcEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1',
           HttpEndpoint: 'https://api.hyperspace.node.glif.io/rpc/v1',
-          Connected: true
+          Connected: true,
+          Testnet: true
         }
       ],
       SelectedNetwork: 'Filecoin Hyperspace Testnet',
@@ -307,11 +308,11 @@ export const store = createStore({
     filecoinAccounts (state) {
       return state.FilecoinAccounts
     },
-    filecoinAccountByAddress: (state) => (id) => {
+    filecoinAccountByAddress: (state) => (address) => {
       if (state.FilecoinAccounts === null || state.FilecoinAccounts === undefined) {
         return undefined
       }
-      return state.FilecoinAccounts.find(account => account.Address === id)
+      return state.FilecoinAccounts.find(account => account.Address.substring(1) === address.substring(1))
     }
   }
 })

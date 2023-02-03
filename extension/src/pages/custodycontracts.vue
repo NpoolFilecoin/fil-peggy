@@ -137,6 +137,9 @@ export default {
     let miners = localStorage.getItem(LocalStorageKeys.Miners)
     this.$store.commit('setMiners', JSON.parse(miners))
 
+    let accounts = localStorage.getItem(LocalStorageKeys.FilecoinAccounts)
+    this.$store.commit('setFilecoinAccounts', JSON.parse(accounts))
+
     evbus.on(GlobalEvents.ToolbarAddClick, this.onAddClick)
   },
   unmounted () {

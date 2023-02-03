@@ -11,6 +11,9 @@
       <div v-if='httpEndpoint' class='endpoint'>
         {{ httpEndpoint }}
       </div>
+      <div v-if='testnet' class='tags'>
+        <span class='tag'>Testnet</span>
+      </div>
     </div>
     <img class='delete' src='../assets/icons/delete-24x24.png' v-on:click='onDeleteClick' />
   </div>
@@ -34,6 +37,10 @@ export default {
     httpEndpoint: {
       type: String,
       required: false
+    },
+    testnet: {
+      type: Boolean,
+      required: true
     }
   },
   data () {
@@ -114,6 +121,7 @@ export default {
 
 .item .inner .endpoint {
   color: #0D99FF;
+  margin-left: 20px;
 }
 
 .item .delete {
@@ -121,5 +129,18 @@ export default {
   width: 24px;
   float: right;
   cursor: pointer;
+}
+
+.item .inner .tags {
+  margin-top: 6px;
+}
+
+.item .inner .tags .tag {
+  border: 1px solid white;
+  background-color: #28D90C;
+  color: white;
+  padding: 2px 6px 2px 6px;
+  border-radius: 4px;
+  margin-left: 20px;
 }
 </style>

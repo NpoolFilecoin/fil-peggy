@@ -11,6 +11,7 @@
         :title='network.Title'
         :rpc-endpoint='network.RpcEndpoint'
         :http-endpoint='network.HttpEndpoint'
+        :testnet='network.Testnet'
       />
     </div>
   </div>
