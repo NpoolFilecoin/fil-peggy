@@ -319,6 +319,7 @@ export default {
             })
         })
         .catch(() => {
+          self.$store.commit('setShowGlobalTip', true)
           self.$store.commit('setGlobalTipText', '<span style="color: red">Invalid Owner<span>')
         })
     },

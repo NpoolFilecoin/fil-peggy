@@ -219,6 +219,12 @@ export default {
       this.$router.back()
     },
     onCustodyMinerClick: function () {
+      let owner = this.$store.getters.filecoinAccountByAddress(this.miner.OwnerAddress)
+      if (!owner || owner.PrivateKey.length === 0 || !owner.Warm) {
+        this.$store.commit('setShowGlobalTip', true)
+        this.$store.commit('setGlobalTipText', '<span style="color: red">Need to import owner<span>')
+        return
+      }
       this.custoding = true
     },
     onCustodyClick: function () {
