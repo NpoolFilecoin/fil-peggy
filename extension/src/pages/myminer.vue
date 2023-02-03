@@ -156,7 +156,7 @@ import { durationDisplay } from '../utils/time_display'
 import { activityDir } from '../utils/activity_dir'
 import { ActivityDirs } from '../const/contract_types'
 import { LocalStorageKeys } from '../const/store_keys'
-import { mpoolGetNonce, setOwner } from '../filapi/filapi'
+import { mpoolGetNonce, setOwner, stateLookupId, delegateAddress } from '../filapi/filapi'
 
 export default {
   name: 'myMiner',
@@ -245,7 +245,8 @@ export default {
             .then((resp) => {
               console.log(resp)
             })
-            .catch(() => {
+            .catch((error) => {
+              console.log(error)
               this.$store.commit('setShowGlobalTip', true)
               this.$store.commit('setGlobalTipText', '<span style="color: red">Fail set owner<span>')
             })
@@ -278,14 +279,29 @@ export default {
         return
       }
 
-      return setOwner(
-        network.HttpEndpoint,
-        this.miner.MinerId,
-        this.miner.OwnerAddress,
-        owner.PrivateKey,
-        nonce,
-        this.contractAddress
-      )
+      return new Promise((resolve, reject) => {
+        let filAddr = delegateAddress(this.contractAddress)
+        stateLookupId(network.HttpEndpoint, filAddr)
+          .then((resp) => {
+            setOwner(
+              network.HttpEndpoint,
+              this.miner.MinerId,
+              this.miner.OwnerAddress,
+              owner.PrivateKey,
+              nonce,
+              resp.data.result
+            )
+            .then((resp) => {
+              resolve(resp)
+            })
+            .catch((error) => {
+              reject(error)
+            })
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   },
   computed: {

@@ -6,7 +6,12 @@ import {
   KeyTypes,
   privateKeyToAddress
 } from './wallet.js'
-import { ethAddressFromDelegated, Network } from '@glif/filecoin-address'
+import {
+  ethAddressFromDelegated,
+  Network,
+  delegatedFromEthAddress,
+  newFromString
+} from '@glif/filecoin-address'
 import { SingleKeyProvider } from '@glif/local-managed-provider'
 
 export const checkAlive = (rpc) => {
@@ -68,6 +73,21 @@ export const stateAccountKey = (rpc, accountId) => {
     })
 }
 
+export const stateLookupId = (rpc, address) => {
+  let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+  return axios
+    .post(rpc, {
+      jsonrpc: '2.0',
+      method: 'Filecoin.StateLookupID',
+      params: [address, []],
+      id: rpcId
+    }, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+}
+
 export const stateGetActor = (rpc, actorId) => {
   let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
   return axios
@@ -87,6 +107,10 @@ export const ethAddress = (filAddr) => {
   return ethAddressFromDelegated(filAddr)
 }
 
+export const delegateAddress = (ethAddr) => {
+  return delegatedFromEthAddress(ethAddr)
+}
+
 export const mpoolGetNonce = (rpc, accountId) => {
   let rpcId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
   return axios
@@ -103,6 +127,19 @@ export const mpoolGetNonce = (rpc, accountId) => {
 }
 
 export const setOwner = (rpc, minerId, curOwnerAddress, curOwnerPrivKey, curOwnerNonce, newOwner) => {
+  let addr = newFromString(newOwner)
+  // TODO: use cbor encode
+
+  let array = new Uint8Array(addr.bytes.length + 1)
+  array[0] = 2 << 5 | addr.bytes.length
+  for (let i = 0; i < addr.bytes.length; i++) {
+    array[i + 1] = addr.bytes[i]
+  }
+
+  // f07113: QwDJNw==
+
+  let params = Buffer.from(array).toString('base64')
+
   const message = {
     To: minerId,
     From: curOwnerAddress,
@@ -112,10 +149,8 @@ export const setOwner = (rpc, minerId, curOwnerAddress, curOwnerPrivKey, curOwne
     GasFeeCap: '100000000',
     GasPremium: '100000000',
     Method: 23,
-    Params: newOwner
+    Params: params
   }
-
-  console.log(message)
 
   const provider = new SingleKeyProvider(curOwnerPrivKey, Network.TEST)
   return new Promise((resolve, reject) => {
@@ -126,9 +161,7 @@ export const setOwner = (rpc, minerId, curOwnerAddress, curOwnerPrivKey, curOwne
           .post(rpc, {
             jsonrpc: '2.0',
             method: 'Filecoin.MpoolPush',
-            params: [{
-              Message: resp,
-            }],
+            params: [resp],
             id: rpcId
           }, {
             headers: {
