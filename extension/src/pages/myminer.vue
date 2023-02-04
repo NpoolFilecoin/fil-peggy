@@ -163,6 +163,7 @@ import {
   delegateAddress,
   stateWaitMsg
 } from '../filapi/filapi'
+import { custodyMiner } from '../web3/peggy'
 
 export default {
   name: 'myMiner',
@@ -270,14 +271,35 @@ export default {
       }
       stateWaitMsg(network.HttpEndpoint, cid)
         .then((resp) => {
-          console.log(resp)
+          if (resp.data.result.Receipt.ExitCode != 0) {
+            return
+          }
+          this.custodyMiner()
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(() => {
           setTimeout(() => {
             this.waitMessage(cid)
           }, 30000)
         })
+    },
+    custodyMiner: function () {
+      const network = this.$store.getters.selectedNetwork
+      if (!network) {
+        return
+      }
+      this.$store.commit('setShowGlobalTip', true)
+      custodyMiner(network.RpcEndpoint, this.contractAddress, this.miner.MinerId, [], [])
+        .then(() => {
+          this.updateMinerInfo()
+          this.$store.commit('setGlobalTipText', '<span style="color: green">Success custody miner<span>')
+        })
+        .catch(() => {
+          this.$store.commit('setGlobalTipText', '<span style="color: red">Fail custody miner<span>')
+        })
+    },
+    updateMinerInfo: function () {
+      // TODO: update miner info
+      console.log('TODO: update miner info')
     },
     onCancelClick: function () {
       this.custoding = false
