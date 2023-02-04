@@ -208,14 +208,18 @@ export const checkPeggy = (rpc, contractAddress) => {
   })
 }
 
-export const custodyMiner = (rpc, contractAddress, minerId, feeBeneficiaries, rewardBeneficiaries) => {
+export const custodyMiner = (rpc, from, fromPrivKey, contractAddress, minerId, feeBeneficiaries, rewardBeneficiaries) => {
 	let idAddress = newFromString(minerId)
 	let mid = idFromAddress(idAddress)
 
 	return new Promise((resolve, reject) => {
     let web3 = new Web3(rpc)
     let contract = new web3.eth.Contract(abi, contractAddress)
-    contract.methods.custodyMiner(mid, feeBeneficiaries, rewardBeneficiaries).call()
+		web3.eth.accounts.wallet.add(fromPrivKey)
+    contract.methods.custodyMiner(mid, feeBeneficiaries, rewardBeneficiaries).send({
+			from: from,
+			gas: 3000000
+		})
     .then(result => {
       resolve(result)
     })

@@ -287,13 +287,21 @@ export default {
       if (!network) {
         return
       }
+
+      let address = '0xE6d80a2806f4f3805Ec95122Bc3845dED31C2164'
+      let account = this.$store.getters.filecoinAccountByAddress(address)
+      if (!account) {
+        return
+      }
+
       this.$store.commit('setShowGlobalTip', true)
-      custodyMiner(network.RpcEndpoint, this.contractAddress, this.miner.MinerId, [], [])
+      custodyMiner(network.RpcEndpoint, address, account.PrivateKey, this.contractAddress, this.miner.MinerId, [], [])
         .then(() => {
           this.updateMinerInfo()
           this.$store.commit('setGlobalTipText', '<span style="color: green">Success custody miner<span>')
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log(error)
           this.$store.commit('setGlobalTipText', '<span style="color: red">Fail custody miner<span>')
         })
     },

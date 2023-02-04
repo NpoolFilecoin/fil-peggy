@@ -8,6 +8,7 @@
       <div class='info'>
         <span v-if='usedFor' class='tag'>{{ usedFor }}</span>
         <span class='tag'>{{ warm ? 'Warm' : 'Cold' }}</span>
+        <span v-if='blockchain' class='tag'>{{ blockchain }}</span>
       </div>
     </div>
     <img class='icon' src='../assets/icons/delete-24x24.png' />
@@ -40,6 +41,10 @@ export default {
     balance: {
       // eslint-disable-next-line no-undef
       type: BigInt,
+      required: true
+    },
+    blockchain: {
+      type: String,
       required: true
     }
   },

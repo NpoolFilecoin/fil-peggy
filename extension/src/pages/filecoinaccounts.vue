@@ -10,6 +10,7 @@
         :warm='account.Warm'
         :balance='account.Balance'
         :name='account.Name'
+        :blockchain='account.Blockchain'
       />
     </div>
   </div>
@@ -50,6 +51,8 @@ import accountItem from '../components/accountitem.vue'
 import { LocalStorageKeys } from '../const/store_keys'
 import { evbus } from '../evbus/event_bus'
 import { importWallet } from '../filapi/filapi'
+import { privateKeyToAccount } from '../web3/web3'
+import { Blockchains } from '../const/blockchain_def'
 
 export default {
   name: 'filecoinAccounts',
@@ -61,7 +64,8 @@ export default {
       adding: false,
       privateKey: '',
       address: '',
-      addressName: ''
+      addressName: '',
+      blockchain: Blockchains.FIL
     }
   },
   mounted () {
@@ -99,7 +103,8 @@ export default {
         Address: this.address,
         Name: this.addressName,
         Warm: this.privateKey.length > 0,
-        PrivateKey: this.privateKey
+        PrivateKey: this.privateKey,
+        Blockchain: this.blockchain
       })
 
       this.$store.commit('setFilecoinAccounts', accounts)
@@ -112,8 +117,14 @@ export default {
       this.adding = false
     },
     onPrivateKeyEntered: function () {
-      let address = importWallet(this.privateKey)
-      this.address = address.Address
+      try {
+        let address = importWallet(this.privateKey)
+        this.address = address.Address
+      } catch {
+        let address = privateKeyToAccount(this.privateKey)
+        this.address = address.address
+        this.blockchain = Blockchains.ETH
+      }
     }
   },
   computed: {

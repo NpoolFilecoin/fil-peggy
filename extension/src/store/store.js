@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 
 import { CustodyTypes, ActivityTypes } from '../const/contract_types'
 import { AccountUsedFors } from '../const/account_used_for'
+import { Blockchains } from '../const/blockchain_def'
 
 export const store = createStore({
   state () {
@@ -111,19 +112,22 @@ export const store = createStore({
           Balance: 2574561321313212312312321n,
           UsedFor: AccountUsedFors.FundsAccount,
           Warm: true,
-          PriavateKey: ''
+          PriavateKey: '',
+          Blockchain: Blockchains.FIL
         }, {
           Address: 't1213464564565safdsaasfd46',
           Name: 'Filecoin Hyperspace Test Account1',
           Balance: 2574561321313212312312321n,
           UsedFor: AccountUsedFors.InitialOwner,
           Warm: true,
-          PriavateKey: ''
+          PriavateKey: '',
+          Blockchain: Blockchains.FIL
         }, {
           Address: 't1213464564565safdsaasfd46',
           Name: 'F07824 Worker',
           Balance: 2574561321313212312312321n,
-          Warm: false
+          Warm: false,
+          Blockchain: Blockchains.FIL
         }
       ],
       NetworkRawPowerBytes: 1245321321323131232n,
