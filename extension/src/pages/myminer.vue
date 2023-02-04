@@ -233,6 +233,9 @@ export default {
         this.$store.commit('setGlobalTipText', '<span style="color: red">Need to import owner<span>')
         return
       }
+      if (this.miner.CustodyContract) {
+        return
+      }
 
       this.custoding = true
     },
@@ -308,6 +311,7 @@ export default {
     updateMinerInfo: function () {
       // TODO: update miner info
       console.log('TODO: update miner info')
+      // TODO: update contract info
     },
     onCancelClick: function () {
       this.custoding = false
