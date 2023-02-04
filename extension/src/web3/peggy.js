@@ -218,7 +218,7 @@ export const custodyMiner = (rpc, from, fromPrivKey, contractAddress, minerId, f
 		web3.eth.accounts.wallet.add(fromPrivKey)
     contract.methods.custodyMiner(mid, feeBeneficiaries, rewardBeneficiaries).send({
 			from: from,
-			gas: 3000000
+			gas: 300000000
 		})
     .then(result => {
       resolve(result)
