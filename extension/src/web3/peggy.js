@@ -5,6 +5,66 @@ const abi = JSON.parse(`[
 	{
 		"inputs": [
 			{
+				"internalType": "uint64",
+				"name": "minerId",
+				"type": "uint64"
+			},
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "beneficiary",
+						"type": "address"
+					},
+					{
+						"internalType": "uint8",
+						"name": "percent",
+						"type": "uint8"
+					}
+				],
+				"internalType": "struct Beneficiary.FeeBeneficiary[]",
+				"name": "feeBeneficiaries",
+				"type": "tuple[]"
+			},
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "beneficiary",
+						"type": "address"
+					},
+					{
+						"internalType": "uint8",
+						"name": "percent",
+						"type": "uint8"
+					}
+				],
+				"internalType": "struct Beneficiary.FeeBeneficiary[]",
+				"name": "_rewardBeneficiaries",
+				"type": "tuple[]"
+			}
+		],
+		"name": "custodyMiner",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint64",
+				"name": "minerId",
+				"type": "uint64"
+			}
+		],
+		"name": "playPeggy",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "_custodyType",
 				"type": "string"
@@ -87,53 +147,6 @@ const abi = JSON.parse(`[
 				"internalType": "uint64",
 				"name": "minerId",
 				"type": "uint64"
-			},
-			{
-				"components": [
-					{
-						"internalType": "address",
-						"name": "beneficiary",
-						"type": "address"
-					},
-					{
-						"internalType": "uint8",
-						"name": "percent",
-						"type": "uint8"
-					}
-				],
-				"internalType": "struct Beneficiary.FeeBeneficiary[]",
-				"name": "feeBeneficiaries",
-				"type": "tuple[]"
-			},
-			{
-				"components": [
-					{
-						"internalType": "address",
-						"name": "beneficiary",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "amount",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct Beneficiary.RewardBeneficiary[]",
-				"name": "rewardBeneficiaries",
-				"type": "tuple[]"
-			}
-		],
-		"name": "custodyMiner",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint64",
-				"name": "minerId",
-				"type": "uint64"
 			}
 		],
 		"name": "getMiner",
@@ -174,16 +187,16 @@ const abi = JSON.parse(`[
 		"type": "function"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "whoAmI",
+		"outputs": [
 			{
-				"internalType": "uint64",
-				"name": "minerId",
-				"type": "uint64"
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
-		"name": "playPeggy",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]`)
