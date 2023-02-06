@@ -45,7 +45,6 @@ export default {
       if (!network) {
         return
       }
-      console.log(network)
       checkAlive(network.RpcEndpoint)
         .then(() => {
           network.Connected = true
