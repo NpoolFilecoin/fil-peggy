@@ -85,7 +85,7 @@ export default {
         this.validCustodyContract = false
       })
 
-      minerInfo(network.RpcEndpoint, this.title)
+      minerInfo(network.HttpEndpoint, this.title)
       .then()
       .catch(() => {
         this.validMiner = false

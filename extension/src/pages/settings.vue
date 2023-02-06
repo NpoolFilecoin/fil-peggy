@@ -5,14 +5,17 @@
         <label>Networks</label>
         <img class='icon' src='../assets/icons/add-24x24.png' v-on:click='onAddClick' />
       </div>
-      <networkItem
+      <div
         v-for='(network, index) in networks'
         :key='index'
-        :title='network.Title'
-        :rpc-endpoint='network.RpcEndpoint'
-        :http-endpoint='network.HttpEndpoint'
-        :testnet='network.Testnet'
-      />
+      >
+        <networkItem
+          :title='network.Title'
+          :rpc-endpoint='network.RpcEndpoint'
+          :http-endpoint='network.HttpEndpoint'
+          :testnet='network.Testnet'
+        />
+      </div>
     </div>
   </div>
   <div v-if='adding' class='popup'>

@@ -13,6 +13,7 @@
 
 <script>
 import { checkAlive } from '../filapi/filapi'
+import { LocalStorageKeys } from '../const/store_keys'
 
 export default {
   name: 'headerComponent',
@@ -24,6 +25,9 @@ export default {
     }
   },
   mounted () {
+    let networks = JSON.parse(localStorage.getItem(LocalStorageKeys.Networks))
+    this.$store.commit('setNetworks', networks)
+
     this.checkAlive()
     this.checker = setInterval(() => {
       this.checkAlive()
@@ -41,6 +45,7 @@ export default {
       if (!network) {
         return
       }
+      console.log(network)
       checkAlive(network.RpcEndpoint)
         .then(() => {
           network.Connected = true
