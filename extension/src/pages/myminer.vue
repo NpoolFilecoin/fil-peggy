@@ -274,7 +274,7 @@ export default {
       }
       stateWaitMsg(network.HttpEndpoint, cid)
         .then((resp) => {
-          if (resp.data.result.Receipt.ExitCode != 0) {
+          if (resp.data.result.Receipt.ExitCode !== 0) {
             return
           }
           this.custodyMiner()
