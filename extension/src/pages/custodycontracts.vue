@@ -210,6 +210,10 @@ export default {
           this.addingContract = false
 
           let contracts = this.$store.getters.contracts
+          if (contracts === null || contracts === undefined) {
+            contracts = []
+          }
+
           contracts.push({
             CodeID: this.contractCodeId,
             Title: this.contractActorId,
